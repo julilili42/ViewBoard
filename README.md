@@ -6,6 +6,14 @@
 
 ---
 
+📌 Zusammenarbeit
+
+- Entwicklung: `develop`
+- Releases & Abgaben: `main`
+- Neue Features: `feature/<name>`
+
+---
+
 ## 🎯 Zielgruppe und Konzept
 
 - **Private und geschäftliche Projektteams**
@@ -45,13 +53,6 @@
 - **Firebase** für Authentifizierung, Datenbank und Push
 - **Jetpack Compose** 
 
----
-
-## 📌 Zusammenarbeit
-
-- Hauptentwicklung im Branch `develop`
-- Releases auf `main` (z.B. Abgaben)
-- Feature-Branches: `feature/xyz`
 ---
 
 ## 📄 Lizenz
