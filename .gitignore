@@ -7,6 +7,20 @@
 # BlueJ files
 *.ctxt
 
+# Local properties
+local.properties
+
+# Gradle build output
+/build/
+**/build/
+.gradle/
+
+
+# IDE-specific files
+.idea/
+*.iml
+
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
