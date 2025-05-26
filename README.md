@@ -49,7 +49,8 @@
 
 ## 📌 Zusammenarbeit
 
-- Hauptentwicklung im Branch `main`
+- Hauptentwicklung im Branch `develop`
+- Releases auf `main` (z.B. Abgaben)
 - Feature-Branches: `feature/xyz`
 ---
 
