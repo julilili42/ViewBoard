@@ -4,7 +4,7 @@ import com.example.viewboard.account.Account
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class AccountUniTest {
+class AccountUnitTest {
     @Test
     fun test_checkPassword(){
         val acc = Account("name", "eMail", "crazyPassword123")
