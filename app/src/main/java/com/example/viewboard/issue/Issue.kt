@@ -1,7 +1,7 @@
 package com.example.viewboard.issue
 
 class Issue (
-    private val ID: UInt,                       // immutable //
+    private val ID: UInt,                       // immutable, 0 = not synced //
     private val title: String,
     private val desc: String?,                  // could be null //
     private val creator: String,                // immutable //
