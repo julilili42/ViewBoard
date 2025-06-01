@@ -1,6 +1,7 @@
-package com.example.viewboard
+package com.example.viewboard.ui.account
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,18 +36,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.viewboard.R
+import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.theme.Black
 import com.example.viewboard.ui.theme.BlueGray
 import com.example.viewboard.ui.theme.Roboto
 
 @Composable
-fun TopSection (modifier: Modifier = Modifier) {
+fun TopSection(modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-    val uiColor = if(isSystemInDarkTheme()) Color.White else Black
+        val uiColor = if (isSystemInDarkTheme()) Color.White else Black
 
         Box(contentAlignment = Alignment.TopCenter) {
             Image(
@@ -58,7 +62,10 @@ fun TopSection (modifier: Modifier = Modifier) {
                 contentScale = ContentScale.FillBounds
             )
 
-            Row (modifier = Modifier.padding(top = 80.dp), verticalAlignment = Alignment.CenterVertically){
+            Row(
+                modifier = Modifier.padding(top = 80.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = null,
@@ -92,16 +99,16 @@ fun TopSection (modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun LogInSection(modifier: Modifier = Modifier) {
+fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
     Column(modifier = Modifier
         .fillMaxWidth()
         .wrapContentHeight()
         .padding(horizontal = 30.dp)) {
-        LogInTextField(label = "Email", trailing = "", modifier = Modifier.fillMaxWidth())
+        LoginTextField(label = "Email", trailing = "", modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        LogInTextField(
+        LoginTextField(
             label = "Password",
             trailing = "Forgot?",
             modifier = Modifier.fillMaxWidth()
@@ -110,7 +117,7 @@ fun LogInSection(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
-            onClick = {/*TODO*/ },
+            onClick = {navController.navigate(Screen.HomeScreen.route)},
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp),
@@ -129,8 +136,33 @@ fun LogInSection(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun RegisterSection(modifier: Modifier = Modifier) {
+fun RegisterSection(modifier: Modifier = Modifier, navController: NavController) {
     val uiColor = if (isSystemInDarkTheme()) Color.White else Black
+
+    val annotatedText = buildAnnotatedString {
+        withStyle(
+            style = SpanStyle(
+                color = Color(0xFF94A3BB),
+                fontSize = 14.sp,
+                fontFamily = Roboto,
+                fontWeight = FontWeight.Normal
+            )
+        ) {
+            append("Don't have account?")
+        }
+        withStyle(
+            style = SpanStyle(
+                color = uiColor,
+                fontSize = 14.sp,
+                fontFamily = Roboto,
+                fontWeight = FontWeight.Medium
+            )
+        ) {
+            append(" ")
+            append("Create now")
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxHeight(fraction = 0.8f)
@@ -141,41 +173,22 @@ fun RegisterSection(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .wrapContentWidth(Alignment.CenterHorizontally)
-            .padding(bottom = 24.dp),
-        text = buildAnnotatedString {
-            withStyle(
-                style = SpanStyle(
-                    color = Color(0xFF94A3BB),
-                    fontSize = 14.sp,
-                    fontFamily = Roboto,
-                    fontWeight = FontWeight.Normal
-                )
-            ) {
-                append("Don't have account?")
-            }
-            withStyle(
-                style = SpanStyle(
-                    color = uiColor,
-                    fontSize = 14.sp,
-                    fontFamily = Roboto,
-                    fontWeight = FontWeight.Medium
-                )
-            ) {
-                append(" ")
-                append("Create now")
-            }
-        })
+            .padding(bottom = 24.dp)
+            .clickable(onClick = {navController.navigate(Screen.RegistrationScreen.route)})
+        ,
+        text = annotatedText
+    )
 }
 
 
 @Composable
-fun LogInScreen(modifier: Modifier = Modifier) {
+fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
     Surface() {
         Column(modifier = Modifier.fillMaxSize()) {
             TopSection()
             Spacer(modifier = Modifier.height(36.dp))
-            LogInSection()
-            RegisterSection()
+            LoginSection(navController = navController)
+            RegisterSection(navController = navController)
         }
     }
 }
