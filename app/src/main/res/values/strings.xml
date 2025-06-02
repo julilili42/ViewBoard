@@ -10,4 +10,8 @@
     <string name="Password">Password</string>
     <string name="Save">Save</string>
     <string name="Register">Register now</string>
+    <string name="Projects">Projects</string>
+    <string name="User">User</string>
+    <string name="ActiveProjects">Active Projects</string>
+    <string name="RecentProjects">Recent Projects</string>
 </resources>
