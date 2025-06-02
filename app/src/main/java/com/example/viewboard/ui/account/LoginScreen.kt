@@ -44,7 +44,7 @@ import com.example.viewboard.ui.theme.BlueGray
 import com.example.viewboard.ui.theme.Roboto
 
 @Composable
-fun TopSection(modifier: Modifier = Modifier) {
+fun LoginTopSection(modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -136,7 +136,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
 }
 
 @Composable
-fun RegisterSection(modifier: Modifier = Modifier, navController: NavController) {
+fun LoginRegisterSection(modifier: Modifier = Modifier, navController: NavController) {
     val uiColor = if (isSystemInDarkTheme()) Color.White else Black
 
     val annotatedText = buildAnnotatedString {
@@ -185,10 +185,10 @@ fun RegisterSection(modifier: Modifier = Modifier, navController: NavController)
 fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
     Surface() {
         Column(modifier = Modifier.fillMaxSize()) {
-            TopSection()
+            LoginTopSection()
             Spacer(modifier = Modifier.height(36.dp))
             LoginSection(navController = navController)
-            RegisterSection(navController = navController)
+            LoginRegisterSection(navController = navController)
         }
     }
 }
