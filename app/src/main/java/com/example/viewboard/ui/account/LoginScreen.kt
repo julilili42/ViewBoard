@@ -42,7 +42,13 @@ import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.theme.Black
 import com.example.viewboard.ui.theme.BlueGray
 import com.example.viewboard.ui.theme.Roboto
+import com.example.viewboard.ui.theme.uiColor
 
+/**
+ * Top section of the login screen displaying the background shape, logo, and headings.
+ *
+ * @param modifier optional [Modifier] for layout adjustments
+ */
 @Composable
 fun LoginTopSection(modifier: Modifier = Modifier) {
     Column(
@@ -50,7 +56,7 @@ fun LoginTopSection(modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        val uiColor = if (isSystemInDarkTheme()) Color.White else Black
+        val uiColor = uiColor()
 
         Box(contentAlignment = Alignment.TopCenter) {
             Image(
@@ -98,6 +104,13 @@ fun LoginTopSection(modifier: Modifier = Modifier) {
     }
 }
 
+
+/**
+ * Section containing email and password input fields and the login button.
+ *
+ * @param modifier optional [Modifier] for layout adjustments
+ * @param navController controller used to navigate on successful login
+ */
 @Composable
 fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
     Column(modifier = Modifier
@@ -135,9 +148,15 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
     }
 }
 
+/**
+ * Bottom section offering navigation to the registration screen.
+ *
+ * @param modifier optional [Modifier] for layout adjustments
+ * @param navController controller to navigate to registration
+ */
 @Composable
 fun LoginRegisterSection(modifier: Modifier = Modifier, navController: NavController) {
-    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
+    val uiColor = uiColor()
 
     val annotatedText = buildAnnotatedString {
         withStyle(
@@ -180,7 +199,12 @@ fun LoginRegisterSection(modifier: Modifier = Modifier, navController: NavContro
     )
 }
 
-
+/**
+ * Root composable for the login screen, assembling top, middle, and bottom sections.
+ *
+ * @param modifier optional [Modifier] for layout adjustments
+ * @param navController controller for screen navigation
+ */
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
     Surface() {

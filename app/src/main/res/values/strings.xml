@@ -14,4 +14,5 @@
     <string name="User">User</string>
     <string name="ActiveProjects">Active Projects</string>
     <string name="RecentProjects">Recent Projects</string>
+    <string name="Home">Home Screen</string>
 </resources>

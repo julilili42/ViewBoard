@@ -1,6 +1,5 @@
 package com.example.viewboard.ui.account
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -8,10 +7,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import com.example.viewboard.ui.theme.Black
+import com.example.viewboard.ui.theme.uiColor
 
+/**
+ * A reusable text field for login forms that shows a label and an optional trailing action.
+ *
+ * @param modifier   Optional [Modifier] for layout adjustments.
+ * @param label      The label to display inside the text field (e.g., "Email" or "Password").
+ * @param trailing   The text to show in the trailing icon button (e.g., "Forgot?"); pass an empty
+ *                   string if no trailing action is needed.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginTextField(
@@ -19,7 +25,7 @@ fun LoginTextField(
     label: String,
     trailing: String
 ) {
-    val uiColor = if(isSystemInDarkTheme()) Color.White else Black
+    val uiColor = uiColor()
     TextField(
         modifier = modifier,
         value = "",
