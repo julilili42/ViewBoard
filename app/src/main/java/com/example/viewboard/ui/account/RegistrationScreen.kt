@@ -42,8 +42,13 @@ import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.theme.Black
 import com.example.viewboard.ui.theme.BlueGray
 import com.example.viewboard.ui.theme.Roboto
+import com.example.viewboard.ui.theme.uiColor
 
-
+/**
+ * Top section of the registration screen displaying the background shape, logo, and app title.
+ *
+ * @param modifier Optional [Modifier] for layout adjustments.
+ */
 @Composable
 fun RegisterTopSection(modifier: Modifier = Modifier) {
     Column(
@@ -51,7 +56,7 @@ fun RegisterTopSection(modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        val uiColor = if (isSystemInDarkTheme()) Color.White else Black
+        val uiColor = uiColor()
 
         Box(contentAlignment = Alignment.TopCenter) {
             Image(
@@ -93,10 +98,15 @@ fun RegisterTopSection(modifier: Modifier = Modifier) {
     }
 }
 
-
+/**
+ * Section containing the registration form fields and submit button.
+ *
+ * @param navController Controller used to navigate upon successful registration.
+ * @param modifier Optional [Modifier] for layout adjustments.
+ */
 @Composable
 fun RegisterSection(navController: NavController, modifier: Modifier = Modifier) {
-    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
+    val uiColor = uiColor()
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp),
@@ -140,10 +150,15 @@ fun RegisterSection(navController: NavController, modifier: Modifier = Modifier)
     }
 }
 
-
+/**
+ * Bottom section offering navigation back to the login screen.
+ *
+ * @param navController Controller used to navigate back to login.
+ * @param modifier Optional [Modifier] for layout adjustments.
+ */
 @Composable
 fun RegisterLoginSection(navController: NavController, modifier: Modifier = Modifier) {
-    val uiColor = if (isSystemInDarkTheme()) Color.White else Black
+    val uiColor = uiColor()
 
     val annotatedText = buildAnnotatedString {
         withStyle(
@@ -186,6 +201,13 @@ fun RegisterLoginSection(navController: NavController, modifier: Modifier = Modi
     )
 }
 
+/**
+ * Root composable for the registration screen,
+ * assembling top, form, and footer sections.
+ *
+ * @param modifier Optional [Modifier] for layout adjustments.
+ * @param navController Controller for screen navigation.
+ */
 @Composable
 fun RegistrationScreen(modifier: Modifier = Modifier, navController: NavController) {
     Surface() {
