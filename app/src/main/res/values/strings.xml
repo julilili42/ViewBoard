@@ -15,4 +15,12 @@
     <string name="ActiveProjects">Active Projects</string>
     <string name="RecentProjects">Recent Projects</string>
     <string name="Home">Home Screen</string>
+    <string name="AddIssue">Add Issue</string>
+    <string name="Issues">Issues</string>
+    <string name="Create">Create</string>
+    <string name="Title">Title</string>
+    <string name="Description">Description</string>
+    <string name="Optional">Optional</string>
+    <string name="Assignees">Assignees</string>
+    <string name="Labels">Labels</string>
 </resources>
