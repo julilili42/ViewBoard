@@ -7,11 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.account.LoginScreen
 import com.example.viewboard.ui.account.RegistrationScreen
 import com.example.viewboard.ui.home.HomeScreen
-import com.example.viewboard.ui.home.ProjectDetailScreen
+import com.example.viewboard.ui.project.IssueCreationScreen
+import com.example.viewboard.ui.project.ProjectDetailScreen
 
 /**
  * Sets up the app’s navigation graph using Jetpack Compose Navigation.
@@ -52,5 +52,20 @@ fun Navigation(modifier: Modifier = Modifier) {
             val name = backStackEntry.arguments!!.getString("projectName")!!
             ProjectDetailScreen(projectName = name, navController = navController)
         }
+
+
+        composable(
+            route = Screen.IssueCreationScreen.route,
+            arguments = listOf(navArgument("projectName") {
+                type = NavType.StringType
+            })
+        ) { backStackEntry ->
+            val projectName = backStackEntry.arguments!!.getString("projectName")!!
+            IssueCreationScreen(
+                projectName = projectName, navController = navController,
+                onCreateIssue = {/*TODO*/}
+            )
+        }
+
     }
 }

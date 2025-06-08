@@ -30,4 +30,15 @@ sealed class Screen(val route: String) {
          */
         fun createRoute(projectName: String) = "project/$projectName"
     }
+
+    /** Screen for the adding an Issue */
+    object IssueCreationScreen : Screen(route = "project/{projectName}/add-issue") {
+        /**
+         * Helper to build a concrete route string.
+         *
+         * @param projectName the name (or ID) of the project
+         * @return the route with the placeholder replaced, e.g. "project/MyProject"
+         */
+        fun createRoute(projectName: String) = "project/$projectName/add-issue"
+    }
 }
