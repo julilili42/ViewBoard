@@ -43,6 +43,23 @@ import com.example.viewboard.ui.theme.Black
 import com.example.viewboard.ui.theme.BlueGray
 import com.example.viewboard.ui.theme.Roboto
 import com.example.viewboard.ui.theme.uiColor
+import android.app.Activity
+import android.content.Intent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 /**
  * Top section of the login screen displaying the background shape, logo, and headings.
@@ -113,24 +130,59 @@ fun LoginTopSection(modifier: Modifier = Modifier) {
  */
 @Composable
 fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
-        .padding(horizontal = 30.dp)) {
+    val context = LocalContext.current
+    val activity = context as Activity
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            FirebaseAuth.getInstance().signInWithCredential(credential)
+                .addOnCompleteListener(activity) { authResult ->
+                    if (authResult.isSuccessful) {
+                        Toast.makeText(context, "Willkommen ${authResult.result.user?.displayName}", Toast.LENGTH_SHORT).show()
+                        navController.navigate(Screen.HomeScreen.route)
+                    } else {
+                        Toast.makeText(context, "Fehlgeschlagen", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: ApiException) {
+            Toast.makeText(context, "Fehler: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val signInClient = remember {
+        GoogleSignIn.getClient(
+            context,
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(horizontal = 30.dp)
+    ) {
+        // Email/Passwort-Eingabe
         LoginTextField(label = "Email", trailing = "", modifier = Modifier.fillMaxWidth())
-
         Spacer(modifier = Modifier.height(15.dp))
-
         LoginTextField(
             label = "Password",
             trailing = "Forgot?",
             modifier = Modifier.fillMaxWidth()
         )
-
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Klassischer Login-Button
         Button(
-            onClick = {navController.navigate(Screen.HomeScreen.route)},
+            onClick = { navController.navigate(Screen.HomeScreen.route) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp),
@@ -140,13 +192,35 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
             ),
             shape = RoundedCornerShape(size = 4.dp)
         ) {
-            Text(
-                text = "Log in",
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium)
+            Text("Log in")
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // 🟢 Google-Login-Button
+        Button(
+            onClick = { launcher.launch(signInClient.signInIntent) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF4285F4), // Google-Blau
+                contentColor = Color.White,
+            ),
+            shape = RoundedCornerShape(size = 4.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_google), // ❗ Eigenes Icon in res/drawable/
+                contentDescription = "Google Login",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(18.dp)
             )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Mit Google anmelden")
         }
     }
 }
+
 
 /**
  * Bottom section offering navigation to the registration screen.

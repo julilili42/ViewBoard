@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "126518747800",
+    "project_id": "viewboard-74267",
+    "storage_bucket": "viewboard-74267.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126518747800:android:373b10f70096d027ea66ed",
+        "android_client_info": {
+          "package_name": "com.example.viewboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "126518747800-62pu4amgpvlasesjbc8mq968bi13p08j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7lf9VXckeKHw-Vh2Qw37n5AFeSucvZJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "126518747800-62pu4amgpvlasesjbc8mq968bi13p08j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
