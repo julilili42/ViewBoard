@@ -146,4 +146,13 @@ class Issue (
     public fun resetLabels() {
         m_labels.clear()
     }
+
+    /**
+     * Get all labels
+     *
+     * @return all labels
+     */
+    public fun getLabels() : ArrayList<Label> {
+        return m_labels
+    }
 }
