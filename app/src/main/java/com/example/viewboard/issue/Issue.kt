@@ -1,5 +1,7 @@
 package com.example.viewboard.issue
 
+import com.example.viewboard.label.Label
+
 /**
  * @property ID the ID which is also immutable, use ID=0 if it is not synced with any higher abstraction storage
  * @property title the title
@@ -14,14 +16,14 @@ class Issue (
     private val desc: String?,
     private val creator: String,
     private val assignments: ArrayList<String>,
-    private val labels: ArrayList<String>
+    private val labels: ArrayList<Label>
 ) {
     private val m_ID: UInt = ID
     private var m_title: String = title
     private var m_desc: String? = desc
     private val m_creator: String = creator
     private val m_assignments: ArrayList<String> = assignments
-    private val m_labels: ArrayList<String> = labels
+    private val m_labels: ArrayList<Label> = labels
 
     /**
      * Get the ID
@@ -116,7 +118,7 @@ class Issue (
      *
      * @param label the label
      */
-    public fun addLabel(label: String) {
+    public fun addLabel(label: Label) {
         m_labels.add(label)
     }
 
@@ -125,7 +127,7 @@ class Issue (
      *
      * @param label the label
      */
-    public fun removeLabel(label: String) : Boolean {
+    public fun removeLabel(label: Label) : Boolean {
         return m_labels.remove(label)
     }
 
