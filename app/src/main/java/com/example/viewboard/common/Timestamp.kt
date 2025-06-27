@@ -31,6 +31,10 @@ class Timestamp (
         return m_fullFmt.format(m_instant)
     }
 
+    public fun cmp(timestamp: Timestamp) : Boolean {
+        return (m_instant == timestamp.m_instant)
+    }
+
     public fun export() : String {
         return m_instant.toString()
     }
