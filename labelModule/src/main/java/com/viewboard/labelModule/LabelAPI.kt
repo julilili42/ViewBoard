@@ -23,8 +23,8 @@ abstract class LabelAPI () {
         return false
     }
 
-    public fun track(count: UInt) : UInt {
-        val labels = trackIMPL(count)
+    public fun fetch(count: UInt) : UInt {
+        val labels = fetchIMPL(count)
 
         m_labels.addAll(labels)
 
@@ -39,7 +39,7 @@ abstract class LabelAPI () {
         return m_labels
     }
 
-    protected abstract fun trackIMPL(count: UInt) : ArrayList<Label>
+    protected abstract fun fetchIMPL(count: UInt) : ArrayList<Label>
 
     protected abstract fun flushAddIMPL(label: Label) : Boolean
 
