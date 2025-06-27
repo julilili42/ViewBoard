@@ -1,5 +1,6 @@
-package com.example.viewboard.issue
+package com.viewBoard.issueModule
 
+import com.viewBoard.commonModule.Timestamp
 import com.viewBoard.labelModule.Label
 
 /**
@@ -7,21 +8,25 @@ import com.viewBoard.labelModule.Label
  * @property title the title
  * @property desc the description, could be null
  * @property creator the user who created the issue, who is also immutable
+ * @property timestamp the timestamp of the issue, default = current timestamp
  * @property assignments the users assigned to the issue, max assignments = 255
  * @property labels the labels assigned to the issue, max labels = 255
  */
-class Issue (
-    private val ID: UInt,
-    private val title: String,
-    private val desc: String?,
-    private val creator: String,
-    private val assignments: ArrayList<String>,
-    private val labels: ArrayList<Label>
+class Issue
+internal constructor (
+    title: String,
+    desc: String?,
+    creator: String,
+    assignments: ArrayList<String>,
+    labels: ArrayList<Label>,
+    timestamp: Timestamp = Timestamp(),
+    ID: UInt = 0u
 ) {
-    private val m_ID: UInt = ID
+    private var m_ID: UInt = ID
     private var m_title: String = title
     private var m_desc: String? = desc
     private val m_creator: String = creator
+    private val m_timestamp: Timestamp = timestamp
     private val m_assignments: ArrayList<String> = assignments
     private val m_labels: ArrayList<Label> = labels
 
@@ -120,6 +125,7 @@ class Issue (
      */
     public fun addLabel(label: Label) {
         m_labels.add(label)
+        // TODO: call LabelAPI
     }
 
     /**
@@ -129,6 +135,7 @@ class Issue (
      */
     public fun removeLabel(label: Label) : Boolean {
         return m_labels.remove(label)
+        // TODO: call LabelAPI
     }
 
     /**
@@ -138,6 +145,7 @@ class Issue (
      */
     public fun removeLabel(labelIDX: UByte) {
         m_labels.removeAt(labelIDX.toInt())
+        // TODO: call LabelAPI
     }
 
     /**
@@ -154,5 +162,9 @@ class Issue (
      */
     public fun getLabels() : ArrayList<Label> {
         return m_labels
+    }
+
+    internal fun setID(ID: UInt) {
+        m_ID = ID
     }
 }
