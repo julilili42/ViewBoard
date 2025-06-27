@@ -1,6 +1,6 @@
 package com.example.viewboard.issue
 
-import com.example.viewboard.label.Label
+import com.viewboard.labelModule.Label
 
 /**
  * @property ID the ID which is also immutable, use ID=0 if it is not synced with any higher abstraction storage
