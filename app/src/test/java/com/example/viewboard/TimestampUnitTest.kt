@@ -6,7 +6,7 @@ import org.junit.Test
 
 class TimestampUnitTest {
     @Test
-    fun test_import_export() {
+    fun import_export() {
         val ts1 = Timestamp()
 
         val stream = ts1.export()
