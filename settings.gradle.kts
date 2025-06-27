@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "ViewBoard"
 include(":app")
 include(":labelModule")
+include(":commonModule")

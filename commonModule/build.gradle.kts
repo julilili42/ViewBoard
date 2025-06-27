@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.labelmodule"
+    namespace = "com.viewBoard.commonModule"
     compileSdk = 35
 
     defaultConfig {
@@ -36,7 +36,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(project(":commonModule"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
