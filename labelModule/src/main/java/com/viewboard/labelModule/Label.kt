@@ -56,6 +56,10 @@ internal constructor (
         return m_timestamp
     }
 
+    public fun cmp(label: Label) : Boolean {
+        return (m_name == label.m_name)
+    }
+
     internal fun addUsage() {
         m_refCounter++
     }
