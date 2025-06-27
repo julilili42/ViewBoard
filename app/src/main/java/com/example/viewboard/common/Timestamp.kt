@@ -31,6 +31,11 @@ class Timestamp (
         return m_fullFmt.format(m_instant)
     }
 
+    public fun getCustom(customFmt: String, zone: ZoneId) : String {
+        val fmt: DateTimeFormatter = DateTimeFormatter.ofPattern(customFmt).withZone(zone)
+        return fmt.format(m_instant)
+    }
+
     public fun cmp(timestamp: Timestamp) : Boolean {
         return (m_instant == timestamp.m_instant)
     }
