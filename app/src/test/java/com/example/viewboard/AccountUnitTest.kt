@@ -6,7 +6,7 @@ import org.junit.Test
 
 class AccountUnitTest {
     @Test
-    fun checkPassword(){
+    fun checkPassword() {
         val acc = Account("name", "eMail", "crazyPassword123")
 
         assertEquals(acc.checkPassword("crazyPassword123"), true)
