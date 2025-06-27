@@ -15,6 +15,8 @@ abstract class LabelAPI () {
     }
 
     public fun rm(label: Label) : Boolean {
+        // TODO: print warning or inform the user, if ref counter > 0
+
         if (flushRmIMPL(label)) {
             m_labels.remove(label)
             return true
