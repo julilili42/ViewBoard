@@ -1,4 +1,4 @@
-package com.viewboard.labelModule
+package com.viewBoard.labelModule
 
 abstract class LabelAPI () {
     private val m_labels: ArrayList<Label> = ArrayList<Label>()

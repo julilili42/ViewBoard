@@ -1,6 +1,6 @@
 package com.example.viewboard.issue
 
-import com.viewboard.labelModule.Label
+import com.viewBoard.labelModule.Label
 
 abstract class IssueAPI () {
     private val m_issues: ArrayList<Issue> = ArrayList<Issue>()

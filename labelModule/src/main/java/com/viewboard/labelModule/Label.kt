@@ -1,6 +1,6 @@
-package com.viewboard.labelModule
+package com.viewBoard.labelModule
 
-import com.example.viewboard.common.Timestamp
+import com.viewBoard.commonModule.Timestamp
 
 /**
  * @property name the name of the label
