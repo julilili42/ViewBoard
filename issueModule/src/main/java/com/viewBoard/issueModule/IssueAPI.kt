@@ -44,6 +44,7 @@ abstract class IssueAPI () {
     }
 
     public fun fetch(count: UInt) : UInt {
+        m_lastREQ.now()
         val issues: ArrayList<Issue> = fetchIMPL(m_lastID, count)
 
         for (issue in issues) {
@@ -57,7 +58,9 @@ abstract class IssueAPI () {
     }
 
     public fun refetch() : UInt {
-        return refetchIMPL(m_issues, m_lastID, m_lastREQ)
+        val tmpLastREQ: Timestamp = m_lastREQ
+        m_lastREQ.now()
+        return refetchIMPL(m_issues, m_lastID, tmpLastREQ)
     }
 
     // TODO: maybe remove -> replaced ?
