@@ -58,7 +58,7 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,) {
                 height = 50.dp,
                 modifier = Modifier
                     .offset(y = 40.dp)     // verschiebt den FAB 24dp weiter nach unten
-                    .padding(end = 16.dp)
+                    .padding(16.dp)
                     .clip(CircleShape), // behält rechts 16dp Abstand,
                 onClick = {},
 
