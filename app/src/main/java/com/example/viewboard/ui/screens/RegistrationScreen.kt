@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.account
+package com.example.viewboard.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.viewboard.R
+import com.example.viewboard.ui.account.LoginTextField
 import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.theme.Black
 import com.example.viewboard.ui.theme.BlueGray

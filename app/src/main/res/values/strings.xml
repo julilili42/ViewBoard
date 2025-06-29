@@ -12,7 +12,7 @@
     <string name="Register">Register now</string>
     <string name="Projects">Projects</string>
     <string name="User">User</string>
-    <string name="ActiveProjects">Active Projects</string>
+    <string name="ActiveProjects">Projects</string>
     <string name="RecentProjects">Recent Projects</string>
     <string name="Home">Home Screen</string>
     <string name="AddIssue">Add Issue</string>
@@ -23,4 +23,35 @@
     <string name="Optional">Optional</string>
     <string name="Assignees">Assignees</string>
     <string name="Labels">Labels</string>
+    <string name="home">Home</string>
+    <string name="timetable">Timetable</string>
+    <string name="views">Views</string>
+    <string name="profile">Profile</string>
+    <string name="my_tasks">My Issues</string>
+    <string name="sort_tasks">Sort Issues</string>
+    <string name="sort_desc_svgrepo_com">sort</string>
+    <string name="filter_svgrepo_com__1">filter</string>
+    <string name="search">Search\n</string>
+    <string name="plus_large_svgrepo_com">Plus\n</string>
+
+    <color name="primaryLight">#478ED1</color>
+    <color name="primaryDark">#8AB4F8</color>
+
+    <!-- Secondary Palette -->
+    <color name="secondaryLight">#BEDBFF</color>
+    <color name="secondaryDark">#4F83CC</color>
+
+    <!-- Hintergrund & Surface -->
+    <color name="backgroundLight">#FFFFFF</color>
+    <color name="surfaceLight">#F2F2F2</color>
+    <color name="backgroundDark">#121212</color>
+    <color name="surfaceDark">#1E1E1E</color>
+
+    <!-- Text & Icons -->
+    <color name="onPrimaryLight">#FFFFFF</color>
+    <color name="onPrimaryDark">#000000</color>
+    <color name="onBackgroundLight">#000000</color>
+    <color name="onBackgroundDark">#FFFFFF</color>
+    <color name="onSurfaceLight">#000000</color>
+    <color name="onSurfaceDark">#FFFFFF</color>
 </resources>

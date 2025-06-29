@@ -83,5 +83,10 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.gms:google-services:4.4.0")
-
+    implementation ("io.coil-kt:coil-compose:2.4.0")
+    // Material 3 Kernbibliothek
+    implementation ("androidx.compose.material3:material3:1.0.1")
+    // Optional: Fenster-Größenklassen für responsive Layouts
+    implementation ("androidx.compose.material3:material3-window-size-class:1.0.1")
+    // accompanist-reorderable (aktuelle Version zum Zeitpunkt Juni 2025)
 }
