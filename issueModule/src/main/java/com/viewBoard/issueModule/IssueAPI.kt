@@ -5,10 +5,7 @@ import com.viewBoard.labelModule.Label
 
 abstract class IssueAPI () {
     internal val m_issues: HashMap<UInt, Issue> = HashMap<UInt, Issue>()
-//    private val m_issueBuffer: HashMap<String, IssueBuffer> = HashMap<String, IssueBuffer>()
-    private val m_IDs: ArrayList<UInt> = ArrayList<UInt>()
-    private var m_lastID: UInt = 0u
-    private var m_lastREQ: Timestamp = Timestamp()
+    private var m_lastFetchTS: Timestamp = Timestamp()
 
     public fun add(title: String, desc: String?, creator: String, assignments: ArrayList<String>, labels: ArrayList<Label>) : Boolean {
         val issue: Issue = Issue(title, desc, creator, IssueState.NEW, assignments, labels)
@@ -44,62 +41,53 @@ abstract class IssueAPI () {
     }
 
     public fun fetch(count: UInt) : UInt {
-        m_lastREQ.now()
-        val issues: ArrayList<Issue> = fetchIMPL(m_lastID, count)
+        m_lastFetchTS.now()
+
+        val issues: ArrayList<Issue> = fetchIMPL(m_issues, count)
 
         for (issue in issues) {
             m_issues.put(issue.getID(), issue)
-            m_IDs.add(issue.getID())
         }
-
-        m_lastID = issues.last().getID()
 
         return issues.size.toUInt()
     }
 
-    public fun refetch() : UInt {
-        val tmpLastREQ: Timestamp = m_lastREQ
-        m_lastREQ.now()
-        return refetchIMPL(m_issues, m_lastID, tmpLastREQ)
+    public fun fetch(IDs: ArrayList<UInt>) : Boolean {
+        m_lastFetchTS.now()
+
+        val issues: ArrayList<Issue> = fetchIMPL(m_issues, IDs)
+
+        if (IDs.size != issues.size)
+            return false
+
+        for (issue in issues) {
+            m_issues.put(issue.getID(), issue)
+        }
+
+        return true
     }
 
-    // TODO: maybe remove -> replaced ?
-//    public fun filterGlobal(name: String, labels: ArrayList<Label>) {
-//        var filteredIssues: ArrayList<UInt> = ArrayList<UInt>()
-//
-//        for (issue in m_issues) {
-//            val issuelabels: ArrayList<Label> = issue.value.getLabels()
-//
-//            val match: Boolean = issuelabels.any { issueLabel -> labels.any { label -> issueLabel.cmp(label) } }
-//
-//            if (match)
-//                filteredIssues.add(issue.key)
-//        }
-//
-//        m_issueBuffer.put(name, IssueBuffer(filteredIssues))
-//    }
-//
-//    public fun getIssueBuffer(name: String) : IssueBuffer? {
-//        return m_issueBuffer[name]
-//    }
-//
-//    public fun rmIssueBuffer(name: String) {
-//        m_issueBuffer.remove(name)
-//    }
-//
-//    public fun rmAllIssueBuffers() {
-//        m_issueBuffer.clear()
-//    }
+    public fun refetch() : UInt {
+        val newFetchTS: Timestamp = Timestamp()
+
+        val count: UInt = refetchIMPL(m_issues, m_lastFetchTS)
+
+        m_lastFetchTS = newFetchTS
+
+        return count
+    }
 
     public fun getGlobalIssueBuffer() : IssueBuffer {
-        return IssueBuffer(m_IDs)
+        return IssueBuffer(ArrayList<UInt>(m_issues.keys))
     }
 
     // TODO: add getAccountViews(name) : ArrayList<IssueBuffer>
 
-    protected abstract fun fetchIMPL(lastID: UInt, count: UInt) : ArrayList<Issue>
+    protected abstract fun fetchIMPL(issues: HashMap<UInt, Issue>, count: UInt) : ArrayList<Issue>
 
-    protected abstract fun refetchIMPL(issues: HashMap<UInt, Issue>, lastID: UInt, timestamp: Timestamp) : UInt
+    protected abstract fun fetchIMPL(issues: HashMap<UInt, Issue>, IDs: ArrayList<UInt>) : ArrayList<Issue>
+
+    protected abstract fun refetchIMPL(issues: HashMap<UInt, Issue>, timestamp: Timestamp) : UInt
 
     protected abstract fun flushAddIMPL(issue: Issue) : UInt
 
