@@ -66,7 +66,7 @@ fun MyTasksContent(
                     name = name,
                     dueDateTime = dueDateTime,
                     onClick = { navController.navigate("taskDetail/$name") },
-                    onMenuClick = { /* TODO: Menü-Logik */ }
+                    onMenuClick = {}
                 )
             }
         }

@@ -73,7 +73,7 @@ fun MyTasksScreen(
                             name = name,
                             dueDateTime = dueDateTime,
                             onClick = { navController.navigate("taskDetail/$name") },
-                            onMenuClick = { /* TODO: menu logic */ }
+                            onMenuClick = {}
                         )
                     }
                 }
