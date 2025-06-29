@@ -11,7 +11,7 @@ abstract class IssueAPI () {
     private var m_lastREQ: Timestamp = Timestamp()
 
     public fun add(title: String, desc: String?, creator: String, assignments: ArrayList<String>, labels: ArrayList<Label>) : Boolean {
-        val issue: Issue = Issue(title, desc, creator, assignments, labels)
+        val issue: Issue = Issue(title, desc, creator, IssueState.NEW, assignments, labels)
 
         var ID: UInt = flushAddIMPL(issue)
 

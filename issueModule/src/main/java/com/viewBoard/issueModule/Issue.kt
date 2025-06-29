@@ -17,6 +17,7 @@ internal constructor (
     title: String,
     desc: String?,
     creator: String,
+    state: IssueState,
     assignments: ArrayList<String>,
     labels: ArrayList<Label>,
     timestamp: Timestamp = Timestamp(),
@@ -26,6 +27,7 @@ internal constructor (
     private var m_title: String = title
     private var m_desc: String? = desc
     private val m_creator: String = creator
+    private var m_state: IssueState = state
     private val m_timestamp: Timestamp = timestamp
     private val m_assignments: ArrayList<String> = assignments
     private val m_labels: ArrayList<Label> = labels
@@ -80,6 +82,24 @@ internal constructor (
      */
     public fun resetDesc() {
         m_desc = null
+    }
+
+    /**
+     * Get the state
+     *
+     * @return the state
+     */
+    public fun getState() : IssueState {
+        return m_state
+    }
+
+    /**
+     * Set the state
+     *
+     * @param state the state
+     */
+    public fun setState(state: IssueState) {
+        m_state = state
     }
 
     /**
