@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -37,7 +36,6 @@ fun MonthCalendar(
     issues: List<LocalDate> = dummyIssues,
     modifier: Modifier = Modifier
 ) {
-    // 1) Berechne Prefix (Vormonat), Month, Suffix (Folgemonat) für 5 Wochen (35 Zellen)
     val ym           = YearMonth.of(year, month)
     val firstOfMonth = ym.atDay(1)
     val daysInMonth  = ym.lengthOfMonth()
@@ -48,20 +46,14 @@ fun MonthCalendar(
     val prefixDates  = (daysInPrev - offset + 1..daysInPrev).map { prevMonth.atDay(it) }
 
     val monthDates   = (1..daysInMonth).map { ym.atDay(it) }
-
     val totalCells   = 35
     val nextMonth    = ym.plusMonths(1)
     val suffixNeeded = totalCells - (prefixDates.size + monthDates.size)
     val suffixDates  = (1..suffixNeeded).map { nextMonth.atDay(it) }
-
     val allDates = prefixDates + monthDates + suffixDates
-
-    // 2) Wochentags‐Kürzel Mo–So
     val weekdays = DayOfWeek.values().map {
         it.getDisplayName(TextStyle.SHORT, Locale.getDefault())
     }
-
-    // 3) Grid zeichnen
     LazyVerticalGrid(
         columns               = GridCells.Fixed(7),
         modifier              = modifier,
@@ -70,7 +62,6 @@ fun MonthCalendar(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         userScrollEnabled     = false
     ) {
-        // 3a) Header mit Wochentagen
         items(weekdays) { wd ->
             Box(
                 modifier = Modifier
@@ -81,8 +72,6 @@ fun MonthCalendar(
                 Text(wd, style = MaterialTheme.typography.bodySmall)
             }
         }
-
-        // 3b) Datumszellen
         items(allDates) { date ->
             val isCurrent = date.monthValue == month
             val count     = issues.count { it == date }
@@ -104,8 +93,6 @@ fun MonthCalendar(
                     text  = date.dayOfMonth.toString(),
                     style = MaterialTheme.typography.bodyMedium
                 )
-
-                // Issue-Count in kleinem Kreis unten rechts
                 if (count > 0) {
                     Box(
                         modifier = Modifier

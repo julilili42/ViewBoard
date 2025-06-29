@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
@@ -44,16 +43,11 @@ fun SegmentedSwitch(
                 shape = RoundedCornerShape(6.dp)
             )
     ) {
-        // 1) Berechne Breite pro Segment
         val segmentWidth = maxWidth / 2f
-
-        // 2) animierter Offset: 0 für Links, segmentWidth für Rechts
         val offsetX by animateDpAsState(
             targetValue = if (selectedLeft) 0.dp else segmentWidth,
             animationSpec = tween(durationMillis = 300)
         )
-
-        // 3) der bewegte Indikator
         Box(
             modifier = Modifier
                 .offset(x = offsetX)
@@ -62,8 +56,6 @@ fun SegmentedSwitch(
                 .clip(RoundedCornerShape(6.dp))
                 .background(MaterialTheme.colorScheme.primary)
         )
-
-        // 4) die beiden Klick-Flächen
         Row(Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier

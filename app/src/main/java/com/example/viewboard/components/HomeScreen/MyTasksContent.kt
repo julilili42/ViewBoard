@@ -38,7 +38,6 @@ fun MyTasksContent(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        // Kopfzeile mit Titel und Sort-Button
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -55,10 +54,7 @@ fun MyTasksContent(
                 )
             }
         }
-
         Spacer(modifier = Modifier.height(8.dp))
-
-        // Die Liste deiner Tasks als Grid (1 Spalte)
         LazyVerticalGrid(
             columns = GridCells.Fixed(1),
             verticalArrangement = Arrangement.spacedBy(12.dp),

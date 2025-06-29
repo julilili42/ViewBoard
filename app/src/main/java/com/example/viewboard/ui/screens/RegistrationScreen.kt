@@ -79,8 +79,6 @@ fun RegisterTopSection(modifier: Modifier = Modifier) {
                     modifier = Modifier.size(42.dp),
                     tint = uiColor
                 )
-
-
                 Spacer(modifier = Modifier.width(15.dp))
                 Column {
                     Text(

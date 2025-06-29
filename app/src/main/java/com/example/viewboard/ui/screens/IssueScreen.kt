@@ -206,7 +206,6 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,) {
                                 comments = item.comments,
                                 assignees = item.assignees,
                                 modifier = Modifier
-
                                     .clip(RoundedCornerShape(12.dp))
                             )
                         }

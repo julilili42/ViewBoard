@@ -73,15 +73,12 @@ fun Navigation(modifier: Modifier = Modifier) {
             startDestination = Screen.LoginScreen.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            // --- Login / Registration ---
             composable(Screen.LoginScreen.route) {
                 LoginScreen(navController = navController)
             }
             composable(Screen.RegistrationScreen.route) {
                 RegistrationScreen(navController = navController)
             }
-
-            // --- Haupt-Navigation als nested graph (optional) ---
             navigation(
                 startDestination = BottomBarScreen.Home.route,
                 route = "main"
@@ -90,14 +87,11 @@ fun Navigation(modifier: Modifier = Modifier) {
                     HomeScreen(navController = navController)
                 }
                 composable(BottomBarScreen.Timetable.route) {
-                    /* TimetableScreen(navController) */
                     TimetableScreen(navController = navController)
                 }
                 composable(BottomBarScreen.View.route) {
-                    /* ContactsScreen(navController) */
                 }
                 composable(BottomBarScreen.Profile.route) {
-                    /* ProfileScreen(navController) */
                 }
             }
             composable(
@@ -139,16 +133,13 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
     Column(modifier = Modifier
         .fillMaxWidth()
     ) {
-        // 1) Graue Trennlinie
         Divider(
             color = Color.LightGray,
             thickness = 1.dp
         )
-
-        // 2) Weiße Bottom Navigation
         NavigationBar(
             containerColor = Color.White,
-            contentColor = Color.Black  // oder MaterialTheme.colorScheme.onSurface
+            contentColor = Color.Black
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val current = navBackStackEntry?.destination?.route

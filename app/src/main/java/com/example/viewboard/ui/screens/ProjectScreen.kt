@@ -184,7 +184,6 @@ fun ProjectsScreen(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            // Aktionsleiste unter der Überschrift
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -217,7 +216,6 @@ fun ProjectsScreen(
                         }
                     }
                 )
-
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     CustomIcon(
                         iconRes = R.drawable.sort_desc_svgrepo_com,
@@ -242,8 +240,6 @@ fun ProjectsScreen(
                     )
                 }
             }
-
-            // Scrollbares Grid für Projekte
             LazyVerticalGrid(
                 columns = GridCells.Fixed(columns),
                 contentPadding = PaddingValues(16.dp),

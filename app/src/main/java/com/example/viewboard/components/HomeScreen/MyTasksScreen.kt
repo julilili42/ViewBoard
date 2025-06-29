@@ -9,26 +9,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import com.example.viewboard.components.HomeScreen.ProjectCardTasks
 import java.time.LocalDateTime
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-
-import androidx.compose.foundation.shape.RoundedCornerShape
-
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
-
 import androidx.compose.ui.input.pointer.pointerInput
-
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import com.example.viewboard.R
-
 /**
  * Screen displaying "My Tasks" with a sort button and fade-edge effect.
  *
@@ -43,81 +27,54 @@ fun MyTasksScreen(
     myTasks: List<Pair<String, LocalDateTime>>,
     onSortClick: () -> Unit = {}
 ) {
-    Scaffold(
+    // Root-Container ohne Scaffold
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .fillMaxHeight()
-            // Nur die oberen Ecken runden, unten bleiben eckig
-            //.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-        ,
-        containerColor = Color.White,
-        /*topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "My Tasks",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp),
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                actions = {
-                    IconButton(onClick = onSortClick) {
-                        Icon(Icons.Default.Star, contentDescription = "Sort Tasks")
-                    }
-                    IconButton(onClick = onSortClick) {
-                        Icon(
-                            painter = painterResource(R.drawable.filter_svgrepo_com),
-                            contentDescription = "Filter Tasks",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.Unspecified
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
-                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
-                ),
-                modifier = Modifier
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-            )
-        }*/
-    )  { paddingValues ->
-        Box(
+    ) {
+        // Optional: eigener TopBar-Bereich
+        /*Row(
             modifier = Modifier
-                .fillMaxSize()
-
-
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Fading vertical grid of tasks
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(1),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(myTasks) { (name, dueDateTime) ->
-                    var dismissed by remember { mutableStateOf(false) }
-                    if (!dismissed) {
-                        Box(
-                            modifier = Modifier
-                                .pointerInput(Unit) {
-                                    detectHorizontalDragGestures { _, dragAmount ->
-                                        if (dragAmount < -100) dismissed = true
-                                    }
+            Text(
+                text = "My Tasks",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            IconButton(onClick = onSortClick) {
+                Icon(Icons.Default.Star, contentDescription = "Sort Tasks")
+            }
+        }*/
+
+        // Grid der Tasks, beginnt exakt oben im Box
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(myTasks) { (name, dueDateTime) ->
+                var dismissed by remember { mutableStateOf(false) }
+                if (!dismissed) {
+                    Box(
+                        modifier = Modifier
+                            .pointerInput(Unit) {
+                                detectHorizontalDragGestures { _, dragAmount ->
+                                    if (dragAmount < -100) dismissed = true
                                 }
-                        ) {
-                            ProjectCardTasks(
-                                name = name,
-                                dueDateTime = dueDateTime,
-                                onClick = { navController.navigate("taskDetail/$name") },
-                                onMenuClick = { /* TODO: menu logic */ }
-                            )
-                        }
+                            }
+                    ) {
+                        ProjectCardTasks(
+                            name = name,
+                            dueDateTime = dueDateTime,
+                            onClick = { navController.navigate("taskDetail/$name") },
+                            onMenuClick = { /* TODO: menu logic */ }
+                        )
                     }
                 }
             }

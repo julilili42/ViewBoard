@@ -59,8 +59,6 @@ fun ProjectItem(
         .getDisplayName(TextStyle.SHORT, Locale.getDefault())
     val endLabel = Month.of(endMonth)
         .getDisplayName(TextStyle.SHORT, Locale.getDefault())
-
-    // Maximal 3 Avatare anzeigen
     val showCount = avatarUris.size.coerceAtMost(3)
     val avatarSize = 18.dp
     val avatarOverlap = 12.dp
@@ -83,7 +81,6 @@ fun ProjectItem(
                 .padding(16.dp)
         ) {
             Column(Modifier.fillMaxSize()) {
-                // Obere Leiste: Pill + Spacer + Pfeil
                 Row(
                     Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -108,8 +105,6 @@ fun ProjectItem(
                 }
 
                 Spacer(Modifier.height(16.dp))
-
-                // Titel + Zeitraum
                 Text(
                     text = name,
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
@@ -120,10 +115,7 @@ fun ProjectItem(
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.9f)
                 )
-
                 Spacer(Modifier.weight(1f))
-
-                // Unten: Avatare und ProgressBar nebeneinander
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -162,10 +154,7 @@ fun ProjectItem(
                             }
                         }
                     }
-
                     Spacer(Modifier.weight(1f))
-
-                    // ProgressBar rechts ausgerichtet
                     LinearProgressIndicator(
                         progress = progress,
                         modifier = Modifier

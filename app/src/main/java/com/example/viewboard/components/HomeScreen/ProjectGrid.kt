@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.viewboard.components.HomeScreen.ProjectCardTasks
 /**
  * A reusable grid displaying a list of projects.
  *

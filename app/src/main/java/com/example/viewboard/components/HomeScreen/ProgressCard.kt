@@ -53,7 +53,6 @@ fun ProgressCard(
             .padding(horizontal = 16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Titel mit Period-Icon
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -78,10 +77,7 @@ fun ProgressCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-
             Spacer(modifier = Modifier.height(12.dp))
-
-            // Progress-Bar
             LinearProgressIndicator(
                 progress = progress.coerceIn(0f, 1f),
                 modifier = Modifier
@@ -90,10 +86,7 @@ fun ProgressCard(
                 trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                 color = MaterialTheme.colorScheme.primary
             )
-
             Spacer(modifier = Modifier.height(8.dp))
-
-            // Fortschrittstext
             Text(
                 text = "You completed $percent% of your ${period.label} Targets.",
                 style = MaterialTheme.typography.bodySmall,
