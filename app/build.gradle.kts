@@ -68,6 +68,22 @@ dependencies {
     implementation(project(":commonModule"))
     implementation(project(":labelModule"))
     implementation(project(":issueModule"))
+
+    // Firebase BoM & Firebase-Services
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // Google Login
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+
+    // Sonstige
+    implementation("org.mindrot:jbcrypt:0.4")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("androidx.compose.material3:material3:1.0.1")
+    implementation("androidx.compose.material3:material3-window-size-class:1.0.1")
+
+    // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,18 +91,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-
-    // project specific //
-    implementation("org.mindrot:jbcrypt:0.4")
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
-    implementation("com.google.android.gms:play-services-auth:21.0.0")
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.gms:google-services:4.4.0")
-    implementation ("io.coil-kt:coil-compose:2.4.0")
-    // Material 3 Kernbibliothek
-    implementation ("androidx.compose.material3:material3:1.0.1")
-    // Optional: Fenster-Größenklassen für responsive Layouts
-    implementation ("androidx.compose.material3:material3-window-size-class:1.0.1")
-    // accompanist-reorderable (aktuelle Version zum Zeitpunkt Juni 2025)
 }
