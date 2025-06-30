@@ -68,7 +68,6 @@ dependencies {
     implementation(project(":commonModule"))
     implementation(project(":labelModule"))
     implementation(project(":issueModule"))
-    implementation(libs.androidx.room.runtime.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
