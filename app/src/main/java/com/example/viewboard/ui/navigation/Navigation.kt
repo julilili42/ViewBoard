@@ -25,7 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.viewboard.R
-import com.example.viewboard.ui.account.LoginScreen
+import com.example.viewboard.ui.screens.LoginScreen
 import com.example.viewboard.ui.screens.RegistrationScreen
 import com.example.viewboard.ui.screens.HomeScreen
 import androidx.compose.material3.Divider
@@ -37,8 +37,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.viewboard.ui.screens.DragableScreen
 import com.example.viewboard.ui.screens.IssueScreen
 import com.example.viewboard.ui.issue.MainViewModel
+import com.example.viewboard.ui.screens.ProfileScreen
 import com.example.viewboard.ui.screens.ProjectsScreen
 import com.example.viewboard.ui.screens.TimetableScreen
+import com.example.viewboard.ui.screens.ViewScreen
 
 sealed class BottomBarScreen(val route: String, @StringRes val title: Int, val iconRes: Int) {
     object Home     : BottomBarScreen("home",      R.string.home,      R.drawable.house_black_silhouette_without_door_svgrepo_com)
@@ -90,8 +92,10 @@ fun Navigation(modifier: Modifier = Modifier) {
                     TimetableScreen(navController = navController)
                 }
                 composable(BottomBarScreen.View.route) {
+                    ViewScreen(navController = navController)
                 }
                 composable(BottomBarScreen.Profile.route) {
+                    ProfileScreen(navController = navController)
                 }
             }
             composable(
