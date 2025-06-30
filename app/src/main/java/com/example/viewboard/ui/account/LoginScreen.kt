@@ -255,7 +255,7 @@ fun LoginRegisterSection(modifier: Modifier = Modifier, navController: NavContro
             .fillMaxHeight(fraction = 0.8f)
             .fillMaxWidth(),
         contentAlignment = Alignment.BottomCenter
-    ) { }
+    ) {
     Text(
         modifier = modifier
             .fillMaxWidth()
@@ -265,6 +265,7 @@ fun LoginRegisterSection(modifier: Modifier = Modifier, navController: NavContro
         ,
         text = annotatedText
     )
+    }
 }
 
 /**

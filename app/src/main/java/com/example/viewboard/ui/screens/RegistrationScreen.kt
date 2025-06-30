@@ -3,6 +3,7 @@ package com.example.viewboard.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,19 +60,11 @@ fun RegisterTopSection(modifier: Modifier = Modifier) {
     ) {
         val uiColor = uiColor()
 
-        Box(contentAlignment = Alignment.TopCenter) {
-            Image(
-                painter = painterResource(id = R.drawable.shape),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.025f),
-                contentScale = ContentScale.FillBounds
-            )
-
+        Box(contentAlignment = Alignment.TopCenter, modifier=Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.padding(top = 80.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.logo),
