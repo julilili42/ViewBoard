@@ -36,17 +36,22 @@ import androidx.compose.runtime.setValue
 import com.example.viewboard.components.Timetable.SegmentedSwitch
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
 import com.example.viewboard.ui.timetable.CustomIcon
 import com.example.viewboard.ui.timetable.TimelineSchedule
 import com.example.viewboard.ui.timetable.VerticalTimelineSchedule
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableScreen(navController: NavHostController) {
     var showProjects by remember { mutableStateOf(true) }
-
+    val today = LocalDate.now()
+    var year by remember { mutableStateOf(today.year) }
+    var month by remember { mutableStateOf(today.monthValue) } // 1..12
+    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     // Beispieldaten
     val projects = listOf(
         Project("A", "Desc A", "#A13", 1, 3, Color(0xFF00BCD4),5,2.53f),
@@ -70,7 +75,8 @@ fun TimetableScreen(navController: NavHostController) {
                         subtitle = "Just a short overview for you.",
                         onProfileClick = {
                             navController.navigate(BottomBarScreen.Profile.route)
-                        }
+                        },
+                        onBackClick = {navController.navigateUp()}
                     )
         },
         //containerColor = Color.White // sorgt dafür, dass Scaffold-Hintergrund weiß ist
@@ -82,7 +88,13 @@ fun TimetableScreen(navController: NavHostController) {
                 .padding(top = innerPadding.calculateTopPadding())
                // .background(Color.White) // sicherheitshalber
         ) {
-            Spacer(modifier = Modifier.height(80.dp))
+            Text(
+                text ="Timetable", // z.B. "My Projects"
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -184,9 +196,13 @@ fun TimetableScreen(navController: NavHostController) {
                     )
                 } else {
                     TimelineSchedule(
-                        projects = issues,
-                        phases   = listOf("Backlog"),
-                        modifier = Modifier.fillMaxSize()
+                        year         = year,
+                        month        = month,
+                        onYearChange = { year = it },
+                        onMonthChange= { month = it },
+                        projects     = issues,
+                        phases       = listOf(/* … */),
+                        modifier     = Modifier.fillMaxSize()
                     )
                 }
             }

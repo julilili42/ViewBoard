@@ -23,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
-import com.example.viewboard.components.HomeScreen.MyTasksScreen
 import com.example.viewboard.components.HomeScreen.ProgressCard
 import com.example.viewboard.components.HomeScreen.ProjectGrid
 import com.example.viewboard.ui.navigation.Screen
@@ -58,7 +57,8 @@ fun HomeScreen(
                         subtitle = "Welcome back!!",
                         onProfileClick = {
                             navController.navigate(BottomBarScreen.Profile.route)
-                        }
+                        },
+                        onBackClick = {navController.navigateUp()}
             )
         }
     ) { paddingValues ->

@@ -1,4 +1,5 @@
 package com.example.viewboard.ui.issue
+import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
@@ -17,9 +18,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
+import coil.compose.AsyncImage
+import androidx.compose.ui.res.painterResource
+import com.example.viewboard.R
+import androidx.compose.runtime.Composable
 
+import androidx.compose.ui.graphics.Brush
 
 
 
@@ -32,17 +40,25 @@ fun IssueItemCard(
     date: String,
     attachments: Int,
     comments: Int,
-    assignees: List<String>,
     modifier: Modifier = Modifier,
+    avatarUris: List<Uri>,
     onOptionsClick: () -> Unit = {}
 ) {
+    val showCount = avatarUris.size.coerceAtMost(3)
+    val avatarSize = 18.dp
+    val firstAvatar: Uri = avatarUris.first()
+
     Box(
         modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surface)
+            .background(
+                Color.Black.copy(alpha = 0.2f),
+                shape = RoundedCornerShape(16.dp)
+            )
             .border(
                 1.dp,
+
                 MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                 RoundedCornerShape(12.dp)
             )
@@ -112,7 +128,7 @@ fun IssueItemCard(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Star,
+                        painter = painterResource(id = R.drawable.calender_svgrepo_com),
                         contentDescription = "Date",
                         modifier = Modifier.size(16.dp)
                     )
@@ -122,31 +138,35 @@ fun IssueItemCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Attachments",
-                        modifier = Modifier.size(16.dp)
+                        painter = painterResource(id = R.drawable.hour_glass_svgrepo_com),
+                        contentDescription = "Due Date",
+                        modifier = Modifier.size(15.dp)
                     )
                     Text(
-                        text = attachments.toString(),
+                        text = attachments.toString() + " days",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Comments",
-                        modifier = Modifier.size(16.dp)
+                   /* Icon(
+                        painter = painterResource(id = R.drawable.create_note_svgrepo_com__1_),
+                        contentDescription = "Creator",
+                        modifier = Modifier.size(17.dp)
                     )
-                    Text(
-                        text = comments.toString(),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
-                    assignees.take(3).forEach { avatar ->
-                        Box(
-                            Modifier
-                                .size(24.dp)
+                    Box (  Modifier
+                        .size(avatarSize +3.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colorScheme.surface,
+                            CircleShape
+                        ),
+                        contentAlignment = Alignment.Center) {
+                        AsyncImage(
+                            model = firstAvatar,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(avatarSize)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.primary)
                                 .border(
@@ -154,33 +174,58 @@ fun IssueItemCard(
                                     MaterialTheme.colorScheme.surface,
                                     CircleShape
                                 ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = avatar,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    }
-                    if (assignees.size > 3) {
-                        Box(
-                            Modifier
-                                .size(24.dp)
+                        )
+                    }*/
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
+
+                        avatarUris.take(showCount).forEachIndexed { index, uri ->
+                            Box (  Modifier
+                                .size(avatarSize +3.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+                                .background(MaterialTheme.colorScheme.primary)
                                 .border(
                                     1.dp,
                                     MaterialTheme.colorScheme.surface,
                                     CircleShape
                                 ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "+${assignees.size - 3}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                                contentAlignment = Alignment.Center) {
+                                AsyncImage(
+                                    model = uri,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(avatarSize)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primary)
+                                        .border(
+                                            1.dp,
+                                            MaterialTheme.colorScheme.surface,
+                                            CircleShape
+                                        ),
+                                )
+                            }
+                        }
+                        val extra = avatarUris.size - showCount
+                        if (extra > 0) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .size(avatarSize +2.dp)
+                                    //.offset(x = (showCount * avatarOverlap)) // nach den sichtbaren Avataren
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .border(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.surface,
+                                        CircleShape
+                                    )
+                            ) {
+                                Text(
+                                    text = "+$extra",
+                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = Color.Black
+                                )
+
                         }
                     }
                 }

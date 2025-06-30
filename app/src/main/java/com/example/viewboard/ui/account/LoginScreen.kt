@@ -252,7 +252,7 @@ fun LoginRegisterSection(modifier: Modifier = Modifier, navController: NavContro
 
     Box(
         modifier = Modifier
-            .fillMaxHeight(fraction = 0.8f)
+            .fillMaxHeight(0.6f)
             .fillMaxWidth(),
         contentAlignment = Alignment.BottomCenter
     ) { }
@@ -278,7 +278,6 @@ fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
     Surface() {
         Column(modifier = Modifier.fillMaxSize()) {
             LoginTopSection()
-            Spacer(modifier = Modifier.height(36.dp))
             LoginSection(navController = navController)
             LoginRegisterSection(navController = navController)
         }

@@ -1,4 +1,4 @@
-package com.example.viewboard.components.HomeScreen
+package com.example.viewboard.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -12,7 +12,9 @@ import androidx.navigation.NavController
 import java.time.LocalDateTime
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.graphics.Color
+import com.example.viewboard.components.HomeScreen.ProjectCardTasks
+import com.example.viewboard.ui.navigation.Screen
+
 /**
  * Screen displaying "My Tasks" with a sort button and fade-edge effect.
  *
@@ -72,8 +74,8 @@ fun MyTasksScreen(
                         ProjectCardTasks(
                             name = name,
                             dueDateTime = dueDateTime,
-                            onClick = { navController.navigate("taskDetail/$name") },
-                            onMenuClick = {}
+                            onClick = { navController.navigate(Screen.IssueCreationScreen.createRoute(name)) },
+                            onMenuClick = {navController.navigate(Screen.IssueCreationScreen.createRoute(name))}
                         )
                     }
                 }

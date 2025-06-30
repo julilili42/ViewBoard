@@ -112,9 +112,9 @@ fun Navigation(modifier: Modifier = Modifier) {
             ) { backStack ->
                 val projectName = backStack.arguments!!.getString("projectName")!!
                 DragableScreen(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 ) {
-                    IssueScreen(mainViewModel,navController)
+                    IssueScreen(mainViewModel,navController,projectName)
                 }
             }
         }

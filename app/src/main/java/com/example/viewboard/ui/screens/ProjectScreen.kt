@@ -158,7 +158,8 @@ fun ProjectsScreen(
                     subtitle = "Welcome back!!",
                     onProfileClick = {
                         navController.navigate(BottomBarScreen.Profile.route)
-                    }
+                    },
+                    onBackClick = {navController.navigateUp()}
                 )
 
         },
@@ -184,6 +185,13 @@ fun ProjectsScreen(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
+            Text(
+                text = projectName +" Projects", // z.B. "My Projects"
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -259,7 +267,7 @@ fun ProjectsScreen(
                         totalMilestones     = project.totalMilestones,
                         completedMilestones = project.completedMilestones,
                         avatarUris          = dummyAvatarUris,
-                        onClick             = {navController.navigate(Screen.IssueCreationScreen.createRoute("projectName"))}
+                        onClick             = {navController.navigate(Screen.IssueCreationScreen.createRoute(project.name))}
                     )
                 }
             }
