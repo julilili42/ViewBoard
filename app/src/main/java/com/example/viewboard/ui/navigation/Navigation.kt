@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -24,12 +25,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.viewboard.R
-import com.example.viewboard.ui.screens.LoginScreen
+import com.example.viewboard.ui.account.LoginScreen
 import com.example.viewboard.ui.screens.RegistrationScreen
 import com.example.viewboard.ui.screens.HomeScreen
 import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 
@@ -38,11 +37,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.viewboard.ui.screens.DragableScreen
 import com.example.viewboard.ui.screens.IssueScreen
 import com.example.viewboard.ui.issue.MainViewModel
-import com.example.viewboard.ui.screens.HelpSupportScreen
-import com.example.viewboard.ui.screens.ProfileScreen
 import com.example.viewboard.ui.screens.ProjectsScreen
 import com.example.viewboard.ui.screens.TimetableScreen
-import com.example.viewboard.ui.screens.ViewScreen
 
 sealed class BottomBarScreen(val route: String, @StringRes val title: Int, val iconRes: Int) {
     object Home     : BottomBarScreen("home",      R.string.home,      R.drawable.house_black_silhouette_without_door_svgrepo_com)
@@ -59,8 +55,7 @@ fun Navigation(modifier: Modifier = Modifier) {
     val currentRoute = navBackStackEntry?.destination?.route
     val hideOn = listOf(
         Screen.LoginScreen.route,
-        Screen.RegistrationScreen.route,
-        Screen.HelpSupportScreen.route
+        Screen.RegistrationScreen.route
     )
     val showBottomBar = currentRoute !in hideOn
     val mainViewModel = MainViewModel()
@@ -84,9 +79,6 @@ fun Navigation(modifier: Modifier = Modifier) {
             composable(Screen.RegistrationScreen.route) {
                 RegistrationScreen(navController = navController)
             }
-            composable(Screen.HelpSupportScreen.route) {
-                HelpSupportScreen(navController = navController)
-            }
             navigation(
                 startDestination = BottomBarScreen.Home.route,
                 route = "main"
@@ -98,10 +90,8 @@ fun Navigation(modifier: Modifier = Modifier) {
                     TimetableScreen(navController = navController)
                 }
                 composable(BottomBarScreen.View.route) {
-                    ViewScreen(navController = navController)
                 }
                 composable(BottomBarScreen.Profile.route) {
-                    ProfileScreen(navController = navController)
                 }
             }
             composable(
@@ -149,8 +139,7 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
         )
         NavigationBar(
             containerColor = Color.White,
-            contentColor = Color.Black,
-            modifier = Modifier.padding(bottom = 1.dp)
+            contentColor = Color.Black
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val current = navBackStackEntry?.destination?.route
@@ -163,7 +152,7 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
                             contentDescription = stringResource(screen.title),
                             modifier      = Modifier.size(26.dp))
                     },
-                    label = { Text(stringResource(screen.title), color = MaterialTheme.colorScheme.inverseOnSurface) },
+                    label = { Text(stringResource(screen.title)) },
                     selected = current == screen.route,
                     onClick = {
                         if (current != screen.route) {
