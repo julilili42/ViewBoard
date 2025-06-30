@@ -39,7 +39,9 @@ import com.google.firebase.auth.GoogleAuthProvider
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.material3.TextField
 import androidx.compose.ui.text.input.VisualTransformation
-
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.google.firebase.Timestamp
 
 
 /**
@@ -177,26 +179,39 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
                     return@Button
                 }
 
-                FirebaseAuth.getInstance()
-                    .signInWithEmailAndPassword(email, password)
+                val auth = FirebaseAuth.getInstance()
+                val db = Firebase.firestore
+
+                auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            Toast.makeText(context, "Willkommen!", Toast.LENGTH_SHORT).show()
-                            navController.navigate(Screen.HomeScreen.route)
+                            val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
+
+                            db.collection("users").document(uid).get()
+                                .addOnSuccessListener { doc ->
+                                    val isOnline = doc.getBoolean("isOnline") ?: false
+                                    if (isOnline) {
+                                        // Benutzer ist schon online → sofort abmelden
+                                        auth.signOut()
+                                        Toast.makeText(context, "Benutzer ist bereits angemeldet.", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        // Als online markieren
+                                        db.collection("users").document(uid).update(
+                                            mapOf(
+                                                "isOnline" to true,
+                                                "lastActive" to com.google.firebase.Timestamp.now()
+                                            )
+                                        )
+                                        Toast.makeText(context, "Willkommen!", Toast.LENGTH_SHORT).show()
+                                        navController.navigate(Screen.HomeScreen.route)
+                                    }
+                                }
                         } else {
                             Toast.makeText(context, "Login fehlgeschlagen: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (isSystemInDarkTheme()) BlueGray else Black,
-                contentColor = Color.White,
-            ),
-            shape = RoundedCornerShape(size = 4.dp)
-        ) {
+        ){
             Text("Log in")
         }
 

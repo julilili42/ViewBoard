@@ -43,6 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.ui.navigation.Screen
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
@@ -111,7 +115,17 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                 // Logout
                 Text(
                     modifier = Modifier
-                        .clickable { navController.navigate(Screen.LoginScreen.route) }
+                        .clickable {
+                            val uid = FirebaseAuth.getInstance().currentUser?.uid
+                            if (uid != null) {
+                                Firebase.firestore.collection("users").document(uid)
+                                    .update("isOnline", false)
+                            }
+                            FirebaseAuth.getInstance().signOut()
+                            navController.navigate(Screen.LoginScreen.route) {
+                                popUpTo(0) // zurück zum Login-Screen
+                            }
+                        }
                         .padding(8.dp),
                     text = "Abmelden",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
