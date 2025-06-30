@@ -47,10 +47,4 @@ class Timestamp (
     public fun import(data: String) {
         m_instant = Instant.parse(data)
     }
-
-    companion object {
-        fun now(): Boolean {
-
-        }
-    }
 }

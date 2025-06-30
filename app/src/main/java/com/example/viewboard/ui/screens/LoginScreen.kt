@@ -211,6 +211,14 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
                         }
                     }
             },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isSystemInDarkTheme()) BlueGray else Black,
+                contentColor = Color.White,
+            ),
+            shape = RoundedCornerShape(size = 4.dp)
         ){
             Text("Log in")
         }
