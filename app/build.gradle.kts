@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose.android)
     implementation(project(":commonModule"))
     implementation(project(":labelModule"))
+    implementation(project(":projectModule"))
     implementation(project(":issueModule"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
