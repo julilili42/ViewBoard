@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -29,6 +28,8 @@ import com.example.viewboard.ui.screens.LoginScreen
 import com.example.viewboard.ui.screens.RegistrationScreen
 import com.example.viewboard.ui.screens.HomeScreen
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 
@@ -148,7 +149,8 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
         )
         NavigationBar(
             containerColor = Color.White,
-            contentColor = Color.Black
+            contentColor = Color.Black,
+            modifier = Modifier.padding(bottom = 1.dp)
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val current = navBackStackEntry?.destination?.route
@@ -161,7 +163,7 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
                             contentDescription = stringResource(screen.title),
                             modifier      = Modifier.size(26.dp))
                     },
-                    label = { Text(stringResource(screen.title)) },
+                    label = { Text(stringResource(screen.title), color = MaterialTheme.colorScheme.inverseOnSurface) },
                     selected = current == screen.route,
                     onClick = {
                         if (current != screen.route) {
