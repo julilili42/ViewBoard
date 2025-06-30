@@ -37,6 +37,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.viewboard.ui.screens.DragableScreen
 import com.example.viewboard.ui.screens.IssueScreen
 import com.example.viewboard.ui.issue.MainViewModel
+import com.example.viewboard.ui.screens.HelpSupportScreen
 import com.example.viewboard.ui.screens.ProfileScreen
 import com.example.viewboard.ui.screens.ProjectsScreen
 import com.example.viewboard.ui.screens.TimetableScreen
@@ -57,7 +58,8 @@ fun Navigation(modifier: Modifier = Modifier) {
     val currentRoute = navBackStackEntry?.destination?.route
     val hideOn = listOf(
         Screen.LoginScreen.route,
-        Screen.RegistrationScreen.route
+        Screen.RegistrationScreen.route,
+        Screen.HelpSupportScreen.route
     )
     val showBottomBar = currentRoute !in hideOn
     val mainViewModel = MainViewModel()
@@ -80,6 +82,9 @@ fun Navigation(modifier: Modifier = Modifier) {
             }
             composable(Screen.RegistrationScreen.route) {
                 RegistrationScreen(navController = navController)
+            }
+            composable(Screen.HelpSupportScreen.route) {
+                HelpSupportScreen(navController = navController)
             }
             navigation(
                 startDestination = BottomBarScreen.Home.route,
