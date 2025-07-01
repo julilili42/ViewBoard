@@ -5,7 +5,7 @@ import com.viewBoard.commonModule.Timestamp
 
 data class LabelLayout (
     @DocumentId
-    var id: String,
+    var id: String = "",
     var name: String,
     var creator: String,
     var refCounter: UInt = 0u,

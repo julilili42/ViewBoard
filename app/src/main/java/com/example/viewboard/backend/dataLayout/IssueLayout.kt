@@ -6,7 +6,7 @@ import com.viewBoard.issueModule.IssueState
 
 data class IssueLayout (
     @DocumentId
-    var id: String,
+    var id: String = "",
     var title: String,
     var desc: String,
     var creator: String,
