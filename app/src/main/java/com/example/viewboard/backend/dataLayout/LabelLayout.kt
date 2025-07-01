@@ -6,8 +6,8 @@ import com.viewBoard.commonModule.Timestamp
 data class LabelLayout (
     @DocumentId
     var id: String = "",
-    var name: String,
-    var creator: String,
-    var refCounter: UInt = 0u,
+    var name: String = "",
+    var creator: String = "",
+    var refCounter: Int = 0,
     var creationTS: Timestamp = Timestamp()
 )
