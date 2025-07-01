@@ -1,6 +1,6 @@
 package com.example.viewboard
 
-import com.viewBoard.commonModule.Timestamp
+import com.example.viewboard.backend.Timestamp
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

@@ -65,9 +65,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.navigation.runtime.android)
     implementation(libs.androidx.navigation.compose.android)
-    implementation(project(":commonModule"))
-    implementation(project(":labelModule"))
-    implementation(project(":issueModule"))
 
     // Firebase BoM & Firebase-Services
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))

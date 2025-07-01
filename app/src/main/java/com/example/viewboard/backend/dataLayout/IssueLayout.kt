@@ -1,8 +1,8 @@
 package com.example.viewboard.backend.dataLayout
 
 import com.google.firebase.firestore.DocumentId
-import com.viewBoard.commonModule.Timestamp
-import com.viewBoard.issueModule.IssueState
+import com.example.viewboard.backend.Timestamp
+import com.example.viewboard.backend.IssueState
 
 data class IssueLayout (
     @DocumentId

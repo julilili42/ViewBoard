@@ -1,4 +1,4 @@
-package com.viewBoard.commonModule
+package com.example.viewboard.backend
 
 import java.time.Instant
 import java.time.ZoneId

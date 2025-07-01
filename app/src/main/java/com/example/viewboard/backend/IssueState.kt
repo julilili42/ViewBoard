@@ -1,4 +1,4 @@
-package com.viewBoard.issueModule
+package com.example.viewboard.backend
 
 enum class IssueState {
     NEW,
