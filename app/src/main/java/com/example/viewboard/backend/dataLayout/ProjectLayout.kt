@@ -15,6 +15,7 @@ data class ProjectLayout (
     var totalMilestones: Int = 0,
     var completedMilestones: Float = 0f,
     var issues: ArrayList<String> = ArrayList<String>(),
+    var labels: ArrayList<String> = ArrayList<String>(),
     var users: ArrayList<String> = ArrayList<String>(),
     var creationTS: Timestamp = Timestamp()
 )
