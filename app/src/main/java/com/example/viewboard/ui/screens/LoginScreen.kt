@@ -191,9 +191,9 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
                                 .addOnSuccessListener { doc ->
                                     val isOnline = doc.getBoolean("isOnline") ?: false
                                     if (isOnline) {
-                                        // Benutzer ist schon online → sofort abmelden
-                                        auth.signOut()
-                                        Toast.makeText(context, "Benutzer ist bereits angemeldet.", Toast.LENGTH_SHORT).show()
+//                                        // Benutzer ist schon online → sofort abmelden
+//                                        auth.signOut()
+//                                        Toast.makeText(context, "Benutzer ist bereits angemeldet.", Toast.LENGTH_SHORT).show()
                                     } else {
                                         // Als online markieren
                                         db.collection("users").document(uid).update(
