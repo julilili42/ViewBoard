@@ -198,7 +198,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
                                         // Als online markieren
                                         db.collection("users").document(uid).update(
                                             mapOf(
-                                                "isOnline" to true,
+                                                "isOnline" to false,
                                                 "lastActive" to com.google.firebase.Timestamp.now()
                                             )
                                         )
