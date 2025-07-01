@@ -42,12 +42,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
+import com.example.viewboard.components.ProfilePicture
 import com.example.viewboard.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-
+import com.example.viewboard.components.SectionCard
+import com.example.viewboard.ui.screens.HelpSupportScreen
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -55,20 +57,20 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 24.dp)
         ) {
             item {
                 // profile image
                 Box(contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        androidx.compose.foundation.Image(
+
+                        ProfilePicture(
                             painter = painterResource(id = R.drawable.pb_raoul),
-                            contentDescription = "Profilbild",
-                            modifier = Modifier
-                                .size(120.dp)
-                                .clip(CircleShape)
-                                .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                            contentDescription = "Profilbild Raoul",
+                            size = 120.dp,
+                            borderColor = MaterialTheme.colorScheme.primary,
+                            borderWidth = 3.dp
                         )
+
                         Spacer(modifier = Modifier.size(16.dp))
                         Text(
                             text = "Raoul Mustermann",
@@ -144,29 +146,6 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
 }
 
 @Composable
-private fun SectionCard(
-    title: String,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Card(
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .background(MaterialTheme.colorScheme.surface),
-        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(vertical = 12.dp)) {
-            Text(
-                text = title,
-                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
-            )
-            content()
-        }
-    }
-}
-
-@Composable
 private fun MenuItem(text: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
@@ -212,55 +191,4 @@ private fun NotificationsDialog(
 }
 
 
-@Composable
-fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavController) {
-    Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-        ) {
-            // Back arrow
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Zurück",
-                    modifier = Modifier
-                        .clickable(onClick = { navController.popBackStack() })
-                        .size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "Hilfe & Support",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-                )
-            }
-            Spacer(Modifier.size(24.dp))
 
-            // FAQ
-            SectionCard(title = "FAQ") {
-                MenuItem("Wie verwende ich ViewBoard?", onClick = { /* TODO: Show FAQ */ })
-                Divider()
-                MenuItem("Passwort zurücksetzen", onClick = { /* TODO */ })
-                Divider()
-                MenuItem("Datenschutzrichtlinien", onClick = { /* TODO */ })
-            }
-            Spacer(Modifier.size(24.dp))
-
-            SectionCard(title = "Kontakt") {
-                MenuItem("E-Mail an Support", onClick = { /* TODO: Intent mailto: */ })
-                Divider()
-                MenuItem("Feedback senden", onClick = { /* TODO: Feedback-Form */ })
-            }
-            Spacer(Modifier.weight(1f))
-
-            // app version
-            Text(
-                text = "Version 1.0.0",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-        }
-    }
-}

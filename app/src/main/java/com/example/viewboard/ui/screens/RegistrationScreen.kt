@@ -1,9 +1,8 @@
 package com.example.viewboard.ui.screens
 
-import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +16,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -25,11 +26,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -40,21 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.viewboard.R
+import com.example.viewboard.ui.account.LoginTextField
 import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.theme.Black
 import com.example.viewboard.ui.theme.BlueGray
 import com.example.viewboard.ui.theme.Roboto
 import com.example.viewboard.ui.theme.uiColor
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-
-
-
-
+import androidx.compose.runtime.*
 
 /**
  * Top section of the registration screen displaying the background shape, logo, and app title.
@@ -64,17 +58,17 @@ import androidx.compose.runtime.setValue
 @Composable
 fun RegisterTopSection(modifier: Modifier = Modifier) {
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
         val uiColor = uiColor()
 
-        Box(contentAlignment = Alignment.TopCenter, modifier=Modifier.fillMaxWidth()) {
+        Box(contentAlignment = Alignment.TopCenter) {
             Row(
                 modifier = Modifier.padding(top = 80.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.logo),
@@ -109,15 +103,14 @@ fun RegisterTopSection(modifier: Modifier = Modifier) {
 @Composable
 fun RegisterSection(navController: NavController, modifier: Modifier = Modifier) {
     val uiColor = uiColor()
-    val context = LocalContext.current
 
+    // State für Eingaben
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp),
+        modifier = Modifier.padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
@@ -131,38 +124,17 @@ fun RegisterSection(navController: NavController, modifier: Modifier = Modifier)
             )
             Spacer(modifier = Modifier.height(40.dp))
 
-            LoginTextField(label = "Name", text = name, onTextChange = { name = it })
+            LoginTextField(label = stringResource(R.string.Name), value = name, onValueChange = { name = it })
             Spacer(modifier = Modifier.height(30.dp))
-            LoginTextField(label = "Email", text = email, onTextChange = { email = it })
+
+            LoginTextField(label = stringResource(R.string.Email), value = email, onValueChange = { email = it })
             Spacer(modifier = Modifier.height(30.dp))
-            LoginTextField(label = "Password", text = password, onTextChange = { password = it })
+
+            LoginTextField(label = stringResource(R.string.Password), value = password, onValueChange = { password = it })
             Spacer(modifier = Modifier.height(60.dp))
 
             Button(
-                onClick = {
-                    FirebaseAuth.getInstance()
-                        .createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val uid = task.result.user?.uid ?: return@addOnCompleteListener
-                                val db = Firebase.firestore
-                                val userMap = HashMap<String, String>()
-                                userMap["name"] = name
-                                userMap["email"] = email
-
-                                db.collection("users").document(uid).set(userMap)
-                                    .addOnSuccessListener {
-                                        Toast.makeText(context, "Registrierung erfolgreich", Toast.LENGTH_SHORT).show()
-                                        navController.navigate(Screen.HomeScreen.route)
-                                    }
-                                    .addOnFailureListener {
-                                        Toast.makeText(context, "Fehler beim Speichern: ${it.message}", Toast.LENGTH_SHORT).show()
-                                    }
-                            } else {
-                                Toast.makeText(context, "Fehler: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                },
+                onClick = { navController.navigate(Screen.HomeScreen.route) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
@@ -171,7 +143,7 @@ fun RegisterSection(navController: NavController, modifier: Modifier = Modifier)
                     containerColor = if (isSystemInDarkTheme()) BlueGray else Black,
                     contentColor = Color.White,
                 ),
-                shape = RoundedCornerShape(size = 4.dp)
+                shape = RoundedCornerShape(4.dp)
             ) {
                 Text(
                     text = stringResource(R.string.Register),
@@ -240,15 +212,21 @@ fun RegisterLoginSection(navController: NavController, modifier: Modifier = Modi
  * @param modifier Optional [Modifier] for layout adjustments.
  * @param navController Controller for screen navigation.
  */
+
 @Composable
 fun RegistrationScreen(modifier: Modifier = Modifier, navController: NavController) {
-    Surface() {
+    Surface {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RegisterTopSection()
-            Spacer(modifier = Modifier.height(70.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             RegisterSection(navController = navController)
+            Spacer(modifier = Modifier.height(30.dp))
             RegisterLoginSection(navController = navController)
         }
     }

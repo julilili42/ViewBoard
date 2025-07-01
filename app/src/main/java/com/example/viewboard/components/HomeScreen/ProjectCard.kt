@@ -56,7 +56,7 @@ fun ProjectCard(
                 modifier = Modifier.align(Alignment.Center)
             )
 
-            // Oben rechts: Weißer Kasten mit Gradient-Zahl
+           /* // Oben rechts: Weißer Kasten mit Gradient-Zahl
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -74,7 +74,7 @@ fun ProjectCard(
                         )
                     )
 
-            }
+            }*/
         }
     }
 }

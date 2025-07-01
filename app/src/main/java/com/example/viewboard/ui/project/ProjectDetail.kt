@@ -118,7 +118,7 @@ fun ProjectDetailScreen(
                     .padding(16.dp),
                 onClick = {
                     navController.navigate(
-                        Screen.IssueCreationScreen.createRoute(
+                        Screen.IssueScreen.createRoute(
                             projectName = projectName
                         )
                     )

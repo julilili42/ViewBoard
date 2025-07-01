@@ -156,9 +156,12 @@ fun ProjectsScreen(
                 ProfileHeader(
                     name = "Raoul",
                     subtitle = "Welcome back!!",
+                    navController =navController,
+                    showBackButton = true,
                     onProfileClick = {
                         navController.navigate(BottomBarScreen.Profile.route)
-                    }
+                    },
+                    onBackClick = {navController.navigateUp()}
                 )
 
         },
@@ -174,7 +177,7 @@ fun ProjectsScreen(
                     .offset(y = 40.dp)     // verschiebt den FAB 24dp weiter nach unten
                     .padding(16.dp)
                     .clip(CircleShape), // behält rechts 16dp Abstand,
-                onClick = onAddProject,
+                onClick = { navController.navigate(Screen.ProjectCreationScreen.route) },
 
             )
         }
@@ -184,6 +187,13 @@ fun ProjectsScreen(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
+            Text(
+                text = projectName +" Projects", // z.B. "My Projects"
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -259,7 +269,7 @@ fun ProjectsScreen(
                         totalMilestones     = project.totalMilestones,
                         completedMilestones = project.completedMilestones,
                         avatarUris          = dummyAvatarUris,
-                        onClick             = {navController.navigate(Screen.IssueCreationScreen.createRoute("projectName"))}
+                        onClick             = {navController.navigate(Screen.IssueScreen.createRoute(project.name))}
                     )
                 }
             }
