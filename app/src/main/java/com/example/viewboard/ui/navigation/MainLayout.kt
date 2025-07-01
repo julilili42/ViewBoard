@@ -2,6 +2,7 @@ package com.example.viewboard.ui.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Divider
@@ -34,14 +35,14 @@ sealed class BottomBarScreen(val route: String, @StringRes val title: Int, val i
 fun MainLayout(
     navController: NavHostController,
     currentRoute: String?,
-    content: @Composable (Modifier) -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
         bottomBar = {
             BottomBar(navController = navController, currentRoute = currentRoute)
         }
     ) { innerPadding ->
-        content(Modifier.padding(innerPadding))
+        content(innerPadding)
     }
 }
 

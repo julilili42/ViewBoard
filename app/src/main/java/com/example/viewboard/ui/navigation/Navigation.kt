@@ -2,6 +2,7 @@ package com.example.viewboard.ui.navigation
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -75,29 +76,64 @@ fun Navigation(modifier: Modifier = Modifier) {
             navigation(startDestination = BottomBarScreen.Home.route, route = "main") {
                 composable(BottomBarScreen.Home.route) {
                     MainLayout(navController, currentRoute) { padding ->
-                        HomeScreen(navController = navController)
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding) // ✅ korrekt
+                        ) {
+                            HomeScreen(
+                                navController = navController,
+                                modifier = Modifier
+                            )
+                        }
                     }
+
                 }
                 composable(BottomBarScreen.Timetable.route) {
                     MainLayout(navController, currentRoute) { padding ->
-                        TimetableScreen(navController = navController)
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding) // ✅ korrekt
+                        ) {
+                            TimetableScreen(navController = navController)
+                        }
                     }
                 }
                 composable(BottomBarScreen.View.route) {
                     MainLayout(navController, currentRoute) { padding ->
-                        ViewScreen(navController = navController)
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding) // ✅ korrekt
+                        ) {
+                            ViewScreen(navController = navController)
+                        }
                     }
                 }
                 composable(BottomBarScreen.Profile.route) {
                     MainLayout(navController, currentRoute) { padding ->
-                        ProfileScreen(navController = navController)
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding) // ✅ korrekt
+                        ) {
+                            ProfileScreen(navController = navController)
+                        }
                     }
                 }
             }
 
             composable(BottomBarScreen.Profile.route) {
                 MainLayout(navController, currentRoute) { padding ->
-                    ProfileScreen(navController = navController)
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(padding) // ✅ korrekt
+                    ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding) // ✅ korrekt
+                    ) {
+                        ProfileScreen(navController = navController)
+                    }
+                }
                 }
             }
             composable(
@@ -108,12 +144,22 @@ fun Navigation(modifier: Modifier = Modifier) {
             ) { backStackEntry ->
                 val projectName = backStackEntry.arguments!!.getString("projectName")!!
                 MainLayout(navController, currentRoute) { padding ->
-                    ProjectsScreen(navController = navController, projectName = projectName)
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(padding) // ✅ korrekt
+                    ) {
+                        ProjectsScreen(navController = navController, projectName = projectName)
+                    }
                 }
             }
             composable(Screen.HelpSupportScreen.route) {
                 MainLayout(navController, currentRoute) { padding ->
-                    HelpSupportScreen(navController = navController)
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(padding) // ✅ korrekt
+                    ) {
+                        HelpSupportScreen(navController = navController)
+                    }
                 }
             }
             composable(
@@ -124,10 +170,15 @@ fun Navigation(modifier: Modifier = Modifier) {
             ) { backStack ->
                 val projectName = backStack.arguments!!.getString("projectName")!!
                 MainLayout(navController, currentRoute) { padding ->
-                    DragableScreen(
-                        modifier = Modifier.fillMaxSize(),
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(padding) // ✅ korrekt
                     ) {
-                        IssueScreen(mainViewModel, navController, projectName)
+                        DragableScreen(
+                            modifier = Modifier.fillMaxSize(),
+                        ) {
+                            IssueScreen(mainViewModel, navController, projectName)
+                        }
                     }
                 }
             }

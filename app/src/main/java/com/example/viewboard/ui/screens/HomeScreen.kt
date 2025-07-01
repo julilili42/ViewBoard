@@ -44,6 +44,7 @@ fun HomeScreen(
     navController: NavController,
     activeProjects: List<String> = listOf("Created", "Shared", "Archived", "All"),
     myTasks: List<Pair<String, LocalDateTime>> = tasks,
+    modifier: Modifier,
     onSortTasks: () -> Unit = {}
 ) {
     var columnHeightPx    by remember { mutableStateOf(0) }
@@ -60,7 +61,7 @@ fun HomeScreen(
                         onProfileClick = {
                             navController.navigate(BottomBarScreen.Profile.route)
                         },
-                        onBackClick = {navController.navigateUp()}
+                        onBackClick = {navController.navigateUp()},
             )
         }
     ) { paddingValues ->
@@ -73,7 +74,6 @@ fun HomeScreen(
                     screenHeightPx = coords.size.height
                 }
         ) {
-            var topContentHeightPx by remember { mutableStateOf(0f) }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -58,7 +58,7 @@ fun TimelineSchedule(
         }
         val dummyIssues = extractIssueDates(issues)
 
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
+        Column(modifier = Modifier.fillMaxSize()) {
             // 1) Monat/Jahr Picker
             MonthYearPicker(
                 year = year,
@@ -67,7 +67,7 @@ fun TimelineSchedule(
                 onYearChange = onYearChange,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 4.dp)
             )
 
             // 2) Kalender
@@ -95,7 +95,7 @@ fun TimelineSchedule(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f) // nimmt den restlichen Platz ein
-                    .padding(8.dp)
+                    .padding(start = 8.dp, top = 0.dp, end = 8.dp, bottom = 0.dp)
             ) {
                 when {
                     selectedDate == null -> {
@@ -115,7 +115,7 @@ fun TimelineSchedule(
                     else -> {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxSize().navigationBarsPadding()
+                            modifier = Modifier.fillMaxSize()
                         ) {
                             item {
                                 Text(

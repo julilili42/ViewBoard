@@ -57,7 +57,6 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 24.dp)
         ) {
             item {
                 // profile image
