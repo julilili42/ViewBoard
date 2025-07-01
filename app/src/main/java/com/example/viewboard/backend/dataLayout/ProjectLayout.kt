@@ -12,5 +12,6 @@ data class ProjectLayout (
     var startMonth: Int = 0, // 1–12
     var endMonth: Int = 0,   // 1–12
     var totalMilestones: Int = 0,
-    var completedMilestones: Float = 0f
+    var completedMilestones: Float = 0f,
+    var issues: ArrayList<String> = ArrayList<String>(),
 )
