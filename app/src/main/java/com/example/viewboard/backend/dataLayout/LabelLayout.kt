@@ -1,4 +1,4 @@
-package com.example.viewboard.dataLayout
+package com.example.viewboard.backend.dataLayout
 
 import com.google.firebase.firestore.DocumentId
 import com.viewBoard.commonModule.Timestamp
@@ -9,5 +9,5 @@ data class LabelLayout (
     var name: String,
     var creator: String,
     var refCounter: UInt = 0u,
-    var creationTS: Timestamp = Timestamp(),
+    var creationTS: Timestamp = Timestamp()
 )
