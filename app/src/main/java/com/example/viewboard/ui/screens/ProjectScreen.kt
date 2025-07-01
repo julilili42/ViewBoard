@@ -177,7 +177,7 @@ fun ProjectsScreen(
                     .offset(y = 40.dp)     // verschiebt den FAB 24dp weiter nach unten
                     .padding(16.dp)
                     .clip(CircleShape), // behält rechts 16dp Abstand,
-                onClick = onAddProject,
+                onClick = { navController.navigate(Screen.ProjectCreationScreen.route) },
 
             )
         }
@@ -269,7 +269,7 @@ fun ProjectsScreen(
                         totalMilestones     = project.totalMilestones,
                         completedMilestones = project.completedMilestones,
                         avatarUris          = dummyAvatarUris,
-                        onClick             = {navController.navigate(Screen.IssueCreationScreen.createRoute(project.name))}
+                        onClick             = {navController.navigate(Screen.IssueScreen.createRoute(project.name))}
                     )
                 }
             }

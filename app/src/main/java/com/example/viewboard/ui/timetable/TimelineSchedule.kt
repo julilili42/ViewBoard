@@ -136,10 +136,10 @@ fun TimelineSchedule(
                                     name = issue.title,
                                     dueDateTime = dueDateTime,
                                     onClick = {
-                                        navController.navigate(Screen.IssueCreationScreen.createRoute(issue.title))
+                                        navController.navigate(Screen.IssueScreen.createRoute(issue.title))
                                     },
                                     onMenuClick = {
-                                        navController.navigate(Screen.IssueCreationScreen.createRoute(issue.title))
+                                        navController.navigate(Screen.IssueScreen.createRoute(issue.title))
                                     }
                                 )
                             }

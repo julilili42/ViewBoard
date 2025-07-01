@@ -2,6 +2,7 @@ package com.example.viewboard.ui.navigation
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,9 +39,11 @@ import com.example.viewboard.ui.screens.DragableScreen
 import com.example.viewboard.ui.screens.IssueScreen
 import com.example.viewboard.ui.issue.MainViewModel
 import com.example.viewboard.ui.screens.HelpSupportScreen
+import com.example.viewboard.ui.screens.IssueCreationScreen
 import com.example.viewboard.ui.screens.ProjectsScreen
 import com.example.viewboard.ui.screens.TimetableScreen
 import com.example.viewboard.ui.screens.ProfileScreen
+import com.example.viewboard.ui.screens.ProjectCreationScreen
 import com.example.viewboard.ui.screens.ViewScreen
 
 
@@ -152,7 +155,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                     }
                 }
             }
-            composable(Screen.HelpSupportScreen.route) {
+            composable(route = Screen.HelpSupportScreen.route) {
                 MainLayout(navController, currentRoute) { padding ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
@@ -162,8 +165,32 @@ fun Navigation(modifier: Modifier = Modifier) {
                     }
                 }
             }
+            composable(route = Screen.IssueCreationScreen.route) {
+                MainLayout(navController, currentRoute) { padding ->
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(padding)
+                    ) {
+
+                            IssueCreationScreen(navController = navController)
+
+                    }
+                }
+            }
+            composable(route = Screen.ProjectCreationScreen.route) {
+                MainLayout(navController, currentRoute) { padding ->
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(padding)
+                    ) {
+
+                        ProjectCreationScreen(navController = navController)
+
+                    }
+                }
+            }
             composable(
-                route = Screen.IssueCreationScreen.route,
+                route = Screen.IssueScreen.route,
                 arguments = listOf(navArgument("projectName") {
                     type = NavType.StringType
                 })
@@ -181,56 +208,6 @@ fun Navigation(modifier: Modifier = Modifier) {
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun BottomBar(navController: NavHostController, currentRoute: String?) {
-    val items = listOf(
-        BottomBarScreen.Home,
-        BottomBarScreen.Timetable,
-        BottomBarScreen.View,
-        BottomBarScreen.Profile
-    )
-
-    Column(modifier = Modifier
-        .fillMaxWidth()
-    ) {
-        Divider(
-            color = Color.LightGray,
-            thickness = 1.dp
-        )
-        NavigationBar(
-            containerColor = Color.White,
-            contentColor = Color.Black
-        ) {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val current = navBackStackEntry?.destination?.route
-
-            items.forEach { screen ->
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = screen.iconRes),
-                            contentDescription = stringResource(screen.title),
-                            modifier      = Modifier.size(26.dp))
-                    },
-                    label = { Text(stringResource(screen.title)) },
-                    selected = current == screen.route,
-                    onClick = {
-                        if (current != screen.route) {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    }
-                )
             }
         }
     }

@@ -29,6 +29,7 @@ import com.example.viewboard.ui.issue.IssueItemCard
 import com.example.viewboard.ui.issue.IssueUiItem
 import com.example.viewboard.ui.issue.MainViewModel
 import com.example.viewboard.ui.navigation.BottomBarScreen
+import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.project.CustomSearchField
 import com.example.viewboard.ui.timetable.CustomIcon
 
@@ -64,7 +65,7 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                     .offset(y = 40.dp)     // verschiebt den FAB 24dp weiter nach unten
                     .padding(16.dp)
                     .clip(CircleShape), // behält rechts 16dp Abstand,
-                onClick = {},
+                onClick = {navController.navigate(Screen.IssueCreationScreen.route)},
 
                 )
         }
