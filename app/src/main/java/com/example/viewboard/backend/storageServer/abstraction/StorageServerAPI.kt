@@ -17,8 +17,10 @@ abstract class StorageServerAPI () {
 
     public abstract fun updProject(id: String, projectLayout: ProjectLayout)
 
+    public abstract suspend fun getProject(id: String) : ProjectLayout?
+
     public abstract fun getProjects() : Flow<List<ProjectLayout>>
-    
+
     public abstract fun addLabel(labelLayout: LabelLayout)
 
     public abstract fun rmLabel(labelLayout: LabelLayout)
@@ -28,6 +30,8 @@ abstract class StorageServerAPI () {
     public abstract fun updLabel(labelLayout: LabelLayout)
 
     public abstract fun updLabel(id: String, labelLayout: LabelLayout)
+
+    public abstract suspend fun getLabel(id: String) : LabelLayout?
 
     public abstract fun getLabels() : Flow<List<LabelLayout>>
 
@@ -41,6 +45,8 @@ abstract class StorageServerAPI () {
 
     public abstract fun updIssue(id: String, issueLayout: IssueLayout)
 
+    public abstract suspend fun getIssue(id: String) : IssueLayout?
+
     public abstract fun getIssues() : Flow<List<IssueLayout>>
 
     public abstract fun addView(viewLayout: ViewLayout)
@@ -52,6 +58,8 @@ abstract class StorageServerAPI () {
     public abstract fun updView(viewLayout: ViewLayout)
 
     public abstract fun updView(id: String, viewLayout: ViewLayout)
+
+    public abstract suspend fun getView(id: String) : ViewLayout?
 
     public abstract fun getViews() : Flow<List<ViewLayout>>
 

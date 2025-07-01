@@ -12,6 +12,7 @@ import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 
 object FirebaseAPI : StorageServerAPI() {
     public fun init() {
@@ -56,6 +57,11 @@ object FirebaseAPI : StorageServerAPI() {
         m_projectTable.document(id).set(projectLayout)
     }
 
+    public override suspend fun getProject(id: String) : ProjectLayout? {
+        val snap = m_projectTable.document(id).get().await()
+        return snap.toObject(ProjectLayout::class.java)
+    }
+
     public override fun getProjects() : Flow<List<ProjectLayout>> {
         return m_projects
     }
@@ -90,6 +96,11 @@ object FirebaseAPI : StorageServerAPI() {
         m_labelTable.document(id).set(labelLayout)
     }
 
+    public override suspend fun getLabel(id: String) : LabelLayout? {
+        val snap = m_labelTable.document(id).get().await()
+        return snap.toObject(LabelLayout::class.java)
+    }
+
     public override fun getLabels() : Flow<List<LabelLayout>> {
         return m_labels
     }
@@ -120,6 +131,11 @@ object FirebaseAPI : StorageServerAPI() {
         m_issueTable.document(id).set(issueLayout)
     }
 
+    public override suspend fun getIssue(id: String) : IssueLayout? {
+        val snap = m_issueTable.document(id).get().await()
+        return snap.toObject(IssueLayout::class.java)
+    }
+
     public override fun getIssues() : Flow<List<IssueLayout>> {
         return m_issues
     }
@@ -148,6 +164,11 @@ object FirebaseAPI : StorageServerAPI() {
 
     public override fun updView(id: String, viewLayout: ViewLayout) {
         m_viewTable.document(id).set(viewLayout)
+    }
+
+    public override suspend fun getView(id: String) : ViewLayout? {
+        val snap = m_viewTable.document(id).get().await()
+        return snap.toObject(ViewLayout::class.java)
     }
 
     public override fun getViews() : Flow<List<ViewLayout>> {
