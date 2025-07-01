@@ -7,12 +7,12 @@ import com.viewBoard.issueModule.IssueState
 data class IssueLayout (
     @DocumentId
     var id: String = "",
-    var title: String,
-    var desc: String,
-    var creator: String,
-    var state: IssueState,
-    var assignments: ArrayList<String>,
-    var labels: ArrayList<LabelLayout>,
+    var title: String = "",
+    var desc: String = "",
+    var creator: String = "",
+    var state: IssueState = IssueState.NEW,
+    var assignments: ArrayList<String> = ArrayList<String>(),
+    var labels: ArrayList<LabelLayout> = ArrayList<LabelLayout>(),
     var creationTS: Timestamp = Timestamp(),
     var deadlineTS: Timestamp = Timestamp()
 )
