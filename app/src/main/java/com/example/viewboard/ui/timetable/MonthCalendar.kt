@@ -81,9 +81,9 @@ fun MonthCalendar(
                     .aspectRatio(1f)
                     .background(
                         if (isCurrent)
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                         else
-                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
                     )
                     .padding(4.dp),
                 contentAlignment = Alignment.TopStart
