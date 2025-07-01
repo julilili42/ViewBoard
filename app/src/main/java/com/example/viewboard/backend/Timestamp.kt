@@ -47,4 +47,8 @@ class Timestamp (
     public fun import(data: String) {
         m_instant = Instant.parse(data)
     }
+
+    public fun import(instant: Instant) {
+        m_instant = instant
+    }
 }
