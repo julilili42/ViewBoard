@@ -21,11 +21,11 @@ abstract class StorageServerAPI () {
 
     public abstract fun getProjects() : Flow<List<ProjectLayout>>
 
-    public abstract fun addLabel(labelLayout: LabelLayout)
+    public abstract suspend fun addLabel(projID: String, labelLayout: LabelLayout)
 
-    public abstract fun rmLabel(labelLayout: LabelLayout)
+    public abstract suspend fun rmLabel(projID: String, labelLayout: LabelLayout)
 
-    public abstract fun rmLabel(id: String)
+    public abstract suspend fun rmLabel(projID: String, id: String)
 
     public abstract fun updLabel(labelLayout: LabelLayout)
 
@@ -35,11 +35,13 @@ abstract class StorageServerAPI () {
 
     public abstract fun getLabels() : Flow<List<LabelLayout>>
 
-    public abstract fun addIssue(issueLayout: IssueLayout)
+    public abstract fun getLabels(projID: String) : Flow<List<LabelLayout>>
 
-    public abstract fun rmIssue(issueLayout: IssueLayout)
+    public abstract suspend fun addIssue(projID: String, issueLayout: IssueLayout)
 
-    public abstract fun rmIssue(id: String)
+    public abstract suspend fun rmIssue(projID: String, issueLayout: IssueLayout)
+
+    public abstract suspend fun rmIssue(projID: String, id: String)
 
     public abstract fun updIssue(issueLayout: IssueLayout)
 
@@ -49,11 +51,13 @@ abstract class StorageServerAPI () {
 
     public abstract fun getIssues() : Flow<List<IssueLayout>>
 
-    public abstract fun addView(viewLayout: ViewLayout)
+    public abstract fun getIssues(projID: String) : Flow<List<IssueLayout>>
 
-    public abstract fun rmView(viewLayout: ViewLayout)
+    public abstract suspend fun addView(projID: String, viewLayout: ViewLayout)
 
-    public abstract fun rmView(id: String)
+    public abstract suspend fun rmView(projID: String, viewLayout: ViewLayout)
+
+    public abstract suspend fun rmView(projID: String, id: String)
 
     public abstract fun updView(viewLayout: ViewLayout)
 
@@ -63,10 +67,13 @@ abstract class StorageServerAPI () {
 
     public abstract fun getViews() : Flow<List<ViewLayout>>
 
+    public abstract fun getViews(projID: String) : Flow<List<ViewLayout>>
+
     protected lateinit var m_projects: Flow<List<ProjectLayout>>
     protected lateinit var m_labels: Flow<List<LabelLayout>>
     protected lateinit var m_issues: Flow<List<IssueLayout>>
     protected lateinit var m_views: Flow<List<ViewLayout>>
 
     // TODO could the get functions provide a read only ref ?
+    // TODO add suspend to other functions ? -> than await must be added
 }

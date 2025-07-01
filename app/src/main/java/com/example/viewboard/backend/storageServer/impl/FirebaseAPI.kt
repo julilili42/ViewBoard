@@ -11,6 +11,10 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
@@ -66,9 +70,15 @@ object FirebaseAPI : StorageServerAPI() {
         return m_projects
     }
 
-    public override fun addLabel(labelLayout: LabelLayout) {
+    public override suspend fun addLabel(projID: String, labelLayout: LabelLayout) {
+        val proj: ProjectLayout? = getProject(projID)
+
         m_labelTable.add(labelLayout)
             .addOnSuccessListener { ref ->
+                proj!!.labels.add(ref.id)
+
+                updProject(proj!!)
+
                 println("success adding label: " + ref.id)
             }
             .addOnFailureListener {
@@ -76,14 +86,26 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun rmLabel(labelLayout: LabelLayout) {
+    public override suspend fun rmLabel(projID: String, labelLayout: LabelLayout) {
         // TODO: print warning or inform the user, if ref counter > 0
+
+        val proj: ProjectLayout? = getProject(projID)
+
+        proj!!.labels.remove(labelLayout.id)
+
+        updProject(proj!!)
 
         m_labelTable.document(labelLayout.id).delete()
     }
 
-    public override fun rmLabel(id: String) {
+    public override suspend fun rmLabel(projID: String, id: String) {
         // TODO: print warning or inform the user, if ref counter > 0
+
+        val proj: ProjectLayout? = getProject(projID)
+
+        proj!!.labels.remove(id)
+
+        updProject(proj!!)
 
         m_labelTable.document(id).delete()
     }
@@ -105,9 +127,37 @@ object FirebaseAPI : StorageServerAPI() {
         return m_labels
     }
 
-    public override fun addIssue(issueLayout: IssueLayout) {
+    public override fun getLabels(projID: String) : Flow<List<LabelLayout>> {
+        return m_projectTable.document(projID).snapshots()
+            .map { snap ->
+                snap.toObject(ProjectLayout::class.java)?.labels ?: emptyList()
+            }
+            .distinctUntilChanged()
+            .flatMapLatest { labels ->
+                if (labels.isEmpty()) return@flatMapLatest flowOf(emptyList())
+                val docFlows = labels.map { label ->
+                    m_labelTable.document(label).snapshots()
+                        .map { snap ->
+                            snap.toObject(LabelLayout::class.java)
+                        }
+                }
+
+                combine (docFlows) { docs ->
+                    val map = docs.filterNotNull().associateBy { it.id }
+                    labels.mapNotNull { map[it] }
+                }
+            }
+    }
+
+    public override suspend fun addIssue(projID: String, issueLayout: IssueLayout) {
+        val proj: ProjectLayout? = getProject(projID)
+
         m_issueTable.add(issueLayout)
             .addOnSuccessListener { ref ->
+                proj!!.issues.add(ref.id)
+
+                updProject(proj!!)
+
                 println("success adding issue: " + ref.id)
             }
             .addOnFailureListener {
@@ -115,11 +165,23 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun rmIssue(issueLayout: IssueLayout) {
+    public override suspend fun rmIssue(projID: String, issueLayout: IssueLayout) {
+        val proj: ProjectLayout? = getProject(projID)
+
+        proj!!.issues.remove(issueLayout.id)
+
+        updProject(proj!!)
+
         m_issueTable.document(issueLayout.id).delete()
     }
 
-    public override fun rmIssue(id: String) {
+    public override suspend fun rmIssue(projID: String, id: String) {
+        val proj: ProjectLayout? = getProject(projID)
+
+        proj!!.issues.remove(id)
+
+        updProject(proj!!)
+
         m_issueTable.document(id).delete()
     }
 
@@ -140,9 +202,37 @@ object FirebaseAPI : StorageServerAPI() {
         return m_issues
     }
 
-    public override fun addView(viewLayout: ViewLayout) {
+    public override fun getIssues(projID: String) : Flow<List<IssueLayout>> {
+        return m_projectTable.document(projID).snapshots()
+            .map { snap ->
+                snap.toObject(ProjectLayout::class.java)?.issues ?: emptyList()
+            }
+            .distinctUntilChanged()
+            .flatMapLatest { issues ->
+                if (issues.isEmpty()) return@flatMapLatest flowOf(emptyList())
+                val docFlows = issues.map { issue ->
+                    m_issueTable.document(issue).snapshots()
+                        .map { snap ->
+                            snap.toObject(IssueLayout::class.java)
+                        }
+                }
+
+                combine (docFlows) { docs ->
+                    val map = docs.filterNotNull().associateBy { it.id }
+                    issues.mapNotNull { map[it] }
+                }
+            }
+    }
+
+    public override suspend fun addView(projID: String, viewLayout: ViewLayout) {
+        val proj: ProjectLayout? = getProject(projID)
+
         m_viewTable.add(viewLayout)
             .addOnSuccessListener { ref ->
+                proj!!.views.add(ref.id)
+
+                updProject(proj!!)
+
                 println("success adding view: " + ref.id)
             }
             .addOnFailureListener {
@@ -150,11 +240,23 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun rmView(viewLayout: ViewLayout) {
+    public override suspend fun rmView(projID: String, viewLayout: ViewLayout) {
+        val proj: ProjectLayout? = getProject(projID)
+
+        proj!!.views.remove(viewLayout.id)
+
+        updProject(proj!!)
+
         m_viewTable.document(viewLayout.id).delete()
     }
 
-    public override fun rmView(id: String) {
+    public override suspend fun rmView(projID: String, id: String) {
+        val proj: ProjectLayout? = getProject(projID)
+
+        proj!!.views.remove(id)
+
+        updProject(proj!!)
+
         m_viewTable.document(id).delete()
     }
 
@@ -175,8 +277,32 @@ object FirebaseAPI : StorageServerAPI() {
         return m_views
     }
 
+    public override fun getViews(projID: String) : Flow<List<ViewLayout>> {
+        return m_projectTable.document(projID).snapshots()
+            .map { snap ->
+                snap.toObject(ProjectLayout::class.java)?.views ?: emptyList()
+            }
+            .distinctUntilChanged()
+            .flatMapLatest { views ->
+                if (views.isEmpty()) return@flatMapLatest flowOf(emptyList())
+                val docFlows = views.map { view ->
+                    m_viewTable.document(view).snapshots()
+                        .map { snap ->
+                            snap.toObject(ViewLayout::class.java)
+                        }
+                }
+
+                combine (docFlows) { docs ->
+                    val map = docs.filterNotNull().associateBy { it.id }
+                    views.mapNotNull { map[it] }
+                }
+            }
+    }
+
     private lateinit var m_projectTable: CollectionReference
     private lateinit var m_labelTable: CollectionReference
     private lateinit var m_issueTable: CollectionReference
     private lateinit var m_viewTable: CollectionReference
+
+    // TODO is it bad to use set() to update instead of .update() ?
 }
