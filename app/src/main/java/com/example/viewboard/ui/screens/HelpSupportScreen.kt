@@ -35,7 +35,6 @@ fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavControlle
             .fillMaxSize()
             .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
             // Back arrow
             Box(
