@@ -3,6 +3,7 @@ package com.example.viewboard.backend.storageServer.impl
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.storageServer.abstraction.StorageServerAPI
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
@@ -24,6 +25,9 @@ object FirebaseAPI : StorageServerAPI() {
 
         m_issueTable = db.collection("Issues")
         m_issues = m_issueTable.snapshots().map { it.toObjects<IssueLayout>() }
+
+        m_viewTable = db.collection("Views")
+        m_views = m_viewTable.snapshots().map { it.toObjects<ViewLayout>() }
     }
 
     public override fun addProject(projectLayout: ProjectLayout) {
@@ -120,7 +124,38 @@ object FirebaseAPI : StorageServerAPI() {
         return m_issues
     }
 
+    public override fun addView(viewLayout: ViewLayout) {
+        m_viewTable.add(viewLayout)
+            .addOnSuccessListener { ref ->
+                println("success adding view: " + ref.id)
+            }
+            .addOnFailureListener {
+                println("Failure adding view: ")
+            }
+    }
+
+    public override fun rmView(viewLayout: ViewLayout) {
+        m_viewTable.document(viewLayout.id).delete()
+    }
+
+    public override fun rmView(id: String) {
+        m_viewTable.document(id).delete()
+    }
+
+    public override fun updView(viewLayout: ViewLayout) {
+        m_viewTable.document(viewLayout.id).set(viewLayout)
+    }
+
+    public override fun updView(id: String, viewLayout: ViewLayout) {
+        m_viewTable.document(id).set(viewLayout)
+    }
+
+    public override fun getViews() : Flow<List<ViewLayout>> {
+        return m_views
+    }
+
     private lateinit var m_projectTable: CollectionReference
     private lateinit var m_labelTable: CollectionReference
     private lateinit var m_issueTable: CollectionReference
+    private lateinit var m_viewTable: CollectionReference
 }

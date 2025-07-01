@@ -3,6 +3,7 @@ package com.example.viewboard.backend.storageServer.abstraction
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.dataLayout.ViewLayout
 import kotlinx.coroutines.flow.Flow
 
 abstract class StorageServerAPI () {
@@ -42,9 +43,22 @@ abstract class StorageServerAPI () {
 
     public abstract fun getIssues() : Flow<List<IssueLayout>>
 
+    public abstract fun addView(viewLayout: ViewLayout)
+
+    public abstract fun rmView(viewLayout: ViewLayout)
+
+    public abstract fun rmView(id: String)
+
+    public abstract fun updView(viewLayout: ViewLayout)
+
+    public abstract fun updView(id: String, viewLayout: ViewLayout)
+
+    public abstract fun getViews() : Flow<List<ViewLayout>>
+
     protected lateinit var m_projects: Flow<List<ProjectLayout>>
     protected lateinit var m_labels: Flow<List<LabelLayout>>
     protected lateinit var m_issues: Flow<List<IssueLayout>>
+    protected lateinit var m_views: Flow<List<ViewLayout>>
 
     // TODO could the get functions provide a read only ref ?
 }
