@@ -303,6 +303,4 @@ object FirebaseAPI : StorageServerAPI() {
     private lateinit var m_labelTable: CollectionReference
     private lateinit var m_issueTable: CollectionReference
     private lateinit var m_viewTable: CollectionReference
-
-    // TODO is it bad to use set() to update instead of .update() ?
 }

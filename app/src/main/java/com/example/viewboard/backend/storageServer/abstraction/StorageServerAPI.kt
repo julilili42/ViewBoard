@@ -73,7 +73,4 @@ abstract class StorageServerAPI () {
     protected lateinit var m_labels: Flow<List<LabelLayout>>
     protected lateinit var m_issues: Flow<List<IssueLayout>>
     protected lateinit var m_views: Flow<List<ViewLayout>>
-
-    // TODO could the get functions provide a read only ref ?
-    // TODO add suspend to other functions ? -> than await must be added
 }
