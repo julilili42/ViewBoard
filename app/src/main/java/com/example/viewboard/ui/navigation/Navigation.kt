@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -28,28 +29,20 @@ import com.example.viewboard.ui.screens.LoginScreen
 import com.example.viewboard.ui.screens.RegistrationScreen
 import com.example.viewboard.ui.screens.HomeScreen
 import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.viewboard.ui.screens.DragableScreen
 import com.example.viewboard.ui.screens.IssueScreen
 import com.example.viewboard.ui.issue.MainViewModel
 import com.example.viewboard.ui.screens.HelpSupportScreen
-import com.example.viewboard.ui.screens.ProfileScreen
 import com.example.viewboard.ui.screens.ProjectsScreen
 import com.example.viewboard.ui.screens.TimetableScreen
+import com.example.viewboard.ui.screens.ProfileScreen
 import com.example.viewboard.ui.screens.ViewScreen
 
-sealed class BottomBarScreen(val route: String, @StringRes val title: Int, val iconRes: Int) {
-    object Home     : BottomBarScreen("home",      R.string.home,      R.drawable.house_black_silhouette_without_door_svgrepo_com)
-    object Timetable: BottomBarScreen("timetable", R.string.timetable, R.drawable.calendar_mark_svgrepo_com)
-    object View : BottomBarScreen("View",  R.string.views,  R.drawable.contacts_svgrepo_com)
-    object Profile  : BottomBarScreen("profile",   R.string.profile,   R.drawable.user_svgrepo_com)
-}
+
 
 @SuppressLint("ViewModelConstructorInComposable")
 @Composable
@@ -59,24 +52,18 @@ fun Navigation(modifier: Modifier = Modifier) {
     val currentRoute = navBackStackEntry?.destination?.route
     val hideOn = listOf(
         Screen.LoginScreen.route,
-        Screen.RegistrationScreen.route,
-        Screen.HelpSupportScreen.route
+        Screen.RegistrationScreen.route
     )
     val showBottomBar = currentRoute !in hideOn
     val mainViewModel = MainViewModel()
 
     Scaffold(
         modifier = modifier,
-        bottomBar = {
-            if (showBottomBar) {
-                BottomBar(navController = navController, currentRoute = currentRoute)
-            }
-        }
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = Screen.LoginScreen.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
         ) {
             composable(Screen.LoginScreen.route) {
                 LoginScreen(navController = navController)
@@ -84,47 +71,64 @@ fun Navigation(modifier: Modifier = Modifier) {
             composable(Screen.RegistrationScreen.route) {
                 RegistrationScreen(navController = navController)
             }
-            composable(Screen.HelpSupportScreen.route) {
-                HelpSupportScreen(navController = navController)
-            }
-            navigation(
-                startDestination = BottomBarScreen.Home.route,
-                route = "main"
-            ) {
+
+            navigation(startDestination = BottomBarScreen.Home.route, route = "main") {
                 composable(BottomBarScreen.Home.route) {
-                    HomeScreen(navController = navController)
+                    MainLayout(navController, currentRoute) { padding ->
+                        HomeScreen(navController = navController)
+                    }
                 }
                 composable(BottomBarScreen.Timetable.route) {
-                    TimetableScreen(navController = navController)
+                    MainLayout(navController, currentRoute) { padding ->
+                        TimetableScreen(navController = navController)
+                    }
                 }
                 composable(BottomBarScreen.View.route) {
-                    ViewScreen(navController = navController)
+                    MainLayout(navController, currentRoute) { padding ->
+                        ViewScreen(navController = navController)
+                    }
                 }
                 composable(BottomBarScreen.Profile.route) {
+                    MainLayout(navController, currentRoute) { padding ->
+                        ProfileScreen(navController = navController)
+                    }
+                }
+            }
+
+            composable(BottomBarScreen.Profile.route) {
+                MainLayout(navController, currentRoute) { padding ->
                     ProfileScreen(navController = navController)
                 }
             }
             composable(
                 route = Screen.ProjectDetail.route,
-                arguments = listOf(navArgument("projectName"){
+                arguments = listOf(navArgument("projectName") {
                     type = NavType.StringType
                 })
             ) { backStackEntry ->
                 val projectName = backStackEntry.arguments!!.getString("projectName")!!
-                ProjectsScreen(
-                    navController = navController,
-                    projectName = projectName,
-                )
+                MainLayout(navController, currentRoute) { padding ->
+                    ProjectsScreen(navController = navController, projectName = projectName)
+                }
+            }
+            composable(Screen.HelpSupportScreen.route) {
+                MainLayout(navController, currentRoute) { padding ->
+                    HelpSupportScreen(navController = navController)
+                }
             }
             composable(
                 route = Screen.IssueCreationScreen.route,
-                arguments = listOf(navArgument("projectName") { type = NavType.StringType })
+                arguments = listOf(navArgument("projectName") {
+                    type = NavType.StringType
+                })
             ) { backStack ->
                 val projectName = backStack.arguments!!.getString("projectName")!!
-                DragableScreen(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    IssueScreen(mainViewModel,navController)
+                MainLayout(navController, currentRoute) { padding ->
+                    DragableScreen(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        IssueScreen(mainViewModel, navController, projectName)
+                    }
                 }
             }
         }
@@ -149,8 +153,7 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
         )
         NavigationBar(
             containerColor = Color.White,
-            contentColor = Color.Black,
-            modifier = Modifier.padding(bottom = 1.dp)
+            contentColor = Color.Black
         ) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val current = navBackStackEntry?.destination?.route
@@ -163,7 +166,7 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
                             contentDescription = stringResource(screen.title),
                             modifier      = Modifier.size(26.dp))
                     },
-                    label = { Text(stringResource(screen.title), color = MaterialTheme.colorScheme.inverseOnSurface) },
+                    label = { Text(stringResource(screen.title)) },
                     selected = current == screen.route,
                     onClick = {
                         if (current != screen.route) {

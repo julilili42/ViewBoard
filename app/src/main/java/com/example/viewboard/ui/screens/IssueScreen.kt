@@ -1,6 +1,7 @@
 package com.example.viewboard.ui.screens
 
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,7 +34,7 @@ import com.example.viewboard.ui.timetable.CustomIcon
 
 
 @Composable
-fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,) {
+fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,projectName:String) {
     val categories = listOf("New", "Ongoing", "Completed")
     var selectedTab by remember { mutableStateOf(0) }
 
@@ -42,9 +43,12 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,) {
             ProfileHeader(
                 name = "Raoul",
                 subtitle = "Welcome back!!",
+                navController =navController,
+                showBackButton = true,
                 onProfileClick = {
                     navController.navigate(BottomBarScreen.Profile.route)
-                }
+                },
+                onBackClick = {navController.navigateUp()}
             )
 
         },
@@ -70,6 +74,13 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,) {
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
+            Text(
+                text = projectName +" - Issues", // z.B. "My Projects"
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            )
             // Aktionsleiste unter der Überschrift
             Row(
                 modifier = Modifier
@@ -191,6 +202,13 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,) {
                     .padding(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                val dummyAvatarUris = listOf(
+                    Uri.parse("https://picsum.photos/seed/1/64"),
+                    Uri.parse("https://picsum.photos/seed/2/64"),
+                    Uri.parse("https://picsum.photos/seed/3/64"),
+                    Uri.parse("https://picsum.photos/seed/4/64"),
+                    Uri.parse("https://picsum.photos/seed/5/64")
+                )
                 mainViewModel.getItemsForCategory(selectedTab).forEach { item ->
                     key(item.id) {      // <-- HIER der wichtigste Schritt
                         DragTarget(
@@ -204,7 +222,7 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,) {
                                 date = item.date,
                                 attachments = item.attachments,
                                 comments = item.comments,
-                                assignees = item.assignees,
+                                avatarUris = dummyAvatarUris,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
                             )

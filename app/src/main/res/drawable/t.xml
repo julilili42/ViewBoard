@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="800dp"
+    android:height="800dp"
+    android:viewportWidth="270"
+    android:viewportHeight="270">
+
+    <!-- Raute (gedrehtes Quadrat) -->
+    <group
+        android:rotation="45"
+        android:pivotX="135"
+        android:pivotY="135">
+        <path
+            android:fillColor="#331F2937"
+            android:fillAlpha="0.2"
+            android:pathData="M95,95 h80 v80 h-80 z"/>
+    </group>
+
+    <!-- V -->
+    <path
+        android:strokeColor="#FF1F2937"
+        android:strokeWidth="6"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineCap="round"
+        android:pathData="M115,105 L135,175 L155,105"/>
+
+    <!-- B -->
+    <path
+        android:strokeColor="#FF1F2937"
+        android:strokeWidth="6"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineCap="round"
+        android:pathData="M155,105
+                          Q165,115 153,130
+                          Q165,145 150,160
+                          Q140,170 135,175"/>
+</vector>

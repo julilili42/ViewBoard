@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 
 import androidx.compose.runtime.getValue
@@ -36,18 +35,77 @@ import androidx.compose.runtime.setValue
 import com.example.viewboard.components.Timetable.SegmentedSwitch
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
+import com.example.viewboard.ui.issue.IssueUiItem
 import com.example.viewboard.ui.timetable.CustomIcon
 import com.example.viewboard.ui.timetable.TimelineSchedule
 import com.example.viewboard.ui.timetable.VerticalTimelineSchedule
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableScreen(navController: NavHostController) {
     var showProjects by remember { mutableStateOf(true) }
-
+    val today = LocalDate.now()
+    var year by remember { mutableStateOf(today.year) }
+    var month by remember { mutableStateOf(today.monthValue) } // 1..12
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     // Beispieldaten
+    val dummyIssues = listOf(
+        IssueUiItem(
+            title = "UI Bug in Kalender",
+            priority = "Hoch",
+            status = "Offen",
+            date = "2025-07-01",
+            attachments = 2,
+            comments = 3,
+            assignees = listOf("RA", "EM"),
+            backgroundColor = Color(0xFFEF5350) // Rot
+        ),
+        IssueUiItem(
+            title = "Backend-Timeout",
+            priority = "Mittel",
+            status = "In Arbeit",
+            date = "2025-07-01",
+            attachments = 1,
+            comments = 5,
+            assignees = listOf("JS"),
+            backgroundColor = Color(0xFFFFA726) // Orange
+        ),
+        IssueUiItem(
+            title = "Onboarding-Flow testen",
+            priority = "Niedrig",
+            status = "Geschlossen",
+            date = "2025-07-03",
+            attachments = 0,
+            comments = 1,
+            assignees = listOf("AL"),
+            backgroundColor = Color(0xFF66BB6A) // Grün
+        ),
+        IssueUiItem(
+            title = "Design Review",
+            priority = "Mittel",
+            status = "Offen",
+            date = "2025-07-04",
+            attachments = 3,
+            comments = 2,
+            assignees = listOf("LD", "EM"),
+            backgroundColor = Color(0xFF42A5F5) // Blau
+        ),IssueUiItem(
+            title = "Design Review",
+            priority = "Mittel",
+            status = "Offen",
+            date = "2025-07-04",
+            attachments = 3,
+            comments = 2,
+            assignees = listOf("LD", "EM"),
+            backgroundColor = Color(0xFF42A5F5) // Blau
+        )
+
+    )
+
     val projects = listOf(
         Project("A", "Desc A", "#A13", 1, 3, Color(0xFF00BCD4),5,2.53f),
         Project("B", "Desc B", "#B13", 4, 6, Color(0xFF8BC34A),4,1.53f),
@@ -68,9 +126,12 @@ fun TimetableScreen(navController: NavHostController) {
                     ProfileHeader(
                         name = "Raoul",
                         subtitle = "Just a short overview for you.",
+                        navController =navController,
+                        showBackButton = false,
                         onProfileClick = {
                             navController.navigate(BottomBarScreen.Profile.route)
-                        }
+                        },
+                        onBackClick = {navController.navigateUp()}
                     )
         },
         //containerColor = Color.White // sorgt dafür, dass Scaffold-Hintergrund weiß ist
@@ -82,7 +143,13 @@ fun TimetableScreen(navController: NavHostController) {
                 .padding(top = innerPadding.calculateTopPadding())
                // .background(Color.White) // sicherheitshalber
         ) {
-            Spacer(modifier = Modifier.height(80.dp))
+            Text(
+                text ="Timetable", // z.B. "My Projects"
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -183,11 +250,20 @@ fun TimetableScreen(navController: NavHostController) {
                         modifier = Modifier.fillMaxSize()
                     )
                 } else {
-                    TimelineSchedule(
-                        projects = issues,
-                        phases   = listOf("Backlog"),
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    selectedDate?.let {
+                        TimelineSchedule(
+                            year         = year,
+                            month        = month,
+                            onYearChange = { year = it },
+                            onMonthChange= { month = it },
+                            projects     = issues,
+                            phases       = listOf(/* … */),
+                            issues       = dummyIssues,
+                            modifier     = Modifier.fillMaxSize(),
+                            navController = navController
+
+                        )
+                    }
                 }
             }
         }

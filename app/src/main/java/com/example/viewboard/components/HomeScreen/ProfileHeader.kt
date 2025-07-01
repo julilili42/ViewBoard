@@ -1,53 +1,49 @@
 package com.example.viewboard.components.HomeScreen
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.viewboard.R
+import com.example.viewboard.components.ProfilePicture
+import com.example.viewboard.ui.navigation.BackButton
+import com.example.viewboard.ui.navigation.hasSoftNavigationBar
 
 @Composable
 fun ProfileHeader(
     name: String,
     subtitle: String,
-    onProfileClick: () -> Unit
+    showBackButton: Boolean ,
+    navController: NavController,
+    onProfileClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
-    //
+    val usesSoftNav = hasSoftNavigationBar()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
-
     ) {
-        // Profilbild ganz links, klickbar
-        Image(
+        // Profilbild
+
+        ProfilePicture(
             painter = painterResource(id = R.drawable.pb_raoul),
-            contentDescription = "Profil",
-            modifier = Modifier
-                .size(48.dp)
-                // Border mit Primary-Farbe und Kreisform
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = CircleShape
-                )
-                // Bild selbst auf Kreis clippen
-                .clip(CircleShape)
-                .clickable(onClick = onProfileClick)
+            contentDescription = "Profilbild Raoul",
+            size = 48.dp,
+            borderColor = MaterialTheme.colorScheme.primary,
+            borderWidth = 3.dp
         )
+
         Spacer(modifier = Modifier.width(12.dp))
 
-        // Text-Block mit Name + Untertitel
+        // Name + Untertitel
         Column {
             Text(
                 text = "Hi $name",
@@ -58,6 +54,17 @@ fun ProfileHeader(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Zeige BackButton ganz rechts nur, wenn Soft-Navigation aktiv ist
+        if (showBackButton) {
+            BackButton(
+                text = "Back",
+                modifier = Modifier.align(Alignment.CenterVertically),
+                onClick = onBackClick
             )
         }
     }
