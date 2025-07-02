@@ -50,6 +50,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.example.viewboard.components.SectionCard
 import com.example.viewboard.ui.screens.HelpSupportScreen
+
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {

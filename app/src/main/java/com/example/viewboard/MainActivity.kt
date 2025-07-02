@@ -23,14 +23,33 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val l = LabelLayout(name = "3. label", creator = "ich")
-//        FirebaseAPI.addLabel(l)
+       // FirebaseAPI.addLabel(l)
 
         val i = IssueLayout(title = "3. issue", creator = "ich")
-//        FirebaseAPI.addIssue(i)
+        //FirebaseAPI.addIssue(i)
 
         val p = ProjectLayout(name = "first project", creator = "ich", issues = arrayListOf("SlIsrElzBCUuNoPG3G7K", "OplQrgTrggRIW9yDNQ8a", "f7DmLeYkwfQ7IkA6tze3"))
-//        FirebaseAPI.addProject(p)
-
+       // FirebaseAPI.addProject(p)
+       /* lifecycleScope.launch {
+            val startMonth = (0..1).random()    // 0 oder 1
+            val endMonth   = (4..7).random()
+            for (i in 1..20) {
+                val projectName = "Project #$i"
+                val p = ProjectLayout(
+                    name = projectName,
+                    creator = "ich",
+                    startMonth = startMonth,
+                    endMonth = endMonth,
+                    issues = arrayListOf("SlIsrElzBCUuNoPG3G7K", "OplQrgTrggRIW9yDNQ8a", "f7DmLeYkwfQ7IkA6tze3")// leer oder fülle nach Bedarf
+                )
+                try {
+                    FirebaseAPI.addProject(p)
+                    println("Projekt angelegt: $projectName")
+                } catch (e: Exception) {
+                    println("Fehler beim Anlegen von $projectName: ${e.localizedMessage}")
+                }
+            }
+        }
         lifecycleScope.launch {
             val p = FirebaseAPI.getProject("ysZaMVY24jnSyLuE5FKJ")
             println(p!!.creationTS.getFull())
@@ -39,7 +58,7 @@ class MainActivity : ComponentActivity() {
             p!!.issues.add("f7DmLeYkwfQ7IkA6tze3")
 //            FirebaseAPI.updProject("ysZaMVY24jnSyLuE5FKJ", p)
         }
-
+*/
         val v = ViewLayout(name = "first view", creator = "ich", issues = arrayListOf("SlIsrElzBCUuNoPG3G7K"))
 //        FirebaseAPI.addView(v)
 

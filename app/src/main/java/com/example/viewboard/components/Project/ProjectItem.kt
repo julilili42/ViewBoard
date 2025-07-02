@@ -54,15 +54,20 @@ fun ProjectItem(
     avatarUris: List<Uri>,
     onClick: () -> Unit
 ) {
-    val progress = (completedMilestones / totalMilestones).coerceIn(0f, 1f)
-    val startLabel = Month.of(startMonth)
-        .getDisplayName(TextStyle.SHORT, Locale.getDefault())
-    val endLabel = Month.of(endMonth)
-        .getDisplayName(TextStyle.SHORT, Locale.getDefault())
-    val showCount = avatarUris.size.coerceAtMost(3)
-    val avatarSize = 18.dp
-    val avatarOverlap = 12.dp
+    // Progress als Float berechnen (sonst Integer-Division)
+    val progress = (completedMilestones.toFloat() / totalMilestones.toFloat())
+        .coerceIn(0f, 1f)
 
+// Calendar.MONTH liefert 0–11, Month.of erwartet 1–12
+    val startLabel = Month.of(startMonth + 1)
+        .getDisplayName(TextStyle.SHORT, Locale.getDefault())
+    val endLabel   = Month.of(endMonth   + 1)
+        .getDisplayName(TextStyle.SHORT, Locale.getDefault())
+
+// Avatare: maximal 3 anzeigen
+    val showCount     = avatarUris.size.coerceAtMost(3)
+    val avatarSize    = 18.dp
+    val avatarOverlap = 12.dp
     Card(
         modifier = Modifier
             .fillMaxWidth()

@@ -1,6 +1,7 @@
 package com.example.viewboard.ui.screens
 
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.example.viewboard.dataclass.Project
@@ -36,8 +37,13 @@ import com.example.viewboard.components.Timetable.SegmentedSwitch
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.issue.IssueUiItem
 import com.example.viewboard.ui.timetable.CustomIcon
 import com.example.viewboard.ui.timetable.TimelineSchedule
@@ -47,11 +53,44 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableScreen(navController: NavHostController) {
+    FirebaseAPI.init()
+
+    // Projekte
+    val projectLayouts = remember { mutableStateListOf<ProjectLayout>() }
+    // Issues
+    val issuesList = remember { mutableStateListOf<IssueLayout>() }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        // Projekte laden
+        try {
+            FirebaseAPI.getProjects().collect { layouts ->
+                projectLayouts.clear()
+                projectLayouts.addAll(layouts)
+            }
+        } catch (e: Exception) {
+            error = "Projekte-Ladefehler: ${e.localizedMessage}"
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        // Issues laden
+        try {
+            FirebaseAPI.getIssues(/* hier ggf. projectId oder leer für alle */).collect { list ->
+                issuesList.clear()
+                issuesList.addAll(list)
+            }
+        } catch (e: Exception) {
+            error = "Issues-Ladefehler: ${e.localizedMessage}"
+        }
+    }
+
+
     var showProjects by remember { mutableStateOf(true) }
     val today = LocalDate.now()
     var year by remember { mutableStateOf(today.year) }
     var month by remember { mutableStateOf(today.monthValue) } // 1..12
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    var selectedDate by remember { mutableStateOf<LocalDate?>(today) }
     // Beispieldaten
     val dummyIssues = listOf(
         IssueUiItem(
@@ -106,18 +145,9 @@ fun TimetableScreen(navController: NavHostController) {
 
     )
 
-    val projects = listOf(
-        Project("A", "Desc A", "#A13", 1, 3, Color(0xFF00BCD4),5,2.53f),
-        Project("B", "Desc B", "#B13", 4, 6, Color(0xFF8BC34A),4,1.53f),
-        Project("C", "Desc C", "#D13", 3, 9, Color(0xFF8BC34A),4,3.53f),
-        Project("D", "Desc D", "#G13", 2, 5, Color(0xFF8BC34A),4,1.53f),
-        Project("E", "Desc E", "#F13", 2, 5, Color(0xFF8BC34A),4,3.53f),
-        Project("F", "Desc F", "#M13", 4, 5, Color(0xFF8BC34A),4,1.53f),
-        Project("G", "Desc G", "#N13", 8, 12, Color(0xFF8BC34A),4,1.53f),
-    )
     val issues = listOf(
-        Project("Issue 1", "Fix crash", "Backlog", 2, 2, Color(0xFFFF5722),4,1.53f),
-        Project("Issue 2", "Add tests", "Backlog", 3, 4, Color(0xFFFFC107),5,4.53f)
+        Project("Wdeadwadwaw","Issue 1", "Fix crash", "Backlog", 2, 2, Color(0xFFFF5722),4,1.53f),
+        Project("Wdeadwadwaw","Issue 2", "Add tests", "Backlog", 3, 4, Color(0xFFFFC107),5,4.53f)
     )
 
     Scaffold(
@@ -233,7 +263,15 @@ fun TimetableScreen(navController: NavHostController) {
                 }
             }
 
-
+            val projects = listOf(
+                    Project("dfsa","A", "Desc A", "#A13", 1, 3, Color(0xFF00BCD4),5,2.53f),
+                    Project("dfsa","B", "Desc B", "#B13", 4, 6, Color(0xFF8BC34A),4,1.53f),
+                    Project("dfsa","C", "Desc C", "#D13", 3, 9, Color(0xFF8BC34A),4,3.53f),
+                    Project("dfsa","D", "Desc D", "#G13", 2, 5, Color(0xFF8BC34A),4,1.53f),
+                    Project("dfsa","E", "Desc E", "#F13", 2, 5, Color(0xFF8BC34A),4,3.53f),
+                    Project("dfsa","F", "Desc F", "#M13", 4, 5, Color(0xFF8BC34A),4,1.53f),
+                    Project("dfsa","G", "Desc G", "#N13", 8, 12, Color(0xFF8BC34A),4,1.53f),
+                )
 
             // Content-Bereich: weißen Hintergrund bereits gesetzt
             Box(
@@ -256,9 +294,9 @@ fun TimetableScreen(navController: NavHostController) {
                             month        = month,
                             onYearChange = { year = it },
                             onMonthChange= { month = it },
-                            projects     = issues,
+                            projects     = projectLayouts,
                             phases       = listOf(/* … */),
-                            issues       = dummyIssues,
+                            issues       = issuesList,
                             modifier     = Modifier.fillMaxSize(),
                             navController = navController
 

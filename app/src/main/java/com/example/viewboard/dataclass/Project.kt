@@ -3,6 +3,7 @@ package com.example.viewboard.dataclass
 import androidx.compose.ui.graphics.Color
 
 data class Project(
+    val projectId: String,
     val name: String,
     val description: String,
     val phase: String,

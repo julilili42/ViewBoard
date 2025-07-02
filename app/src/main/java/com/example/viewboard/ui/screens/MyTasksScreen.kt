@@ -74,8 +74,14 @@ fun MyTasksScreen(
                         ProjectCardTasks(
                             name = name,
                             dueDateTime = dueDateTime,
-                            onClick = { navController.navigate(Screen.IssueScreen.createRoute(name)) },
-                            onMenuClick = {navController.navigate(Screen.IssueScreen.createRoute(name))}
+                            onClick = { navController.navigate(Screen.IssueScreen.createRoute(
+                                name,
+                                   ""
+                            )) },
+                            onMenuClick = {navController.navigate(Screen.IssueScreen.createRoute(
+                                name,
+                                ""
+                            ))}
                         )
                     }
                 }

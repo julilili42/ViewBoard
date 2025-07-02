@@ -33,6 +33,12 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
 import java.text.ParseException
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.LabelLayout
+import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.ui.navigation.ChipInputField
 
 
 // ---------------------------------------------------
@@ -43,6 +49,7 @@ import java.text.ParseException
 @Composable
 fun IssueCreationScreen(
     navController: NavController,
+    projectId: String = "ysZaMVY24jnSyLuE5FKJ",
     currentUserId: String = "1",
     onCreate: () -> Unit = {}
 ) {
@@ -76,7 +83,7 @@ fun IssueCreationScreen(
     val isTimeValid by derivedStateOf {
         try { timeFormatter.parse(timeText); true } catch (_: Exception) { false }
     }
-
+    val coroutineScope = rememberCoroutineScope()
     fun updateDeadlineFromDateText() {
         val d = dateFormatter.parse(dateText) ?: throw IllegalArgumentException("Ungültiges Datum")
         calendar.time = d
@@ -251,10 +258,36 @@ fun IssueCreationScreen(
 
             Button(
                 onClick = {
-                    updateDeadlineFromDateText()
-                    updateDeadlineFromTimeText()
-                    onCreate()
-                    navController.popBackStack()
+                    // Validierung
+                    if (isDateValid && isTimeValid) {
+                        // Datum/Uhrzeit ins Modell übernehmen
+                        updateDeadlineFromDateText()
+                        updateDeadlineFromTimeText()
+                        val labelObjects = ArrayList(labels.map { labelName ->
+                            LabelLayout(
+                                name    = labelName,
+                                creator = currentUserId
+                            )
+                        })
+                        // Issue anlegen und speichern
+                        val newIssue = IssueLayout(
+                            title       = title.trim(),
+                            desc = desc.trim(),
+                            creator     = currentUserId,
+                            assignments = ArrayList(assignments),
+                            labels      = labelObjects,
+                        )
+
+                        coroutineScope.launch {
+                            try {
+                                FirebaseAPI.addIssue(projID=projectId, issueLayout =  IssueLayout(title = "3. issue", creator = "ich"))
+                                navController.popBackStack()
+                            } catch (e: Exception) {
+                                // z.B. Fehler anzeigen:
+                                errorMessage = "Speichern fehlgeschlagen: ${e.localizedMessage}"
+                            }
+                        }
+                    }
                 },
                 enabled = isDateValid && isTimeValid,
                 modifier = Modifier
@@ -270,77 +303,5 @@ fun IssueCreationScreen(
         }
     }
 }
-
-
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@Composable
-fun ChipInputField(
-    entries: List<String>,
-    newEntry: String,
-    inhaltText: String,
-    onNewEntryChange: (String) -> Unit,
-    onEntryConfirmed: () -> Unit,
-    onEntryRemove: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    BasicTextField(
-        value = newEntry,
-        onValueChange = onNewEntryChange,
-        singleLine = true,
-        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-        textStyle = MaterialTheme.typography.bodyMedium.copy(
-            color = MaterialTheme.colorScheme.onSurface
-        ),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { onEntryConfirmed() }),
-        modifier = modifier
-            .fillMaxWidth()
-            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
-            .padding(4.dp),
-        decorationBox = { innerTextField ->
-            Column(modifier = Modifier.fillMaxWidth()) {
-                // Zeile 1: Chips
-                FlowRow(modifier = Modifier.fillMaxWidth()) {
-                    entries.forEach { entry ->
-                        AssistChip(
-                            onClick = { onEntryRemove(entry) },
-                            label = { Text(entry) },
-                            modifier = Modifier
-                                .height(32.dp)
-                                .padding(start = 4.dp, bottom = 2.dp)
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                // Zeile 2: Eingabefeld mit Padding
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(32.dp)
-                        .padding(horizontal = 8.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if (newEntry.isEmpty()) {
-                        Text(
-                            text = inhaltText,
-                            modifier = Modifier.padding(horizontal = 8.dp),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        )
-                    }
-                    Box(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
-                        innerTextField()
-                    }
-                }
-            }
-        }
-    )
-}
-
-
-
-
 
 

@@ -1,5 +1,6 @@
 package com.example.viewboard.ui.screens
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,19 +33,27 @@ import com.example.viewboard.components.HomeScreen.ProjectItem
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.timetable.CustomIcon
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.project.CustomSearchField
+
 
 
 /**
  * Beispiel-Liste von Projekten für Preview und Tests.
  */
+
 val sampleProjectList = listOf(
     Project(
+        projectId = "",
         name = "Fintech App",
         description = "Mobile Banking & Investing",
         phase = "#A23",
@@ -55,6 +64,7 @@ val sampleProjectList = listOf(
         completedMilestones = 5f
     ),
     Project(
+        projectId = "",
         name = "E-Commerce Platform",
         description = "Online-Marktplatz für Kleinunternehmen",
         phase = "#B17",
@@ -65,6 +75,7 @@ val sampleProjectList = listOf(
         completedMilestones = 3f
     ),
     Project(
+        projectId = "",
         name = "Social Media App",
         description = "Chat, Stories & Feed",
         phase = "#C09",
@@ -74,7 +85,7 @@ val sampleProjectList = listOf(
         totalMilestones = 12,
         completedMilestones = 7f
     ),
-    Project(
+    Project(projectId = "",
         name = "Health Tracker",
         description = "Fitness & Wellness Monitoring",
         phase = "#D34",
@@ -84,7 +95,7 @@ val sampleProjectList = listOf(
         totalMilestones = 6,
         completedMilestones = 2.5f
     ),
-    Project(
+    Project(projectId = "",
         name = "Fintech App",
         description = "Mobile Banking & Investing",
         phase = "#A23",
@@ -95,6 +106,7 @@ val sampleProjectList = listOf(
         completedMilestones = 5f
     ),
     Project(
+        projectId = "",
         name = "E-Commerce Platform",
         description = "Online-Marktplatz für Kleinunternehmen",
         phase = "#B17",
@@ -104,7 +116,7 @@ val sampleProjectList = listOf(
         totalMilestones = 10,
         completedMilestones = 3f
     ),
-    Project(
+    Project(projectId = "",
         name = "Social Media App",
         description = "Chat, Stories & Feed",
         phase = "#C09",
@@ -115,6 +127,7 @@ val sampleProjectList = listOf(
         completedMilestones = 7f
     ),
     Project(
+        projectId = "Health Tracker",
         name = "Health Tracker",
         description = "Fitness & Wellness Monitoring",
         phase = "#D34",
@@ -126,6 +139,35 @@ val sampleProjectList = listOf(
     )
 )
 
+object AppColors {
+    // Deine Basisfarben
+    val Orange      = Color(0xFFFFB74D)  // kräftiges Orange
+    val Green       = Color(0xFF81C784)  // sattes Grün
+    val LightBlue   = Color(0xFFBEDBFF)  // helles, aber lebhaftes Blau
+
+    // Ergänzende kräftige Farben in ähnlicher Richtung
+    val DeepOrange  = Color(0xFFFF8A65)
+    val LimeGreen   = Color(0xFF9CCC65)
+    val SkyBlue     = Color(0xFF64B5F6)
+    val Teal        = Color(0xFF4DB6AC)
+    val Purple      = Color(0xFFBA68C8)
+    val Coral       = Color(0xFFFF7043)
+    val Mint        = Color(0xFF4CAF50)
+
+    // Die gesamte Palette
+    val StrongPalette = listOf(
+        Orange,
+        Green,
+        LightBlue,
+        DeepOrange,
+        LimeGreen,
+        SkyBlue,
+        Teal,
+        Purple,
+        Coral,
+        Mint
+    )
+}
 private val dummyAvatarUris = listOf(
     Uri.parse("https://picsum.photos/seed/1/64"),
     Uri.parse("https://picsum.photos/seed/2/64"),
@@ -145,12 +187,39 @@ private val dummyAvatarUris = listOf(
 fun ProjectsScreen(
     navController: NavController,
     projectName: String,
-    projects: List<Project> = sampleProjectList,
+    projects: List<ProjectLayout> = emptyList(),
     columns: Int = 2,
     onAddProject: () -> Unit = {},
     onSort: () -> Unit = {},
     onFilter: () -> Unit = {}
 ) {
+    FirebaseAPI.init()
+    val projectLayouts = remember { mutableStateListOf<ProjectLayout>() }
+    var error by remember { mutableStateOf<String?>(null) }
+    // startet automatisch beim ersten Composable-Aufruf
+    LaunchedEffect(Unit) {
+        try {
+            FirebaseAPI.getProjects().collect { layouts ->
+                projectLayouts.clear()
+                projectLayouts.addAll(layouts)
+            }
+        } catch (e: Exception) {
+            error = "Ladefehler: ${e.localizedMessage}"
+        }
+    }
+    LaunchedEffect(Unit) {
+        try {
+            FirebaseAPI.getProjects().collect { layouts ->
+                projectLayouts.clear()
+                projectLayouts.addAll(layouts)
+            }
+        } catch (e: Exception) {
+            error = "Ladefehler: ${e.localizedMessage}"
+        }
+        projectLayouts.forEach { project ->
+            Log.d("MainActivity", "Projekt: ${project.id} – ${project.name}")
+        }
+    }
     Scaffold(
         topBar = {
                 ProfileHeader(
@@ -259,17 +328,23 @@ fun ProjectsScreen(
                     .fillMaxHeight()
                     .fillMaxWidth()
             ) {
-                items(projects) { project ->
+                val p = ProjectLayout(name = "first project", creator = "ich", issues = arrayListOf("SlIsrElzBCUuNoPG3G7K", "OplQrgTrggRIW9yDNQ8a", "f7DmLeYkwfQ7IkA6tze3"))
+                val layoutsToShow = if (projectLayouts.isEmpty()) {
+                    listOf(p)
+                } else {
+                    projectLayouts
+                }
+                itemsIndexed(projectLayouts) {index, project ->
                     ProjectItem(
                         name                = project.name,
                         phase               = project.phase,
                         startMonth          = project.startMonth,
                         endMonth            = project.endMonth,
-                        color               = project.color,
+                        color               = AppColors.StrongPalette[index % AppColors.StrongPalette.size],
                         totalMilestones     = project.totalMilestones,
                         completedMilestones = project.completedMilestones,
                         avatarUris          = dummyAvatarUris,
-                        onClick             = {navController.navigate(Screen.IssueScreen.createRoute(project.name))}
+                        onClick             = {navController.navigate(Screen.IssueScreen.createRoute(project.name,"project.id "))}
                     )
                 }
             }

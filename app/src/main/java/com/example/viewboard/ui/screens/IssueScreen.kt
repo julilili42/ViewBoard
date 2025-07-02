@@ -35,7 +35,7 @@ import com.example.viewboard.ui.timetable.CustomIcon
 
 
 @Composable
-fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,projectName:String) {
+fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,projectName:String,projectId : String, modifier: Modifier = Modifier)  {
     val categories = listOf("New", "Ongoing", "Completed")
     var selectedTab by remember { mutableStateOf(0) }
 
@@ -210,7 +210,7 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                     Uri.parse("https://picsum.photos/seed/4/64"),
                     Uri.parse("https://picsum.photos/seed/5/64")
                 )
-                mainViewModel.getItemsForCategory(selectedTab).forEach { item ->
+               mainViewModel.getItemsForCategory(selectedTab).forEach { item ->
                     key(item.id) {      // <-- HIER der wichtigste Schritt
                         DragTarget(
                             dataToDrop = item,

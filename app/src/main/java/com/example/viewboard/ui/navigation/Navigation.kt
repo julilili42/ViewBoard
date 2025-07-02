@@ -1,24 +1,14 @@
 package com.example.viewboard.ui.navigation
 
 import android.annotation.SuppressLint
-import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,15 +16,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.example.viewboard.R
 import com.example.viewboard.ui.screens.LoginScreen
 import com.example.viewboard.ui.screens.RegistrationScreen
 import com.example.viewboard.ui.screens.HomeScreen
-import androidx.compose.material3.Divider
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.viewboard.ui.screens.DragableScreen
 import com.example.viewboard.ui.screens.IssueScreen
 import com.example.viewboard.ui.issue.MainViewModel
@@ -165,15 +149,26 @@ fun Navigation(modifier: Modifier = Modifier) {
                     }
                 }
             }
-            composable(route = Screen.IssueCreationScreen.route) {
+            composable(
+                route = Screen.IssueCreationScreen.route,
+                arguments = listOf(
+                    navArgument("projectId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStack ->
+                val projectId = backStack.arguments!!.getString("projectId")!!
+
                 MainLayout(navController, currentRoute) { padding ->
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(padding)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding)
                     ) {
-
-                            IssueCreationScreen(navController = navController)
-
+                        IssueCreationScreen(
+                            navController = navController,
+                            projectId    = projectId
+                        )
                     }
                 }
             }
@@ -191,20 +186,29 @@ fun Navigation(modifier: Modifier = Modifier) {
             }
             composable(
                 route = Screen.IssueScreen.route,
-                arguments = listOf(navArgument("projectName") {
-                    type = NavType.StringType
-                })
+                arguments = listOf(
+                    navArgument("projectName") { type = NavType.StringType },
+                    navArgument("projectId"  ) { type = NavType.StringType }
+                )
             ) { backStack ->
+                // beide Argumente auslesen
                 val projectName = backStack.arguments!!.getString("projectName")!!
+                val projectId   = backStack.arguments!!.getString("projectId")!!
                 MainLayout(navController, currentRoute) { padding ->
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(padding) // ✅ korrekt
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding)
                     ) {
                         DragableScreen(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            IssueScreen(mainViewModel, navController, projectName)
+                            IssueScreen(
+                                mainViewModel,
+                                navController,
+                                projectName  = projectName,
+                                projectId    = projectId   // jetzt mit übergeben
+                            )
                         }
                     }
                 }
