@@ -23,32 +23,23 @@ import com.example.viewboard.ui.theme.uiColor
 fun LoginTextField(
     modifier: Modifier = Modifier,
     label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    trailing: String = ""
+    trailing: String
 ) {
     val uiColor = uiColor()
-
     TextField(
         modifier = modifier,
-        value = value,
-        onValueChange = onValueChange,
+        value = "",
+        onValueChange = {},
         label = {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = uiColor
-            )
+            Text(text = label, style = MaterialTheme.typography.labelMedium, color = uiColor)
         },
         trailingIcon = {
-            if (trailing.isNotEmpty()) {
-                TextButton(onClick = { /* TODO: implement trailing action */ }) {
-                    Text(
-                        text = trailing,
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
-                        color = uiColor
-                    )
-                }
+            TextButton(onClick = {/*TODO*/ }) {
+                Text(
+                    text = trailing,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
+                    color = uiColor
+                )
             }
         }
     )

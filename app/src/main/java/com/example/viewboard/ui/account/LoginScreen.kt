@@ -1,21 +1,33 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.account
 
-import android.app.Activity
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -31,16 +43,17 @@ import com.example.viewboard.ui.theme.Black
 import com.example.viewboard.ui.theme.BlueGray
 import com.example.viewboard.ui.theme.Roboto
 import com.example.viewboard.ui.theme.uiColor
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.material3.TextField
-import androidx.compose.ui.text.input.VisualTransformation
-
-
 
 /**
  * Top section of the login screen displaying the background shape, logo, and headings.
@@ -76,6 +89,8 @@ fun LoginTopSection(modifier: Modifier = Modifier) {
                     modifier = Modifier.size(42.dp),
                     tint = uiColor
                 )
+
+
                 Spacer(modifier = Modifier.width(15.dp))
                 Column {
                     Text(
@@ -100,6 +115,7 @@ fun LoginTopSection(modifier: Modifier = Modifier) {
     }
 }
 
+
 /**
  * Section containing email and password input fields and the login button.
  *
@@ -110,9 +126,6 @@ fun LoginTopSection(modifier: Modifier = Modifier) {
 fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
     val activity = context as Activity
-
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -151,43 +164,19 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
             .wrapContentHeight()
             .padding(horizontal = 30.dp)
     ) {
-        LoginTextField(
-            label = "Email",
-            text = email,
-            onTextChange = { email = it },
-            modifier = Modifier.fillMaxWidth()
-        )
+        // Email/Passwort-Eingabe
+        LoginTextField(label = "Email", trailing = "", modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(15.dp))
         LoginTextField(
             label = "Password",
             trailing = "Forgot?",
-            text = password,
-            onTextChange = { password = it },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
-
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Login-Button
+        // Klassischer Login-Button
         Button(
-            onClick = {
-                if (email.isBlank() || password.isBlank()) {
-                    Toast.makeText(context, "Bitte fülle alle Felder aus", Toast.LENGTH_SHORT).show()
-                    return@Button
-                }
-
-                FirebaseAuth.getInstance()
-                    .signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Toast.makeText(context, "Willkommen!", Toast.LENGTH_SHORT).show()
-                            navController.navigate(Screen.HomeScreen.route)
-                        } else {
-                            Toast.makeText(context, "Login fehlgeschlagen: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-            },
+            onClick = { navController.navigate(Screen.HomeScreen.route) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp),
@@ -202,20 +191,20 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Google-Login-Button
+        // 🟢 Google-Login-Button
         Button(
             onClick = { launcher.launch(signInClient.signInIntent) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF4285F4),
+                containerColor = Color(0xFF4285F4), // Google-Blau
                 contentColor = Color.White,
             ),
             shape = RoundedCornerShape(size = 4.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_google),
+                painter = painterResource(id = R.drawable.ic_google), // ❗ Eigenes Icon in res/drawable/
                 contentDescription = "Google Login",
                 tint = Color.Unspecified,
                 modifier = Modifier.size(18.dp)
@@ -225,6 +214,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
         }
     }
 }
+
 
 /**
  * Bottom section offering navigation to the registration screen.
@@ -265,61 +255,15 @@ fun LoginRegisterSection(modifier: Modifier = Modifier, navController: NavContro
             .fillMaxHeight(fraction = 0.8f)
             .fillMaxWidth(),
         contentAlignment = Alignment.BottomCenter
-    ) {
-        Text(
-            modifier = modifier
-                .fillMaxWidth()
-                .wrapContentWidth(Alignment.CenterHorizontally)
-                .padding(bottom = 24.dp)
-                .clickable(onClick = { navController.navigate(Screen.RegistrationScreen.route) }),
-            text = annotatedText
-        )
-    }
-}
-
-/**
- * A reusable text field for login forms that shows a label and an optional trailing action.
- *
- * @param modifier   Optional [Modifier] for layout adjustments.
- * @param label      The label to display inside the text field (e.g., "Email" or "Password").
- * @param trailing   The text to show in the trailing icon button (e.g., "Forgot?"); pass an empty
- *                   string if no trailing action is needed.
- * @param text       Current input value.
- * @param onTextChange Called when the text changes.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun LoginTextField(
-    modifier: Modifier = Modifier,
-    label: String,
-    trailing: String = "",
-    text: String,
-    onTextChange: (String) -> Unit,
-    visualTransformation: VisualTransformation = VisualTransformation.None
-) {
-    val uiColor = uiColor()
-    TextField(
-        modifier = modifier,
-        value = text,
-        onValueChange = onTextChange,
-        label = {
-            Text(text = label, style = MaterialTheme.typography.labelMedium, color = uiColor)
-        },
-        trailingIcon = {
-            if (trailing.isNotEmpty()) {
-                TextButton(onClick = { /* TODO */ }) {
-                    Text(
-                        text = trailing,
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
-                        color = uiColor
-                    )
-                }
-            }
-        },
-        singleLine = true,
-        maxLines = 1,
-        visualTransformation = visualTransformation
-
+    ) { }
+    Text(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentWidth(Alignment.CenterHorizontally)
+            .padding(bottom = 24.dp)
+            .clickable(onClick = {navController.navigate(Screen.RegistrationScreen.route)})
+        ,
+        text = annotatedText
     )
 }
 
@@ -331,7 +275,7 @@ fun LoginTextField(
  */
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
-    Surface {
+    Surface() {
         Column(modifier = Modifier.fillMaxSize()) {
             LoginTopSection()
             Spacer(modifier = Modifier.height(36.dp))
@@ -340,3 +284,4 @@ fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
         }
     }
 }
+
