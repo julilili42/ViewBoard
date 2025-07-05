@@ -34,10 +34,18 @@ import com.example.viewboard.ui.project.CustomSearchField
 import com.example.viewboard.ui.timetable.CustomIcon
 
 
+
+
 @Composable
 fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,projectName:String,projectId : String, modifier: Modifier = Modifier)  {
+
+    LaunchedEffect(projectId) {
+        mainViewModel.loadMyIssues(projectId)
+    }
+
     val categories = listOf("New", "Ongoing", "Completed")
     var selectedTab by remember { mutableStateOf(0) }
+
 
     Scaffold(
         topBar = {

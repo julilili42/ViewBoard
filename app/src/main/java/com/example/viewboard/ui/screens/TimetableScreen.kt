@@ -64,7 +64,7 @@ fun TimetableScreen(navController: NavHostController) {
     LaunchedEffect(Unit) {
         // Projekte laden
         try {
-            FirebaseAPI.getProjects().collect { layouts ->
+            FirebaseAPI.getMyProjects().collect { layouts ->
                 projectLayouts.clear()
                 projectLayouts.addAll(layouts)
             }

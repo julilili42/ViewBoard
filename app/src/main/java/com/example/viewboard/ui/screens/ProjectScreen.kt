@@ -199,7 +199,7 @@ fun ProjectsScreen(
     // startet automatisch beim ersten Composable-Aufruf
     LaunchedEffect(Unit) {
         try {
-            FirebaseAPI.getProjects().collect { layouts ->
+            FirebaseAPI.getMyProjects().collect { layouts ->
                 projectLayouts.clear()
                 projectLayouts.addAll(layouts)
             }
@@ -209,7 +209,7 @@ fun ProjectsScreen(
     }
     LaunchedEffect(Unit) {
         try {
-            FirebaseAPI.getProjects().collect { layouts ->
+            FirebaseAPI.getMyProjects().collect { layouts ->
                 projectLayouts.clear()
                 projectLayouts.addAll(layouts)
             }

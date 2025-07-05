@@ -6,6 +6,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewModelScope
+import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+
 
 
 class MainViewModel : ViewModel() {
@@ -13,44 +19,47 @@ class MainViewModel : ViewModel() {
     var isDragging by mutableStateOf(false)
         private set
 
-    init {
-        items.addAll(
-            listOf(
-                IssueUiItem(
-                    title = "Dashboard design for admin",
-                    priority = "High",
-                    status = "On Track",
-                    date = "14 Oct 2022",
-                    attachments = 5,
-                    comments = 5,
-                    assignees = listOf("MA", "LA", "MC"),
-                    backgroundColor = Color.Gray
-                ),
-                IssueUiItem(
-                    title = "User login flow",
-                    priority = "Medium",
-                    status = "Stuck",
-                    date = "20 Oct 2022",
-                    attachments = 3,
-                    comments = 2,
-                    assignees = listOf("AL", "BR"),
-                    backgroundColor = Color.Blue
-                ),
-                IssueUiItem(
-                    title = "Payment integration",
-                    priority = "Low",
-                    status = "Done",
-                    date = "10 Oct 2022",
-                    attachments = 2,
-                    comments = 1,
-                    assignees = listOf("CH"),
-                    backgroundColor = Color.Green
+    var issues = mutableStateListOf<IssueLayout>()
+        private set
+
+    fun loadMyIssues(projectId: String) {
+        viewModelScope.launch {
+            FirebaseAPI.getMyIssues(projectId).collectLatest { issueList ->
+                issues.clear()
+                issues.addAll(issueList)
+
+                items.clear()
+                items.addAll(
+                    issueList.map { issue ->
+                        IssueUiItem(
+                            title = issue.title,
+                            priority = "–",
+                            status = issue.state.name,
+                            date = issue.deadlineTS.toString(),
+                            attachments = 0,
+                            comments = 0,
+                            assignees = issue.assignments,
+                            backgroundColor = Color.Gray,
+                            id = issue.id
+                        )
+                    }
                 )
-            )
-        )
+            }
+        }
     }
 
-
+    private fun issueLayoutToUiItem(issue: IssueLayout): IssueUiItem {
+        return IssueUiItem(
+            title = issue.title,
+            priority = "Medium",
+            status = issue.state.name,
+            date = issue.deadlineTS.toString(),
+            attachments = 0,
+            comments = 0,
+            assignees = issue.assignments,
+            backgroundColor = Color.Gray // ggf. aus Label ableiten
+        )
+    }
     fun startDragging() { isDragging = true }
     fun stopDragging()  { isDragging = false }
 

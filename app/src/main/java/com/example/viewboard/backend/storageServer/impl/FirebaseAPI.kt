@@ -4,6 +4,7 @@ import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.ViewLayout
+import com.example.viewboard.backend.dataLayout.UserHelper
 import com.example.viewboard.backend.storageServer.abstraction.StorageServerAPI
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
@@ -40,7 +41,14 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun addProject(projectLayout: ProjectLayout, onSuccess: (String) -> Unit, onFailure: (ProjectLayout) -> Unit) {
-        m_projectTable.add(projectLayout)
+        val uid = UserHelper.getUid() ?: return
+
+        val projectWithUser = projectLayout.copy(
+            creator = uid,
+            users = arrayListOf(uid)
+        )
+        m_projectTable.add(projectWithUser)
+
             .addOnSuccessListener { ref ->
                 println("successfully added project: " + ref.id)
                 onSuccess(ref.id)
@@ -49,6 +57,17 @@ object FirebaseAPI : StorageServerAPI() {
                 println("failed to add project")
                 onFailure(projectLayout)
             }
+    }
+
+    fun getMyProjects(): Flow<List<ProjectLayout>> {
+        val uid = UserHelper.getUid()
+        return if (uid != null) {
+            m_projects.map { projects ->
+                projects.filter { it.users.contains(uid) }
+            }
+        } else {
+            flowOf(emptyList())
+        }
     }
 
     public override fun rmProject(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
@@ -416,6 +435,18 @@ object FirebaseAPI : StorageServerAPI() {
 
         return snap.toObject(IssueLayout::class.java)
     }
+
+    fun getMyIssues(projID: String): Flow<List<IssueLayout>> {
+        val uid = UserHelper.getUid()
+        return getIssues(projID).map { issues ->
+            if (uid != null) {
+                issues.filter { it.assignments.contains(uid) || it.creator == uid }
+            } else {
+                emptyList()
+            }
+        }
+    }
+
 
     public override fun getIssues() : Flow<List<IssueLayout>> {
         return m_issues
