@@ -3,14 +3,9 @@ package com.example.viewboard.ui.screens
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -20,7 +15,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -29,17 +23,14 @@ import com.example.viewboard.backend.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
-import java.text.ParseException
 import androidx.compose.runtime.rememberCoroutineScope
+import com.example.viewboard.backend.auth.impl.AuthAPI
 import kotlinx.coroutines.launch
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
-import com.example.viewboard.backend.dataLayout.UserHelper
 
 
 // ---------------------------------------------------
@@ -51,7 +42,7 @@ import com.example.viewboard.backend.dataLayout.UserHelper
 fun IssueCreationScreen(
     navController: NavController,
     projectId: String = "ysZaMVY24jnSyLuE5FKJ",
-    currentUserId: String = UserHelper.getUid() ?: "",
+    currentUserId: String = AuthAPI.getUid() ?: "",
 
     onCreate: () -> Unit = {}
 ) {

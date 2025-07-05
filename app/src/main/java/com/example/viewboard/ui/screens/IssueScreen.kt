@@ -24,6 +24,7 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.viewboard.R
+import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.components.HomeScreen.ProfileHeader
 import com.example.viewboard.ui.issue.IssueItemCard
 import com.example.viewboard.ui.issue.IssueUiItem
@@ -57,7 +58,7 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
     Scaffold(
         topBar = {
             ProfileHeader(
-                name = "Raoul",
+                name = AuthAPI.getDisplayName() ?: "failed to load username",
                 subtitle = "Welcome back!!",
                 navController =navController,
                 showBackButton = true,

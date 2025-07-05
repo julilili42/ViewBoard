@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
+import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.components.HomeScreen.ProgressCard
 import com.example.viewboard.components.HomeScreen.ProjectGrid
 import com.example.viewboard.ui.navigation.Screen
@@ -54,7 +55,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
                     ProfileHeader(
-                        name = "Raoul",
+                        name = AuthAPI.getDisplayName() ?: "failed to load username",
                         subtitle = "Welcome back!!",
                         navController =navController,
                         showBackButton = false ,

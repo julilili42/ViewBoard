@@ -1,10 +1,10 @@
 package com.example.viewboard.backend.storageServer.impl
 
+import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.ViewLayout
-import com.example.viewboard.backend.dataLayout.UserHelper
 import com.example.viewboard.backend.storageServer.abstraction.StorageServerAPI
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
@@ -41,7 +41,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun addProject(projectLayout: ProjectLayout, onSuccess: (String) -> Unit, onFailure: (ProjectLayout) -> Unit) {
-        val uid = UserHelper.getUid() ?: return
+        val uid = AuthAPI.getUid() ?: return
 
         val projectWithUser = projectLayout.copy(
             creator = uid,
@@ -60,7 +60,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     fun getMyProjects(): Flow<List<ProjectLayout>> {
-        val uid = UserHelper.getUid()
+        val uid = AuthAPI.getUid()
         return if (uid != null) {
             m_projects.map { projects ->
                 projects.filter { it.users.contains(uid) }
@@ -437,7 +437,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     fun getMyIssues(projID: String): Flow<List<IssueLayout>> {
-        val uid = UserHelper.getUid()
+        val uid = AuthAPI.getUid()
         return getIssues(projID).map { issues ->
             if (uid != null) {
                 issues.filter { it.assignments.contains(uid) || it.creator == uid }

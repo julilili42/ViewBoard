@@ -10,6 +10,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
+import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.components.ProfilePicture
 import com.example.viewboard.ui.navigation.BackButton
 import com.example.viewboard.ui.navigation.hasSoftNavigationBar
@@ -46,7 +47,7 @@ fun ProfileHeader(
         // Name + Untertitel
         Column {
             Text(
-                text = "Hi $name",
+                text = AuthAPI.getDisplayName() ?: "failed to load username",
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(4.dp))

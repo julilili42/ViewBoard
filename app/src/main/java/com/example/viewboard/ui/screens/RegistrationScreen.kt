@@ -45,14 +45,10 @@ import com.example.viewboard.ui.theme.Black
 import com.example.viewboard.ui.theme.BlueGray
 import com.example.viewboard.ui.theme.Roboto
 import com.example.viewboard.ui.theme.uiColor
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import com.example.viewboard.backend.dataLayout.UserHelper
-import com.google.firebase.auth.UserProfileChangeRequest
+import com.example.viewboard.backend.auth.impl.AuthAPI
 
 
 /**
@@ -139,7 +135,7 @@ fun RegisterSection(navController: NavController, modifier: Modifier = Modifier)
 
             Button(
                 onClick = {
-                    UserHelper.register(
+                    AuthAPI.register(
                         name = name,
                         email = email,
                         password = password,

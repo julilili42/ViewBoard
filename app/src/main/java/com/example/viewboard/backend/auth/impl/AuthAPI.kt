@@ -1,12 +1,13 @@
-package com.example.viewboard.backend.dataLayout
+package com.example.viewboard.backend.auth.impl
 
+import com.example.viewboard.backend.auth.abstraction.AuthServerAPI
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.firestore
 
-object UserHelper {
-    fun register(
+object AuthAPI : AuthServerAPI() {
+    public override fun register(
         name: String,
         email: String,
         password: String,
@@ -39,19 +40,19 @@ object UserHelper {
             }
     }
 
-    fun getUid(): String? {
+    public override fun getUid(): String? {
         return FirebaseAuth.getInstance().currentUser?.uid
     }
 
-    fun getEmail(): String? {
+    public override fun getEmail(): String? {
         return FirebaseAuth.getInstance().currentUser?.email
     }
 
-    fun getDisplayName(): String? {
+    public override fun getDisplayName(): String? {
         return FirebaseAuth.getInstance().currentUser?.displayName
     }
 
-    fun isLoggedIn(): Boolean {
+    public override fun isLoggedIn(): Boolean {
         return FirebaseAuth.getInstance().currentUser != null
     }
 }
