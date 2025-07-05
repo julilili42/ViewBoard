@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
+import com.example.viewboard.backend.dataLayout.UserHelper
 import com.example.viewboard.components.ProfilePicture
 import com.example.viewboard.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -53,8 +54,10 @@ import com.example.viewboard.ui.screens.HelpSupportScreen
 
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
+    var showNotifDialog by remember { mutableStateOf(false) }
+    val userName = UserHelper.getDisplayName() ?: "failed to load username"
+
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        var showNotifDialog by remember { mutableStateOf(false) }
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize(),
@@ -74,7 +77,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
 
                         Spacer(modifier = Modifier.size(16.dp))
                         Text(
-                            text = "Raoul Mustermann",
+                            text = userName,
                             style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onBackground
                         )
