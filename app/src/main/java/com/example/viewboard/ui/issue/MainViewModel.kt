@@ -48,6 +48,33 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun loadAllIssues(projectId: String) {
+        viewModelScope.launch {
+            FirebaseAPI.getIssues(projectId, {}, {}).collectLatest { issueList ->
+                issues.clear()
+                issues.addAll(issueList)
+
+                items.clear()
+                items.addAll(
+                    issueList.map { issue ->
+                        IssueUiItem(
+                            title = issue.title,
+                            priority = "–",
+                            status = issue.state.name,
+                            date = issue.deadlineTS.toString(),
+                            attachments = 0,
+                            comments = 0,
+                            assignees = issue.assignments,
+                            backgroundColor = Color.Gray,
+                            id = issue.id
+                        )
+                    }
+                )
+            }
+        }
+    }
+
+
     private fun issueLayoutToUiItem(issue: IssueLayout): IssueUiItem {
         return IssueUiItem(
             title = issue.title,
