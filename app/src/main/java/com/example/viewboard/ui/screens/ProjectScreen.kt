@@ -194,12 +194,15 @@ fun ProjectsScreen(
     onFilter: () -> Unit = {}
 ) {
     FirebaseAPI.init()
+    var showOnlyMyProjects by remember { mutableStateOf(true) }
     val projectLayouts = remember { mutableStateListOf<ProjectLayout>() }
     var error by remember { mutableStateOf<String?>(null) }
     // startet automatisch beim ersten Composable-Aufruf
-    LaunchedEffect(Unit) {
+    LaunchedEffect(showOnlyMyProjects) {
         try {
-            FirebaseAPI.getProjects().collect { layouts ->
+            val flow = if (showOnlyMyProjects) FirebaseAPI.getMyProjects()
+            else FirebaseAPI.getProjects()
+            flow.collect { layouts ->
                 projectLayouts.clear()
                 projectLayouts.addAll(layouts)
             }
@@ -207,19 +210,7 @@ fun ProjectsScreen(
             error = "Ladefehler: ${e.localizedMessage}"
         }
     }
-    LaunchedEffect(Unit) {
-        try {
-            FirebaseAPI.getProjects().collect { layouts ->
-                projectLayouts.clear()
-                projectLayouts.addAll(layouts)
-            }
-        } catch (e: Exception) {
-            error = "Ladefehler: ${e.localizedMessage}"
-        }
-        projectLayouts.forEach { project ->
-            Log.d("MainActivity", "Projekt: ${project.id} – ${project.name}")
-        }
-    }
+
     Scaffold(
         topBar = {
                 ProfileHeader(
@@ -310,11 +301,11 @@ fun ProjectsScreen(
                     CustomIcon(
                         iconRes = R.drawable.filter_svgrepo_com__1,
                         contentDesc = stringResource(R.string.filter_svgrepo_com__1),
-                        backgroundColor = MaterialTheme.colorScheme.primary,
+                        backgroundColor = if (showOnlyMyProjects) Color.Green else Color.Gray,
                         iconTint = Color.White,
                         width = 40.dp,
                         height = 40.dp,
-                        onClick = onFilter,
+                        onClick = { showOnlyMyProjects = !showOnlyMyProjects },
                         modifier = Modifier
                     )
                 }

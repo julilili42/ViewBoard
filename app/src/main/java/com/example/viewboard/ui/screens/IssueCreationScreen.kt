@@ -25,7 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.ui.theme.uiColor
-import com.google.firebase.Timestamp
+import com.example.viewboard.backend.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.OutlinedTextField
@@ -39,6 +39,7 @@ import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
+import com.example.viewboard.backend.dataLayout.UserHelper
 
 
 // ---------------------------------------------------
@@ -50,9 +51,11 @@ import com.example.viewboard.ui.navigation.ChipInputField
 fun IssueCreationScreen(
     navController: NavController,
     projectId: String = "ysZaMVY24jnSyLuE5FKJ",
-    currentUserId: String = "1",
+    currentUserId: String = UserHelper.getUid() ?: "",
+
     onCreate: () -> Unit = {}
 ) {
+
     val uiColor = uiColor()
     val context = LocalContext.current
     val scroll = rememberScrollState()
@@ -67,7 +70,9 @@ fun IssueCreationScreen(
     var newLabelName by remember { mutableStateOf("") }
 
     val calendar = remember { Calendar.getInstance() }
-    var deadline by remember { mutableStateOf(Timestamp(calendar.time)) }
+    var deadline by remember {
+        mutableStateOf(Timestamp().apply { import(calendar.toInstant()) })
+    }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
@@ -84,26 +89,37 @@ fun IssueCreationScreen(
         try { timeFormatter.parse(timeText); true } catch (_: Exception) { false }
     }
     val coroutineScope = rememberCoroutineScope()
+
     fun updateDeadlineFromDateText() {
         val d = dateFormatter.parse(dateText) ?: throw IllegalArgumentException("Ungültiges Datum")
         calendar.time = d
-        deadline = Timestamp(calendar.time)
+        val ts = Timestamp()
+        ts.import(d.toInstant())
+        deadline = ts
     }
+
 
     fun updateDeadlineFromTimeText() {
         val t = timeFormatter.parse(timeText) ?: throw IllegalArgumentException("Ungültige Uhrzeit")
         val cal2 = Calendar.getInstance().apply { time = t }
+
         calendar.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY))
         calendar.set(Calendar.MINUTE, cal2.get(Calendar.MINUTE))
-        deadline = Timestamp(calendar.time)
+
+        val ts = Timestamp()
+        ts.import(calendar.toInstant())
+        deadline = ts
     }
+
 
     fun pickDate() {
         DatePickerDialog(
             context,
             { _, year, month, day ->
                 calendar.set(year, month, day)
-                deadline = Timestamp(calendar.time)
+                val ts = Timestamp()
+                ts.import(calendar.toInstant())
+                deadline = ts
                 dateText = dateFormatter.format(calendar.time)
             },
             calendar.get(Calendar.YEAR),
@@ -118,7 +134,9 @@ fun IssueCreationScreen(
             { _, hour, minute ->
                 calendar.set(Calendar.HOUR_OF_DAY, hour)
                 calendar.set(Calendar.MINUTE, minute)
-                deadline = Timestamp(calendar.time)
+                val ts = Timestamp()
+                ts.import(calendar.toInstant())
+                deadline = ts
                 timeText = timeFormatter.format(calendar.time)
             },
             calendar.get(Calendar.HOUR_OF_DAY),
@@ -126,6 +144,7 @@ fun IssueCreationScreen(
             true
         ).show()
     }
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -272,15 +291,17 @@ fun IssueCreationScreen(
                         // Issue anlegen und speichern
                         val newIssue = IssueLayout(
                             title       = title.trim(),
-                            desc = desc.trim(),
+                            desc        = desc.trim(),
                             creator     = currentUserId,
                             assignments = ArrayList(assignments),
                             labels      = labelObjects,
+                            deadlineTS  = deadline
                         )
+
 
                         coroutineScope.launch {
                             try {
-                                FirebaseAPI.addIssue(projID=projectId, issueLayout =  IssueLayout(title = "3. issue", creator = "ich"))
+                                FirebaseAPI.addIssue(projID = projectId, issueLayout = newIssue)
                                 navController.popBackStack()
                             } catch (e: Exception) {
                                 // z.B. Fehler anzeigen:

@@ -51,9 +51,8 @@ import com.google.firebase.ktx.Firebase
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-
-
-
+import com.example.viewboard.backend.dataLayout.UserHelper
+import com.google.firebase.auth.UserProfileChangeRequest
 
 
 /**
@@ -140,28 +139,18 @@ fun RegisterSection(navController: NavController, modifier: Modifier = Modifier)
 
             Button(
                 onClick = {
-                    FirebaseAuth.getInstance()
-                        .createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val uid = task.result.user?.uid ?: return@addOnCompleteListener
-                                val db = Firebase.firestore
-                                val userMap = HashMap<String, String>()
-                                userMap["name"] = name
-                                userMap["email"] = email
-
-                                db.collection("users").document(uid).set(userMap)
-                                    .addOnSuccessListener {
-                                        Toast.makeText(context, "Registrierung erfolgreich", Toast.LENGTH_SHORT).show()
-                                        navController.navigate(Screen.HomeScreen.route)
-                                    }
-                                    .addOnFailureListener {
-                                        Toast.makeText(context, "Fehler beim Speichern: ${it.message}", Toast.LENGTH_SHORT).show()
-                                    }
-                            } else {
-                                Toast.makeText(context, "Fehler: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                            }
+                    UserHelper.register(
+                        name = name,
+                        email = email,
+                        password = password,
+                        onSuccess = {
+                            Toast.makeText(context, "Registrierung erfolgreich", Toast.LENGTH_SHORT).show()
+                            navController.navigate(Screen.HomeScreen.route)
+                        },
+                        onError = { msg ->
+                            Toast.makeText(context, "Fehler: $msg", Toast.LENGTH_SHORT).show()
                         }
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()

@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
-            val projects = FirebaseAPI.getProjects()
+            val projects = FirebaseAPI.getMyProjects()
             projects.collect { list ->
                 list.forEach { i -> println(i) }
             }

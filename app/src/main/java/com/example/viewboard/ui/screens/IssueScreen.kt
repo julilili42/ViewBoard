@@ -34,10 +34,25 @@ import com.example.viewboard.ui.project.CustomSearchField
 import com.example.viewboard.ui.timetable.CustomIcon
 
 
+
+
 @Composable
 fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,projectName:String,projectId : String, modifier: Modifier = Modifier)  {
+    var showOnlyMyIssues by remember { mutableStateOf(true) }
+
     val categories = listOf("New", "Ongoing", "Completed")
     var selectedTab by remember { mutableStateOf(0) }
+
+    LaunchedEffect(projectId, showOnlyMyIssues) {
+        if (showOnlyMyIssues) {
+            mainViewModel.loadMyIssues(projectId)
+        } else {
+            mainViewModel.loadAllIssues(projectId)
+        }
+    }
+
+
+
 
     Scaffold(
         topBar = {
@@ -132,11 +147,11 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                     CustomIcon(
                         iconRes = R.drawable.filter_svgrepo_com__1,
                         contentDesc = stringResource(R.string.filter_svgrepo_com__1),
-                        backgroundColor = MaterialTheme.colorScheme.primary,
+                        backgroundColor = if (showOnlyMyIssues) MaterialTheme.colorScheme.primary else Color.Gray,
                         iconTint = Color.White,
                         width = 40.dp,
                         height = 40.dp,
-                        onClick = {},
+                        onClick = { showOnlyMyIssues = !showOnlyMyIssues },
                         modifier = Modifier
                     )
                 }
