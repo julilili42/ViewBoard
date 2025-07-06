@@ -2,6 +2,7 @@ package com.example.viewboard.backend.auth.impl
 
 import com.example.viewboard.backend.auth.abstraction.AuthServerAPI
 import com.google.firebase.Firebase
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.firestore
@@ -38,6 +39,84 @@ object AuthAPI : AuthServerAPI() {
                         .addOnFailureListener { e -> onError(e.message ?: "Firestore error") }
                 }
             }
+    }
+
+    public override fun updateEmail(
+        oldPassword: String,
+        newEmail: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        verifyPassword(oldPassword,
+            {
+                val user = FirebaseAuth.getInstance().currentUser!!
+                user.updateEmail(newEmail)
+                    .addOnSuccessListener {
+                        Firebase.firestore
+                            .collection("users")
+                            .document(user.uid)
+                            .update("email", newEmail)
+                            .addOnSuccessListener { onSuccess() }
+                            .addOnFailureListener { e ->
+                                onError(e.message ?: "Firestore-Update fehlgeschlagen")
+                            }
+                    }
+                    .addOnFailureListener { e ->
+                        onError(e.message ?: "E-Mail-Update fehlgeschlagen")
+                    }
+            },
+            onError
+        )
+    }
+
+    public override fun setPassword(
+        newPassword: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user == null) {
+            onError("Kein eingeloggter Nutzer")
+            return
+        }
+
+        user.updatePassword(newPassword)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e ->
+                onError(e.message ?: "Passwort-Update fehlgeschlagen")
+            }
+    }
+
+    public override fun verifyPassword(
+        password: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val email = user?.email
+        if (user == null || email.isNullOrBlank()) {
+            onError("Kein eingeloggter Nutzer oder fehlende E-Mail")
+            return
+        }
+
+        val credential = EmailAuthProvider.getCredential(email, password)
+        user.reauthenticate(credential)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e ->
+                onError(e.message ?: "Passwort stimmt nicht")
+            }
+    }
+
+    public override fun updatePassword(
+        oldPassword: String,
+        newPassword: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        verifyPassword(oldPassword,
+            { setPassword(newPassword, onSuccess, onError) },
+            onError
+        )
     }
 
     public override fun getUid(): String? {

@@ -22,6 +22,8 @@ import com.example.viewboard.ui.screens.HomeScreen
 import com.example.viewboard.ui.screens.DragableScreen
 import com.example.viewboard.ui.screens.IssueScreen
 import com.example.viewboard.ui.issue.MainViewModel
+import com.example.viewboard.ui.screens.ChangeEmailScreen
+import com.example.viewboard.ui.screens.ChangePasswordScreen
 import com.example.viewboard.ui.screens.HelpSupportScreen
 import com.example.viewboard.ui.screens.IssueCreationScreen
 import com.example.viewboard.ui.screens.ProjectsScreen
@@ -149,6 +151,26 @@ fun Navigation(modifier: Modifier = Modifier) {
                     }
                 }
             }
+            composable(route = Screen.ChangePasswordScreen.route) {
+                MainLayout(navController, currentRoute) { padding ->
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                    ) {
+                        ChangePasswordScreen(navController = navController)
+                    }
+                }
+            }
+
+            composable(route = Screen.ChangeEmailScreen.route) {
+                MainLayout(navController, currentRoute) { padding ->
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                    ) {
+                        ChangeEmailScreen(navController = navController)
+                    }
+                }
+            }
+
             composable(
                 route = Screen.IssueCreationScreen.route,
                 arguments = listOf(

@@ -20,6 +20,13 @@ sealed class Screen(val route: String) {
     /** Screen for the help/support page, hides bottomBar */
     object HelpSupportScreen: Screen(route= "helpSupport")
 
+    /** Screen for changing the password */
+    object ChangePasswordScreen: Screen(route= "passwordChange")
+
+    /** Screen for changing the email */
+    object ChangeEmailScreen: Screen(route= "emailChange")
+
+
     /**
      * Screen for displaying details of a specific project.
      * Uses a placeholder `{projectName}` which will be replaced at runtime.

@@ -70,12 +70,6 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                             style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onBackground
                         )
-                        Spacer(modifier = Modifier.size(8.dp))
-                        TextButton(onClick = { /* TODO: Edit Profile */ }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
-                            Spacer(Modifier.size(4.dp))
-                            Text("Profil bearbeiten", color = MaterialTheme.colorScheme.primary)
-                        }
                     }
                 }
                 Spacer(modifier = Modifier.size(32.dp))
@@ -84,11 +78,9 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
             item {
                 // account settings
                 SectionCard (title = "Account") {
-                    MenuItem(text = "E-Mail hinzufügen", onClick = { /* TODO */ })
+                    MenuItem(text = "E-Mail ändern", onClick = { navController.navigate(Screen.ChangeEmailScreen.route) })
                     Divider()
-                    MenuItem(text = "Passwort ändern", onClick = { /* TODO */ })
-                    Divider()
-                    MenuItem(text = "Zwei-Faktor-Authentifizierung", onClick = { /* TODO */ })
+                    MenuItem(text = "Passwort ändern", onClick = {navController.navigate(Screen.ChangePasswordScreen.route)})
                 }
                 Spacer(modifier = Modifier.size(24.dp))
             }
@@ -103,9 +95,8 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                     Divider()
                     MenuItem(text = "Hilfe & Support", onClick = { navController.navigate(Screen.HelpSupportScreen.route) })
                 }
-                Spacer(modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.size(170.dp))
             }
-
             item {
                 // Logout
                 Text(
