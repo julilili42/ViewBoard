@@ -25,10 +25,17 @@ import androidx.compose.material3.Scaffold
 import com.example.viewboard.R
 
 sealed class BottomBarScreen(val route: String, @StringRes val title: Int, val iconRes: Int) {
-    object Home     : BottomBarScreen("home",      R.string.home,      R.drawable.house_black_silhouette_without_door_svgrepo_com)
-    object Timetable: BottomBarScreen("timetable", R.string.timetable, R.drawable.calendar_mark_svgrepo_com)
-    object View : BottomBarScreen("View",  R.string.views,  R.drawable.contacts_svgrepo_com)
-    object Profile  : BottomBarScreen("profile",   R.string.profile,   R.drawable.user_svgrepo_com)
+    object Home : BottomBarScreen(
+        "home",
+        R.string.home,
+        R.drawable.house_black_silhouette_without_door_svgrepo_com
+    )
+
+    object Timetable :
+        BottomBarScreen("timetable", R.string.timetable, R.drawable.calendar_mark_svgrepo_com)
+
+    object View : BottomBarScreen("View", R.string.views, R.drawable.contacts_svgrepo_com)
+    object Profile : BottomBarScreen("profile", R.string.profile, R.drawable.user_svgrepo_com)
 }
 
 @Composable
@@ -55,8 +62,9 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
         BottomBarScreen.View,
         BottomBarScreen.Profile
     )
-    Column(modifier = Modifier
-        .fillMaxWidth()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
         Divider(
             color = Color.LightGray,
@@ -65,23 +73,27 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
         NavigationBar(
             containerColor = Color.White,
             contentColor = Color.Black,
-
         ) {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val current = navBackStackEntry?.destination?.route
-
             items.forEach { screen ->
+                val selected = currentRoute == screen.route
                 NavigationBarItem(
                     icon = {
                         Icon(
                             painter = painterResource(id = screen.iconRes),
                             contentDescription = stringResource(screen.title),
-                            modifier      = Modifier.size(26.dp))
+                            modifier = Modifier.size(26.dp),
+                            tint = if (selected) Color.White else Color(0xFF757575)
+                        )
                     },
-                    label = { Text(stringResource(screen.title)) },
-                    selected = current == screen.route,
+                    label = {
+                        Text(
+                            stringResource(screen.title),
+                            color = if (selected) Color(0xFF212121) else Color(0xFF757575)
+                        )
+                    },
+                    selected = currentRoute == screen.route,
                     onClick = {
-                        if (current != screen.route ) {
+                        if (currentRoute != screen.route) {
                             navController.navigate(screen.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
