@@ -9,5 +9,5 @@ data class LabelLayout (
     var name: String = "",
     var creator: String = "",
     var refCounter: Int = 0,
-    var creationTS: Timestamp = Timestamp()
+    var creationTS: String = Timestamp().export()
 )

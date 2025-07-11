@@ -287,7 +287,7 @@ fun IssueCreationScreen(
                             assignments = ArrayList(assignments),
 //                            labels      = labelObjects,
                             labels      = ArrayList(labels),
-                            deadlineTS  = deadline
+                            deadlineTS  = deadline.export()
                         )
 
 

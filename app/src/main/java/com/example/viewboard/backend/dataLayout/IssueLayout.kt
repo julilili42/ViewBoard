@@ -18,6 +18,6 @@ data class IssueLayout (
     var state: IssueState = IssueState.NEW,
     var assignments: ArrayList<String> = ArrayList<String>(),
     var labels: ArrayList<String> = ArrayList<String>(),
-    var creationTS: Timestamp = Timestamp(),
-    var deadlineTS: Timestamp = Timestamp()
+    var creationTS: String = Timestamp().export(),
+    var deadlineTS: String = Timestamp().export()
 )

@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.navigation.NavController
+import com.example.viewboard.backend.Timestamp
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.components.HomeScreen.ProjectCardTasks
@@ -54,7 +55,7 @@ fun TimelineSchedule(
             issues.filter { issue ->
                 runCatching {
                     // Aus dem Timestamp erst den Datums-String holen …
-                    val dateString = issue.deadlineTS.getDate()
+                    val dateString = Timestamp(data = issue.deadlineTS).getDate()
                     // … und diesen parsen
                     LocalDate.parse(dateString, formatter)
                 }.getOrNull() == selectedDate
@@ -134,7 +135,7 @@ fun TimelineSchedule(
                                 val formatter = DateTimeFormatter.ISO_LOCAL_DATE
                                 val dueDateTime = runCatching {
                                     // erst das Datum als String holen…
-                                    val dateString = issue.deadlineTS.getDate()
+                                    val dateString = Timestamp(data = issue.deadlineTS).getDate()
                                     // …und dann als LocalDate parsen
                                     LocalDate.parse(dateString, formatter).atStartOfDay()
                                 }.getOrElse { LocalDateTime.MIN }
@@ -212,7 +213,7 @@ fun extractIssueDates(issues: List<IssueLayout>): List<LocalDate> {
     return issues.mapNotNull { issue ->
         runCatching {
             // z.B. "2025-07-02T14:35:00Z" → "2025-07-02"
-            val iso = issue.deadlineTS.export()
+            val iso = issue.deadlineTS
             val datePart = iso.substringBefore('T')
             LocalDate.parse(datePart, isoFormatter)
         }.getOrNull()
