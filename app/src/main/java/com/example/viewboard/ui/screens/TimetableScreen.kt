@@ -41,6 +41,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
+import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
@@ -64,7 +65,7 @@ fun TimetableScreen(navController: NavHostController) {
     LaunchedEffect(Unit) {
         // Projekte laden
         try {
-            FirebaseAPI.getMyProjects().collect { layouts ->
+            FirebaseAPI.getProjects(AuthAPI.getUid()).collect { layouts ->
                 projectLayouts.clear()
                 projectLayouts.addAll(layouts)
             }

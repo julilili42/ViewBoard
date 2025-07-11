@@ -59,17 +59,6 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    fun getMyProjects(): Flow<List<ProjectLayout>> {
-        val uid = AuthAPI.getUid()
-        return if (uid != null) {
-            m_projects.map { projects ->
-                projects.filter { it.users.contains(uid) }
-            }
-        } else {
-            flowOf(emptyList())
-        }
-    }
-
     public override fun rmProject(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
         m_projectTable.document(id)
             .delete()
@@ -127,6 +116,16 @@ object FirebaseAPI : StorageServerAPI() {
 
     public override fun getProjects() : Flow<List<ProjectLayout>> {
         return m_projects
+    }
+
+    public override fun getProjects(userID: String?) : Flow<List<ProjectLayout>> {
+        return if (userID != null) {
+            m_projects.map { projects ->
+                projects.filter { it.users.contains(userID) }
+            }
+        } else {
+            flowOf(emptyList())
+        }
     }
 
     public override suspend fun addLabel(projID: String, labelLayout: LabelLayout, onSuccess: (String) -> Unit, onFailure: (LabelLayout) -> Unit) {
@@ -436,20 +435,6 @@ object FirebaseAPI : StorageServerAPI() {
         return snap.toObject(IssueLayout::class.java)
     }
 
-    fun getMyIssues(projID: String): Flow<List<IssueLayout>> {
-        val uid = AuthAPI.getUid()
-        return getIssues(projID).map { issues ->
-            if (uid != null) {
-                issues.filter { it.assignments.contains(uid) || it.creator == uid }
-            } else {
-                emptyList()
-            }
-        }
-    }
-
-
-
-
     public override fun getIssues() : Flow<List<IssueLayout>> {
         return m_issues
     }
@@ -518,6 +503,26 @@ object FirebaseAPI : StorageServerAPI() {
                 println("failed to retrieved issues from project: $projID")
                 onFailure(projID)
             }
+    }
+
+    public override fun getIssues(userID: String?) : Flow<List<IssueLayout>> {
+        return m_issues.map { issues ->
+            if (userID != null) {
+                issues.filter { it.assignments.contains(userID) || it.creator == userID }
+            } else {
+                emptyList()
+            }
+        }
+    }
+
+    public override fun getIssues(projID: String, userID: String?) : Flow<List<IssueLayout>> {
+        return getIssues(projID).map { issues ->
+            if (userID != null) {
+                issues.filter { it.assignments.contains(userID) || it.creator == userID }
+            } else {
+                emptyList()
+            }
+        }
     }
 
     public override suspend fun addView(projID: String, viewLayout: ViewLayout, onSuccess: (String) -> Unit, onFailure: (ViewLayout) -> Unit) {

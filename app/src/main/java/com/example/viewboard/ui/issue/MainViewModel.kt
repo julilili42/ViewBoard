@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewModelScope
+import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import kotlinx.coroutines.flow.collectLatest
@@ -24,7 +25,7 @@ class MainViewModel : ViewModel() {
 
     fun loadMyIssues(projectId: String) {
         viewModelScope.launch {
-            FirebaseAPI.getMyIssues(projectId).collectLatest { issueList ->
+            FirebaseAPI.getIssues(projectId, AuthAPI.getUid()).collectLatest { issueList ->
                 issues.clear()
                 issues.addAll(issueList)
 

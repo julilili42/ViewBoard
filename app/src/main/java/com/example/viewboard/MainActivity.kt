@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
+import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
@@ -77,7 +78,7 @@ class MainActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
-            val projects = FirebaseAPI.getMyProjects()
+            val projects = FirebaseAPI.getProjects(AuthAPI.getUid())
             projects.collect { list ->
                 list.forEach { i -> println(i) }
             }

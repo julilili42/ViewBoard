@@ -30,7 +30,6 @@ abstract class StorageServerAPI () {
      */
     public abstract fun rmProject(id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
 
-
     /**
      * Update a project
      *
@@ -67,6 +66,15 @@ abstract class StorageServerAPI () {
      * @return the projects
      */
     public abstract fun getProjects() : Flow<List<ProjectLayout>>
+
+    /**
+     * Get all projects from user
+     *
+     * @param userID the id of the user
+     *
+     * @return the projects when they have been successfully retrieved
+     */
+    public abstract fun getProjects(userID: String?) : Flow<List<ProjectLayout>>
 
     /**
      * Add a label
@@ -149,8 +157,8 @@ abstract class StorageServerAPI () {
      * Get all labels
      *
      * @param projID the id of the project
-     * @param onSuccess success callback, when the labels has been successfully retrieved
-     * @param onFailure failure callback, if the labels has not been retrieved
+     * @param onSuccess success callback, when the labels have been successfully retrieved
+     * @param onFailure failure callback, if the labels have not been retrieved
      *
      * @return the labels when they have been successfully retrieved
      */
@@ -248,8 +256,8 @@ abstract class StorageServerAPI () {
      * Get all issues from a view
      *
      * @param viewID the id of the view
-     * @param onSuccess success callback, when the issues has been successfully retrieved
-     * @param onFailure failure callback, if the issues has not been retrieved
+     * @param onSuccess success callback, when the issues have been successfully retrieved
+     * @param onFailure failure callback, if the issues have not been retrieved
      *
      * @return the issues when they have been successfully retrieved
      */
@@ -259,12 +267,31 @@ abstract class StorageServerAPI () {
      * Get all issues
      *
      * @param projID the id of the project
-     * @param onSuccess success callback, when the issues has been successfully retrieved
-     * @param onFailure failure callback, if the issues has not been retrieved
+     * @param onSuccess success callback, when the issues have been successfully retrieved
+     * @param onFailure failure callback, if the issues have not been retrieved
      *
      * @return the issues when they have been successfully retrieved
      */
     public abstract fun getIssues(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<IssueLayout>>
+
+    /**
+     * Get all issues from user
+     *
+     * @param userID the id of the user
+     *
+     * @return the issues when they have been successfully retrieved
+     */
+    public abstract fun getIssues(userID: String?) : Flow<List<IssueLayout>>
+
+    /**
+     * Get all issues from user for a project
+     *
+     * @param projID the id of the project
+     * @param userID the id of the user
+     *
+     * @return the issues when they have been successfully retrieved
+     */
+    public abstract fun getIssues(projID: String, userID: String?) : Flow<List<IssueLayout>>
 
     /**
      * Add a view
@@ -327,8 +354,8 @@ abstract class StorageServerAPI () {
      * Get all views
      *
      * @param projID the id of the project
-     * @param onSuccess success callback, when the views has been successfully retrieved
-     * @param onFailure failure callback, if the views has not been retrieved
+     * @param onSuccess success callback, when the views have been successfully retrieved
+     * @param onFailure failure callback, if the views have not been retrieved
      *
      * @return the views when they have been successfully retrieved
      */
