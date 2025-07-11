@@ -30,10 +30,10 @@ fun ChangeEmailScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("E-Mail ändern") },
+                title = { Text("Change E-Mail") },
                 navigationIcon = {
                     TextButton(onClick = { navController.popBackStack() }) {
-                        Text("Abbrechen")
+                        Text("Cancel")
                     }
                 },
                 actions = {
@@ -53,7 +53,7 @@ fun ChangeEmailScreen(
                         },
                         enabled = enabled
                     ) {
-                        Text("Fertig")
+                        Text("Done")
                     }
                 }
             )
@@ -75,7 +75,7 @@ fun ChangeEmailScreen(
                 OutlinedTextField(
                     value = currentPassword,
                     onValueChange = { currentPassword = it },
-                    label = { Text("Aktuelles Passwort") },
+                    label = { Text("Current Password") },
                     singleLine = true,
                     visualTransformation = if (showPassword) VisualTransformation.None
                     else PasswordVisualTransformation(),
@@ -88,7 +88,7 @@ fun ChangeEmailScreen(
                 OutlinedTextField(
                     value = newEmail,
                     onValueChange = { newEmail = it },
-                    label = { Text("Neue E-Mail") },
+                    label = { Text("New E-Mail") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Email
@@ -98,11 +98,10 @@ fun ChangeEmailScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                // Bestätigung
                 OutlinedTextField(
                     value = confirmEmail,
                     onValueChange = { confirmEmail = it },
-                    label = { Text("E-Mail bestätigen") },
+                    label = { Text("Confirm E-Mail") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Email

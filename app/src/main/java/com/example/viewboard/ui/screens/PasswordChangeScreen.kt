@@ -33,10 +33,10 @@ fun ChangePasswordScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Passwort ändern") },
+                title = { Text("Change Password") },
                 navigationIcon = {
                     TextButton(onClick = { navController.popBackStack() }) {
-                        Text("Abbrechen")
+                        Text("Cancel")
                     }
                 },
                 actions = {
@@ -56,7 +56,7 @@ fun ChangePasswordScreen(
                         },
                         enabled = enabled
                     ) {
-                        Text("Fertig")
+                        Text("Done")
                     }
                 }
             )
@@ -74,7 +74,7 @@ fun ChangePasswordScreen(
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
                 PasswordField(
-                    label = "Aktuelles Passwort",
+                    label = "Current Password",
                     password = currentPassword,
                     onValueChange = { currentPassword = it },
                     visible = showCurrent,
@@ -82,7 +82,7 @@ fun ChangePasswordScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 PasswordField(
-                    label = "Neues Passwort",
+                    label = "New Password",
                     password = newPassword,
                     onValueChange = { newPassword = it },
                     visible = showNew,
@@ -90,7 +90,7 @@ fun ChangePasswordScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 PasswordField(
-                    label = "Passwort bestätigen",
+                    label = "Confirm Password",
                     password = confirmPassword,
                     onValueChange = { confirmPassword = it },
                     visible = showConfirm,
