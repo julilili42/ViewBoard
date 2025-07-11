@@ -1,6 +1,10 @@
 package com.example.viewboard.ui.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,14 +20,13 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import com.example.viewboard.components.SectionCard
 import com.example.viewboard.components.MenuItem
@@ -31,56 +34,137 @@ import com.example.viewboard.ui.navigation.BackButton
 
 @Composable
 fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavController) {
-        Column(modifier = Modifier
+    // State für das Ein-/Ausklappen
+    var faqExpanded by remember { mutableStateOf(false) }
+    var passwordExpanded by remember { mutableStateOf(false) }
+
+
+    Column(
+        modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // --- Header mit Back-Button und Titel ---
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
         ) {
-            // Back arrow
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            ) {
-                // Zentrierte Überschrift
-                Text(
-                    text = "Hilfe & Support",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    modifier = Modifier.align(Alignment.Center)
-                )
-
-                // BackButton rechts
-                BackButton(
-                    text = "Back",
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.align(Alignment.CenterEnd)
-                )
-            }
-            Spacer(Modifier.size(24.dp))
-
-            // FAQ
-            SectionCard(title = "FAQ") {
-                MenuItem("Wie verwende ich ViewBoard?", onClick = { /* TODO: Show FAQ */ })
-                Divider()
-                MenuItem("Passwort zurücksetzen", onClick = { /* TODO */ })
-                Divider()
-                MenuItem("Datenschutzrichtlinien", onClick = { /* TODO */ })
-            }
-            Spacer(Modifier.size(24.dp))
-
-            SectionCard(title = "Kontakt") {
-                MenuItem("E-Mail an Support", onClick = { /* TODO: Intent mailto: */ })
-                Divider()
-                MenuItem("Feedback senden", onClick = { /* TODO: Feedback-Form */ })
-            }
-            Spacer(Modifier.weight(1f))
-
-            // app version
+            BackButton(
+                text = "Back",
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
             Text(
-                text = "Version 1.0.0",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                text = "Help & Support",
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.align(Alignment.Center)
             )
         }
+
+        Spacer(Modifier.size(24.dp))
+
+        // --- FAQ-Section mit ausklappbarem Inhalt ---
+        SectionCard(title = "FAQ") {
+            // Klickbares Haupt-Item
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { faqExpanded = !faqExpanded }
+                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "How to use ViewBoard?",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = if (faqExpanded) "Collapse" else "Expand",
+                    modifier = Modifier
+                        .size(24.dp)
+                        // Icon drehen je nachdem ob ausgeklappt
+                        .rotate(if (faqExpanded) 90f else 180f)
+                )
+            }
+            // Animiertes Ein-/Ausblenden der Anleitung
+            AnimatedVisibility(
+                visible = faqExpanded,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp)
+                ) {
+                    Text(
+                        text = "1. Start the app and sign in.\n" +
+                                "2. On the Home screen, choose Global or Personal boards.\n" +
+                                "3. Tap the \"+\" icon to add an issue; enter title, description, labels, and deadline.\n" +
+                                "4. Tap an issue to edit or delete it.\n" +
+                                "5. Use the filter menu to sort by label, deadline, or assignee",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Divider()
+                }
+            }
+
+
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { passwordExpanded = !passwordExpanded }
+                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Reseting your password",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = if (passwordExpanded) "Collapse" else "Expand",
+                    modifier = Modifier
+                        .size(24.dp)
+                        // Icon drehen je nachdem ob ausgeklappt
+                        .rotate(if (passwordExpanded) 90f else 180f)
+                )
+            }
+            // Animiertes Ein-/Ausblenden der Anleitung
+            AnimatedVisibility(
+                visible = passwordExpanded,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp)
+                ) {
+                    Text(
+                        text = "1. Start the app and login.\n" +
+                                "2. Go to your Profile using the Navigation Bar.\n" +
+                                "3. Click change password.\n" +
+                                "4. Enter current and new password.\n" +
+                                "5. Now you can login using your new password.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Divider()
+                }
+            }
+        }
+
+        Spacer(Modifier.size(24.dp))
+
+        // App-Version
+        Text(
+            text = "Version 1.0.0",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+    }
 }
