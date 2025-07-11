@@ -285,7 +285,8 @@ fun IssueCreationScreen(
                             desc        = desc.trim(),
                             creator     = currentUserId,
                             assignments = ArrayList(assignments),
-                            labels      = labelObjects,
+//                            labels      = labelObjects,
+                            labels      = ArrayList(labels),
                             deadlineTS  = deadline
                         )
 
