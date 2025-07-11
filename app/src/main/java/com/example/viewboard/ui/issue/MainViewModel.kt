@@ -25,7 +25,7 @@ class MainViewModel : ViewModel() {
 
     fun loadMyIssues(projectId: String) {
         viewModelScope.launch {
-            FirebaseAPI.getIssues(projectId, AuthAPI.getUid()).collectLatest { issueList ->
+            FirebaseAPI.getIssuesFromUser(AuthAPI.getUid(), projectId).collectLatest { issueList ->
                 issues.clear()
                 issues.addAll(issueList)
 
@@ -51,7 +51,7 @@ class MainViewModel : ViewModel() {
 
     fun loadAllIssues(projectId: String) {
         viewModelScope.launch {
-            FirebaseAPI.getIssues(projectId, {}, {}).collectLatest { issueList ->
+            FirebaseAPI.getIssuesFromProject(projectId).collectLatest { issueList ->
                 issues.clear()
                 issues.addAll(issueList)
 

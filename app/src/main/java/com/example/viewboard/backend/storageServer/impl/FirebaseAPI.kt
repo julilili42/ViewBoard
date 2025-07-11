@@ -114,11 +114,11 @@ object FirebaseAPI : StorageServerAPI() {
         return snap.toObject(ProjectLayout::class.java)
     }
 
-    public override fun getProjects() : Flow<List<ProjectLayout>> {
+    public override fun getAllProjects() : Flow<List<ProjectLayout>> {
         return m_projects
     }
 
-    public override fun getProjects(userID: String?) : Flow<List<ProjectLayout>> {
+    public override fun getProjectsFromUser(userID: String?) : Flow<List<ProjectLayout>> {
         return if (userID != null) {
             m_projects.map { projects ->
                 projects.filter { it.users.contains(userID) }
@@ -250,11 +250,11 @@ object FirebaseAPI : StorageServerAPI() {
         return snap.toObject(LabelLayout::class.java)
     }
 
-    public override fun getLabels() : Flow<List<LabelLayout>> {
+    public override fun getAllLabels() : Flow<List<LabelLayout>> {
         return m_labels
     }
 
-    public override fun getLabels(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<LabelLayout>> {
+    public override fun getLabelsFromProject(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<LabelLayout>> {
         return m_projectTable.document(projID)
             .snapshots()
             .map { snap ->
@@ -435,7 +435,7 @@ object FirebaseAPI : StorageServerAPI() {
         return snap.toObject(IssueLayout::class.java)
     }
 
-    public override fun getIssues() : Flow<List<IssueLayout>> {
+    public override fun getAllIssues() : Flow<List<IssueLayout>> {
         return m_issues
     }
 
@@ -472,7 +472,7 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun getIssues(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<IssueLayout>> {
+    public override fun getIssuesFromProject(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<IssueLayout>> {
         return m_projectTable.document(projID)
             .snapshots()
             .map { snap ->
@@ -505,21 +505,23 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun getIssues(userID: String?) : Flow<List<IssueLayout>> {
+    public override fun getIssuesFromUser(userID: String?) : Flow<List<IssueLayout>> {
         return m_issues.map { issues ->
             if (userID != null) {
                 issues.filter { it.assignments.contains(userID) || it.creator == userID }
-            } else {
+            }
+            else {
                 emptyList()
             }
         }
     }
 
-    public override fun getIssues(projID: String, userID: String?) : Flow<List<IssueLayout>> {
-        return getIssues(projID).map { issues ->
+    public override fun getIssuesFromUser(userID: String?, projID: String) : Flow<List<IssueLayout>> {
+        return getIssuesFromProject(projID).map { issues ->
             if (userID != null) {
                 issues.filter { it.assignments.contains(userID) || it.creator == userID }
-            } else {
+            }
+            else {
                 emptyList()
             }
         }
@@ -607,11 +609,11 @@ object FirebaseAPI : StorageServerAPI() {
         return snap.toObject(ViewLayout::class.java)
     }
 
-    public override fun getViews() : Flow<List<ViewLayout>> {
+    public override fun getAllViews() : Flow<List<ViewLayout>> {
         return m_views
     }
 
-    public override fun getViews(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<ViewLayout>> {
+    public override fun getViewsFromProject(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<ViewLayout>> {
         return m_projectTable.document(projID)
             .snapshots()
             .map { snap ->

@@ -65,7 +65,7 @@ abstract class StorageServerAPI () {
      *
      * @return the projects
      */
-    public abstract fun getProjects() : Flow<List<ProjectLayout>>
+    public abstract fun getAllProjects() : Flow<List<ProjectLayout>>
 
     /**
      * Get all projects from user
@@ -74,7 +74,7 @@ abstract class StorageServerAPI () {
      *
      * @return the projects when they have been successfully retrieved
      */
-    public abstract fun getProjects(userID: String?) : Flow<List<ProjectLayout>>
+    public abstract fun getProjectsFromUser(userID: String?) : Flow<List<ProjectLayout>>
 
     /**
      * Add a label
@@ -151,7 +151,7 @@ abstract class StorageServerAPI () {
      *
      * @return the labels
      */
-    public abstract fun getLabels() : Flow<List<LabelLayout>>
+    public abstract fun getAllLabels() : Flow<List<LabelLayout>>
 
     /**
      * Get all labels
@@ -162,7 +162,7 @@ abstract class StorageServerAPI () {
      *
      * @return the labels when they have been successfully retrieved
      */
-    public abstract fun getLabels(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<LabelLayout>>
+    public abstract fun getLabelsFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<LabelLayout>>
 
     /**
      * Add a issue
@@ -250,7 +250,7 @@ abstract class StorageServerAPI () {
      *
      * @return the issues
      */
-    public abstract fun getIssues() : Flow<List<IssueLayout>>
+    public abstract fun getAllIssues() : Flow<List<IssueLayout>>
 
     /**
      * Get all issues from a view
@@ -272,7 +272,7 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssues(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<IssueLayout>>
+    public abstract fun getIssuesFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<IssueLayout>>
 
     /**
      * Get all issues from user
@@ -281,7 +281,7 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssues(userID: String?) : Flow<List<IssueLayout>>
+    public abstract fun getIssuesFromUser(userID: String?) : Flow<List<IssueLayout>>
 
     /**
      * Get all issues from user for a project
@@ -291,7 +291,7 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssues(projID: String, userID: String?) : Flow<List<IssueLayout>>
+    public abstract fun getIssuesFromUser(userID: String?, projID: String) : Flow<List<IssueLayout>>
 
     /**
      * Add a view
@@ -348,7 +348,7 @@ abstract class StorageServerAPI () {
      *
      * @return the views
      */
-    public abstract fun getViews() : Flow<List<ViewLayout>>
+    public abstract fun getAllViews() : Flow<List<ViewLayout>>
 
     /**
      * Get all views
@@ -359,7 +359,7 @@ abstract class StorageServerAPI () {
      *
      * @return the views when they have been successfully retrieved
      */
-    public abstract fun getViews(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<ViewLayout>>
+    public abstract fun getViewsFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<ViewLayout>>
 
     protected lateinit var m_projects: Flow<List<ProjectLayout>>
     protected lateinit var m_labels: Flow<List<LabelLayout>>

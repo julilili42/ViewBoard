@@ -199,8 +199,8 @@ fun ProjectsScreen(
     // startet automatisch beim ersten Composable-Aufruf
     LaunchedEffect(showOnlyMyProjects) {
         try {
-            val flow = if (showOnlyMyProjects) FirebaseAPI.getProjects(AuthAPI.getUid())
-            else FirebaseAPI.getProjects()
+            val flow = if (showOnlyMyProjects) FirebaseAPI.getProjectsFromUser(AuthAPI.getUid())
+            else FirebaseAPI.getAllProjects()
             flow.collect { layouts ->
                 projectLayouts.clear()
                 projectLayouts.addAll(layouts)

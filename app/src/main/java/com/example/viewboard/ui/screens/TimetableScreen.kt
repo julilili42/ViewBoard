@@ -1,7 +1,6 @@
 package com.example.viewboard.ui.screens
 
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.example.viewboard.dataclass.Project
@@ -65,7 +64,7 @@ fun TimetableScreen(navController: NavHostController) {
     LaunchedEffect(Unit) {
         // Projekte laden
         try {
-            FirebaseAPI.getProjects(AuthAPI.getUid()).collect { layouts ->
+            FirebaseAPI.getProjectsFromUser(AuthAPI.getUid()).collect { layouts ->
                 projectLayouts.clear()
                 projectLayouts.addAll(layouts)
             }
@@ -77,7 +76,7 @@ fun TimetableScreen(navController: NavHostController) {
     LaunchedEffect(Unit) {
         // Issues laden
         try {
-            FirebaseAPI.getIssues(/* hier ggf. projectId oder leer für alle */).collect { list ->
+            FirebaseAPI.getAllIssues(/* hier ggf. projectId oder leer für alle */).collect { list ->
                 issuesList.clear()
                 issuesList.addAll(list)
             }
