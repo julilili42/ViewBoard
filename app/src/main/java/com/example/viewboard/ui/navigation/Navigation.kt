@@ -198,7 +198,6 @@ fun Navigation(modifier: Modifier = Modifier) {
                 MainLayout(navController, currentRoute) { padding ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
-                        .padding(padding)
                     ) {
 
                         ProjectCreationScreen(navController = navController)

@@ -78,22 +78,22 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
             item {
                 // account settings
                 SectionCard (title = "Account") {
-                    MenuItem(text = "E-Mail ändern", onClick = { navController.navigate(Screen.ChangeEmailScreen.route) })
+                    MenuItem(text = "Change E-Mail", onClick = { navController.navigate(Screen.ChangeEmailScreen.route) })
                     Divider()
-                    MenuItem(text = "Passwort ändern", onClick = {navController.navigate(Screen.ChangePasswordScreen.route)})
+                    MenuItem(text = "Change Password", onClick = {navController.navigate(Screen.ChangePasswordScreen.route)})
                 }
                 Spacer(modifier = Modifier.size(24.dp))
             }
 
             item {
                 // other
-                SectionCard(title = "Mehr") {
+                SectionCard(title = "More") {
                     MenuItem(
-                        text = "Benachrichtigungen",
+                        text = "Notifications",
                         onClick = { showNotifDialog = true }
                     )
                     Divider()
-                    MenuItem(text = "Hilfe & Support", onClick = { navController.navigate(Screen.HelpSupportScreen.route) })
+                    MenuItem(text = "Help & Support", onClick = { navController.navigate(Screen.HelpSupportScreen.route) })
                 }
                 Spacer(modifier = Modifier.size(170.dp))
             }
@@ -113,7 +113,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                             }
                         }
                         .padding(8.dp),
-                    text = "Abmelden",
+                    text = "Log out",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                     color = MaterialTheme.colorScheme.error
                 )
