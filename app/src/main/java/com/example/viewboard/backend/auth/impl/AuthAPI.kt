@@ -26,9 +26,10 @@ object AuthAPI : AuthServerAPI() {
                 }
                 val user = task.result.user!!
                 // set display name
-                user.updateProfile(UserProfileChangeRequest.Builder()
-                    .setDisplayName(name)
-                    .build()
+                user.updateProfile(
+                    UserProfileChangeRequest.Builder()
+                        .setDisplayName(name)
+                        .build()
                 ).addOnCompleteListener { updTask ->
                     if (!updTask.isSuccessful) {
                         onError(updTask.exception?.message ?: "Failed to set name")
@@ -49,7 +50,8 @@ object AuthAPI : AuthServerAPI() {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        verifyPassword(oldPassword,
+        verifyPassword(
+            oldPassword,
             {
                 val user = FirebaseAuth.getInstance().currentUser!!
                 user.updateEmail(newEmail)
@@ -131,7 +133,8 @@ object AuthAPI : AuthServerAPI() {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        verifyPassword(oldPassword,
+        verifyPassword(
+            oldPassword,
             { setPassword(newPassword, onSuccess, onError) },
             onError
         )
@@ -173,8 +176,13 @@ object AuthAPI : AuthServerAPI() {
                     onError(task.exception?.message ?: "Login failed")
                 }
             }
-            
-    public override suspend fun getDisplayName(userID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : String? {
+    }
+
+    public override suspend fun getDisplayName(
+        userID: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ): String? {
         return Firebase.firestore
             .collection("users")
             .document(userID)
