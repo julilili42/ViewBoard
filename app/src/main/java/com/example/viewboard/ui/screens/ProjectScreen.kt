@@ -1,4 +1,5 @@
 package com.example.viewboard.ui.screens
+
 import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.res.stringResource
 import com.example.viewboard.R
-import com.example.viewboard.components.HomeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.ProfileHeader
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.layout.Row
@@ -27,7 +28,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
-import com.example.viewboard.components.HomeScreen.ProjectItem
+import com.example.viewboard.components.project.ProjectItem
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.timetable.CustomIcon
 import androidx.compose.foundation.layout.height
@@ -43,8 +44,6 @@ import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.project.CustomSearchField
-
-
 
 /**
  * Beispiel-Liste von Projekten für Preview und Tests.

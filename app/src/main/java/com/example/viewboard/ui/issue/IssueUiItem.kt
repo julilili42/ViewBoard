@@ -1,10 +1,8 @@
 package com.example.viewboard.ui.issue
+
 import androidx.compose.ui.graphics.Color
-
 import androidx.compose.runtime.*
-
 import java.util.UUID
-
 
 data class IssueUiItem(
     val title: String,

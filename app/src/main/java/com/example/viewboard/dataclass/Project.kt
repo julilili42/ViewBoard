@@ -2,6 +2,8 @@ package com.example.viewboard.dataclass
 
 import androidx.compose.ui.graphics.Color
 
+// TODO pls remove
+
 data class Project(
     val projectId: String,
     val name: String,

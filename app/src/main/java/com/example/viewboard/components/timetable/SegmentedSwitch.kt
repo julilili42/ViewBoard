@@ -1,4 +1,4 @@
-package com.example.viewboard.components.Timetable
+package com.example.viewboard.components.timetable
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween

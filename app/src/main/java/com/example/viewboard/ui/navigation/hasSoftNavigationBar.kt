@@ -3,10 +3,7 @@ package com.example.viewboard.ui.navigation
 import android.view.KeyCharacterMap
 import android.view.KeyEvent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun hasSoftNavigationBar(): Boolean {

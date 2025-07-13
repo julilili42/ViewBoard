@@ -50,7 +50,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.example.viewboard.backend.auth.impl.AuthAPI
 
-
 /**
  * Top section of the registration screen displaying the background shape, logo, and app title.
  *

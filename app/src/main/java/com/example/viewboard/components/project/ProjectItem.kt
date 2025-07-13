@@ -1,4 +1,4 @@
-package com.example.viewboard.components.HomeScreen
+package com.example.viewboard.components.project
 
 import android.net.Uri
 import androidx.compose.foundation.background

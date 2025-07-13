@@ -32,8 +32,6 @@ import com.example.viewboard.ui.screens.ProfileScreen
 import com.example.viewboard.ui.screens.ProjectCreationScreen
 import com.example.viewboard.ui.screens.ViewScreen
 
-
-
 @SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun Navigation(modifier: Modifier = Modifier) {

@@ -40,8 +40,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.material3.TextField
 import androidx.compose.ui.text.input.VisualTransformation
 
-
-
 /**
  * Top section of the login screen displaying the background shape, logo, and headings.
  *

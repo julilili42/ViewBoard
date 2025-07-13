@@ -1,7 +1,5 @@
 package com.example.viewboard.ui.timetable
 
-
-import android.content.res.Resources
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -29,29 +27,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.viewboard.dataclass.Project
-import androidx.compose.ui.draw.rotate
-
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.layout.Layout
-
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-
-
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.lerp
-
 import androidx.compose.ui.platform.LocalDensity
-
 import java.time.LocalDate
-
 
 @Composable
 fun VerticalTimelineSchedule(

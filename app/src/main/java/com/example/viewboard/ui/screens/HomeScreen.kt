@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.components.HomeScreen.ProgressCard
-import com.example.viewboard.components.HomeScreen.ProjectGrid
+import com.example.viewboard.components.homeScreen.ProgressCard
+import com.example.viewboard.components.homeScreen.ProjectGrid
 import com.example.viewboard.ui.navigation.Screen
 import java.time.LocalDateTime
-import com.example.viewboard.components.HomeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.ProfileHeader
 import com.example.viewboard.ui.navigation.BottomBarScreen
 
 val tasks: List<Pair<String, LocalDateTime>> = listOf(

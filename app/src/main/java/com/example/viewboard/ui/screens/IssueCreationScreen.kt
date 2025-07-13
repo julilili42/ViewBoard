@@ -32,7 +32,6 @@ import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 
-
 // ---------------------------------------------------
 // Dein CreateIssueScreen
 // ---------------------------------------------------

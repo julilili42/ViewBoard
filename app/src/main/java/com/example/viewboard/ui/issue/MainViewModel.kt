@@ -13,8 +13,6 @@ import com.example.viewboard.backend.dataLayout.IssueLayout
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-
-
 class MainViewModel : ViewModel() {
     val items = mutableStateListOf<IssueUiItem>()
     var isDragging by mutableStateOf(false)

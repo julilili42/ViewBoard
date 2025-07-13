@@ -12,7 +12,7 @@ import androidx.navigation.NavController
 import java.time.LocalDateTime
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
-import com.example.viewboard.components.HomeScreen.ProjectCardTasks
+import com.example.viewboard.components.homeScreen.ProjectCardTasks
 import com.example.viewboard.ui.navigation.Screen
 
 /**

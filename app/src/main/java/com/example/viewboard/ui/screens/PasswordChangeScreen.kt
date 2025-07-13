@@ -1,6 +1,5 @@
 package com.example.viewboard.ui.screens
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit

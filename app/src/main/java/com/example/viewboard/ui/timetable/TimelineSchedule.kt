@@ -1,11 +1,11 @@
 package com.example.viewboard.ui.timetable
+
 import android.content.res.Resources
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.viewboard.dataclass.Project
 import java.time.LocalDate
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -25,8 +25,7 @@ import androidx.navigation.NavController
 import com.example.viewboard.backend.Timestamp
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.components.HomeScreen.ProjectCardTasks
-import com.example.viewboard.ui.issue.IssueUiItem
+import com.example.viewboard.components.homeScreen.ProjectCardTasks
 import com.example.viewboard.ui.navigation.Screen
 import java.time.LocalDateTime
 import java.util.Locale

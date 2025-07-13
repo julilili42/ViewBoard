@@ -2,17 +2,12 @@ package com.example.viewboard.ui.screens
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,7 +16,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,7 +24,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import com.example.viewboard.R
-import com.example.viewboard.backend.Timestamp
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import java.text.SimpleDateFormat

@@ -1,4 +1,4 @@
-package com.example.viewboard.components.HomeScreen
+package com.example.viewboard.components.homeScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

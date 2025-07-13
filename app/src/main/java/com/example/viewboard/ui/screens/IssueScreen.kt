@@ -1,6 +1,5 @@
 package com.example.viewboard.ui.screens
 
-
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.components.HomeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.ProfileHeader
 import com.example.viewboard.ui.issue.IssueItemCard
 import com.example.viewboard.ui.issue.IssueUiItem
 import com.example.viewboard.ui.issue.MainViewModel
@@ -33,9 +32,6 @@ import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.project.CustomSearchField
 import com.example.viewboard.ui.timetable.CustomIcon
-
-
-
 
 @Composable
 fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,projectName:String,projectId : String, modifier: Modifier = Modifier)  {

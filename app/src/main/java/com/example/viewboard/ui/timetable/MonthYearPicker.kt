@@ -1,4 +1,5 @@
 package com.example.viewboard.ui.timetable
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

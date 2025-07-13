@@ -5,9 +5,6 @@ package com.example.viewboard.ui.navigation
  * Each Screen object holds its unique route string.
  */
 sealed class Screen(val route: String) {
-
-
-
     /** Screen for the login page */
     object LoginScreen : Screen(route = "login")
 
@@ -25,7 +22,6 @@ sealed class Screen(val route: String) {
 
     /** Screen for changing the email */
     object ChangeEmailScreen: Screen(route= "emailChange")
-
 
     /**
      * Screen for displaying details of a specific project.
@@ -49,11 +45,11 @@ sealed class Screen(val route: String) {
         fun createRoute(projectId: String) =
             "issueCreation{$projectId}"
     }
+
     /** Screen for the adding an Projects */
     object ProjectCreationScreen : Screen(route = "projectsCreation")
 
     object IssueScreen : Screen("issue/{projectName}/{projectId}"){
-
         // Hilfsfunktion, um den Navigations‐String zu bauen
         fun createRoute(projectName: String, projectId: String) =
             "issue/$projectName/$projectId"

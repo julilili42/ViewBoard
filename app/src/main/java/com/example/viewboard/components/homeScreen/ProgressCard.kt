@@ -1,4 +1,4 @@
-package com.example.viewboard.components.HomeScreen
+package com.example.viewboard.components.homeScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
