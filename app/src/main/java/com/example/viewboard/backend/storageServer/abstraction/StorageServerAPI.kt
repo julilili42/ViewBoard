@@ -275,6 +275,44 @@ abstract class StorageServerAPI () {
     public abstract fun getIssuesFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<IssueLayout>>
 
     /**
+     * Get all issues from assignment
+     *
+     * @param userID the id of the assignment
+     *
+     * @return the issues when they have been successfully retrieved
+     */
+    public abstract fun getIssuesFromAssignment(userID: String?) : Flow<List<IssueLayout>>
+
+    /**
+     * Get all issues from assignment
+     *
+     * @param userID the id of the assignment
+     * @param projID the id of the project
+     *
+     * @return the issues when they have been successfully retrieved
+     */
+    public abstract fun getIssuesFromAssignment(userID: String?, projID: String) : Flow<List<IssueLayout>>
+
+    /**
+     * Get all issues from creator
+     *
+     * @param userID the id of the creator
+     *
+     * @return the issues when they have been successfully retrieved
+     */
+    public abstract fun getIssuesFromCreator(userID: String?) : Flow<List<IssueLayout>>
+
+    /**
+     * Get all issues from creator for a project
+     *
+     * @param userID the id of the creator
+     * @param projID the id of the project
+     *
+     * @return the issues when they have been successfully retrieved
+     */
+    public abstract fun getIssuesFromCreator(userID: String?, projID: String) : Flow<List<IssueLayout>>
+
+    /**
      * Get all issues from user
      *
      * @param userID the id of the user
@@ -286,8 +324,8 @@ abstract class StorageServerAPI () {
     /**
      * Get all issues from user for a project
      *
-     * @param projID the id of the project
      * @param userID the id of the user
+     * @param projID the id of the project
      *
      * @return the issues when they have been successfully retrieved
      */
