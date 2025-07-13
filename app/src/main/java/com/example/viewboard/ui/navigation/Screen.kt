@@ -42,8 +42,7 @@ sealed class Screen(val route: String) {
 
     /** Screen for the adding an Issue */
     object IssueCreationScreen : Screen(route = "issueCreation{projectId}"){
-        fun createRoute(projectId: String) =
-            "issueCreation{$projectId}"
+        fun createRoute(projectId: String) = "issueCreation{$projectId}"
     }
 
     /** Screen for the adding an Projects */
@@ -51,7 +50,10 @@ sealed class Screen(val route: String) {
 
     object IssueScreen : Screen("issue/{projectName}/{projectId}"){
         // Hilfsfunktion, um den Navigations‐String zu bauen
-        fun createRoute(projectName: String, projectId: String) =
-            "issue/$projectName/$projectId"
+        fun createRoute(projectName: String, projectId: String) = "issue/$projectName/$projectId"
+    }
+
+    object ViewIssueScreen : Screen("viewIssue/{viewName}/{viewID}"){
+        fun createRoute(viewName: String, viewID: String) = "viewIssue/$viewName/$viewID"
     }
 }
