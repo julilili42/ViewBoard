@@ -690,6 +690,16 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
+    public override fun getViewsFromUser(userID: String?, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<ViewLayout>> {
+        return if (userID != null) {
+            m_views.map { views ->
+                views.filter { it.creator == userID }
+            }
+        } else {
+            flowOf(emptyList())
+        }
+    }
+
     private lateinit var m_projectTable: CollectionReference
     private lateinit var m_labelTable: CollectionReference
     private lateinit var m_issueTable: CollectionReference

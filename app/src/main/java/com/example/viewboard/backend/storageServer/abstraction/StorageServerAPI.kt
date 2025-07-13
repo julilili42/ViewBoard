@@ -107,7 +107,7 @@ abstract class StorageServerAPI () {
     public abstract suspend fun addLabelToIssue(issueID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
 
     /**
-     * Remove a label from a issue
+     * Remove a label from issue
      *
      * @param issueID the id of an issue
      * @param id the id of the label
@@ -206,7 +206,7 @@ abstract class StorageServerAPI () {
     public abstract suspend fun addIssueToView(viewID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
 
     /**
-     * Remove an issue from a view
+     * Remove an issue from view
      *
      * @param viewID the id of the view
      * @param id the id of an issue
@@ -253,7 +253,7 @@ abstract class StorageServerAPI () {
     public abstract fun getAllIssues() : Flow<List<IssueLayout>>
 
     /**
-     * Get all issues from a view
+     * Get all issues from view
      *
      * @param viewID the id of the view
      * @param onSuccess success callback, when the issues have been successfully retrieved
@@ -389,7 +389,7 @@ abstract class StorageServerAPI () {
     public abstract fun getAllViews() : Flow<List<ViewLayout>>
 
     /**
-     * Get all views
+     * Get all views from
      *
      * @param projID the id of the project
      * @param onSuccess success callback, when the views have been successfully retrieved
@@ -398,6 +398,17 @@ abstract class StorageServerAPI () {
      * @return the views when they have been successfully retrieved
      */
     public abstract fun getViewsFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<ViewLayout>>
+
+    /**
+     * Get all views from user
+     *
+     * @param userID the id of the user
+     * @param onSuccess success callback, when the views have been successfully retrieved
+     * @param onFailure failure callback, if the views have not been retrieved
+     *
+     * @return the views when they have been successfully retrieved
+     */
+    public abstract fun getViewsFromUser(userID: String?, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<ViewLayout>>
 
     protected lateinit var m_projects: Flow<List<ProjectLayout>>
     protected lateinit var m_labels: Flow<List<LabelLayout>>
