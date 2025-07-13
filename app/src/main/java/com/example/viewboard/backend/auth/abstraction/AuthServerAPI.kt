@@ -10,4 +10,5 @@ abstract class AuthServerAPI () {
     public abstract fun getDisplayName(): String?
     public abstract fun isLoggedIn(): Boolean
     public abstract fun register(name: String, email: String, password: String, onSuccess: () -> Unit, onError: (String) -> Unit)
+    public abstract suspend fun getDisplayName(userID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : String?
 }

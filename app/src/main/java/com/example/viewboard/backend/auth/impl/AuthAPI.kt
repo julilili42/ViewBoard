@@ -6,6 +6,7 @@ import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.tasks.await
 
 object AuthAPI : AuthServerAPI() {
     public override fun register(
@@ -133,5 +134,22 @@ object AuthAPI : AuthServerAPI() {
 
     public override fun isLoggedIn(): Boolean {
         return FirebaseAuth.getInstance().currentUser != null
+    }
+
+    public override suspend fun getDisplayName(userID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : String? {
+        return Firebase.firestore
+            .collection("users")
+            .document(userID)
+            .get()
+            .addOnSuccessListener {
+                println("successfully retrieved display name: $userID")
+                onSuccess(userID)
+            }
+            .addOnFailureListener {
+                println("failed to retrieved display name:: $userID")
+                onFailure(userID)
+            }
+            .await()
+            .getString("name")
     }
 }
