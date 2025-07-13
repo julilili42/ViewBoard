@@ -1,5 +1,6 @@
 package com.example.viewboard.backend.auth.impl
 
+import android.util.Log
 import com.example.viewboard.backend.auth.abstraction.AuthServerAPI
 import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
@@ -69,6 +70,22 @@ object AuthAPI : AuthServerAPI() {
         )
     }
 
+    public override fun sendPasswordResetMail(
+        email: String,
+        onComplete: (message: String) -> Unit
+    ) {
+        FirebaseAuth.getInstance()
+            .sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                val msg = if (task.isSuccessful)
+                    "Reset email sent to $email"
+                else
+                    "Error sending reset email: ${task.exception?.message}"
+                onComplete(msg)
+            }
+    }
+
+
     public override fun setPassword(
         newPassword: String,
         onSuccess: () -> Unit,
@@ -133,5 +150,27 @@ object AuthAPI : AuthServerAPI() {
 
     public override fun isLoggedIn(): Boolean {
         return FirebaseAuth.getInstance().currentUser != null
+    }
+
+    public override fun loginWithEmail(
+        email: String,
+        password: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (email.isBlank() || password.isBlank()) {
+            onError("Please fill all fields")
+            return
+        }
+
+        FirebaseAuth.getInstance()
+            .signInWithEmailAndPassword(email.trim(), password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onSuccess()
+                } else {
+                    onError(task.exception?.message ?: "Login failed")
+                }
+            }
     }
 }
