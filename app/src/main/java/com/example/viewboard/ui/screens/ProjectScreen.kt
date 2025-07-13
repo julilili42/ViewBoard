@@ -191,7 +191,6 @@ fun ProjectsScreen(
     onSort: () -> Unit = {},
     onFilter: () -> Unit = {}
 ) {
-    FirebaseAPI.init()
     var showOnlyMyProjects by remember { mutableStateOf(true) }
     val projectLayouts = remember { mutableStateListOf<ProjectLayout>() }
     var error by remember { mutableStateOf<String?>(null) }

@@ -47,8 +47,6 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableScreen(navController: NavHostController) {
-    FirebaseAPI.init()
-
     // Projekte
     val projectLayouts = remember { mutableStateListOf<ProjectLayout>() }
     // Issues
