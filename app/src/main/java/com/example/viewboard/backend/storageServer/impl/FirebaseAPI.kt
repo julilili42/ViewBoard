@@ -505,6 +505,50 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
+    public override fun getIssuesFromAssignment(userID: String?) : Flow<List<IssueLayout>> {
+        return m_issues.map { issues ->
+            if (userID != null) {
+                issues.filter { it.assignments.contains(userID) }
+            }
+            else {
+                emptyList()
+            }
+        }
+    }
+
+    public override fun getIssuesFromAssignment(userID: String?, projID: String) : Flow<List<IssueLayout>> {
+        return getIssuesFromProject(projID).map { issues ->
+            if (userID != null) {
+                issues.filter { it.assignments.contains(userID) }
+            }
+            else {
+                emptyList()
+            }
+        }
+    }
+
+    public override fun getIssuesFromCreator(userID: String?) : Flow<List<IssueLayout>> {
+        return m_issues.map { issues ->
+            if (userID != null) {
+                issues.filter { it.creator == userID }
+            }
+            else {
+                emptyList()
+            }
+        }
+    }
+
+    public override fun getIssuesFromCreator(userID: String?, projID: String) : Flow<List<IssueLayout>> {
+        return getIssuesFromProject(projID).map { issues ->
+            if (userID != null) {
+                issues.filter { it.creator == userID }
+            }
+            else {
+                emptyList()
+            }
+        }
+    }
+
     public override fun getIssuesFromUser(userID: String?) : Flow<List<IssueLayout>> {
         return m_issues.map { issues ->
             if (userID != null) {
@@ -644,6 +688,16 @@ object FirebaseAPI : StorageServerAPI() {
                 println("failed to retrieved views from project: $projID")
                 onFailure(projID)
             }
+    }
+
+    public override fun getViewsFromUser(userID: String?, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<ViewLayout>> {
+        return if (userID != null) {
+            m_views.map { views ->
+                views.filter { it.creator == userID }
+            }
+        } else {
+            flowOf(emptyList())
+        }
     }
 
     private lateinit var m_projectTable: CollectionReference

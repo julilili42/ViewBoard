@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewModelScope
+import com.example.viewboard.backend.Timestamp
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
@@ -35,6 +36,32 @@ class MainViewModel : ViewModel() {
                             priority = "–",
                             status = issue.state.name,
                             date = issue.deadlineTS.toString(),
+                            attachments = 0,
+                            comments = 0,
+                            assignees = issue.assignments,
+                            backgroundColor = Color.Gray,
+                            id = issue.id
+                        )
+                    }
+                )
+            }
+        }
+    }
+
+    fun loadIssuesFromView(viewID: String) {
+        viewModelScope.launch {
+            FirebaseAPI.getIssuesFromView(viewID).collectLatest { issueList ->
+                issues.clear()
+                issues.addAll(issueList)
+
+                items.clear()
+                items.addAll(
+                    issueList.map { issue ->
+                        IssueUiItem(
+                            title = issue.title,
+                            priority = "–",
+                            status = issue.state.name,
+                            date = Timestamp(data = issue.deadlineTS).getFull(),
                             attachments = 0,
                             comments = 0,
                             assignees = issue.assignments,

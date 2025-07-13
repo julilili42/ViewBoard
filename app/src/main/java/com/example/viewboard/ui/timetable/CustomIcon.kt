@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.min
@@ -45,6 +46,38 @@ fun CustomIcon(
         Icon(
             painter           = painterResource(id = iconRes),
             contentDescription= contentDesc,
+            tint              = iconTint,
+            modifier          = Modifier.size(iconSize)
+        )
+    }
+}
+
+@Composable
+fun CustomIcon2(
+    iconRes: ImageVector,
+    contentDesc: String,
+    backgroundColor: Color,
+    iconTint: Color,
+    width: Dp = 24.dp,              // statt size
+    height: Dp = 24.dp,             // statt size
+    cornerRadius: Dp = 4.dp,
+    onClick: () -> Unit,
+    modifier: Modifier,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .width(width)
+            .height(height)
+            .clip(RoundedCornerShape(cornerRadius))
+            .background(backgroundColor)
+            .clickable(onClick = onClick)
+    ) {
+        // Icon auf 60% der kleineren Dimension skalieren
+        val iconSize = min(width, height) * 0.6f
+        Icon(
+            imageVector = iconRes,
+            contentDescription = contentDesc,
             tint              = iconTint,
             modifier          = Modifier.size(iconSize)
         )
