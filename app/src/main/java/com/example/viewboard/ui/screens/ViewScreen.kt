@@ -26,6 +26,11 @@ import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.timetable.CustomIcon
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,36 +42,59 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.util.filterViewsByCreator
+import com.example.viewboard.backend.util.filterViewsByProjects
+import com.example.viewboard.backend.util.getProjectByView
 import com.example.viewboard.components.view.ViewItem
 import com.example.viewboard.ui.navigation.Screen
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlin.collections.toSet
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
+    var updated by remember { mutableStateOf(false) }
     var showOnlyMyViews by remember { mutableStateOf(true) }
+    var showDropdownMenu by remember { mutableStateOf(false) }
     val viewLayouts = remember { mutableStateListOf<ViewLayout>() }
+    val allProjLayouts = remember { mutableStateListOf<ProjectLayout>() }
+    val selectedProjLayouts = remember { mutableStateOf(setOf<ProjectLayout>()) }
     val creators = remember { mutableStateListOf<String>() }
     var error by remember { mutableStateOf<String?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect (showOnlyMyViews) {
+    LaunchedEffect (showOnlyMyViews, showDropdownMenu, updated) {
+        updated = false
         try {
-            val flow = if (showOnlyMyViews) FirebaseAPI.getViewsFromUser(AuthAPI.getUid())
-            else FirebaseAPI.getAllViews()
-            flow.collect { layouts ->
-                viewLayouts.clear()
-                viewLayouts.addAll(layouts)
+            val allProjFlow = FirebaseAPI.getAllProjects()
 
-                creators.clear()
-                viewLayouts.forEach { view ->
-                    val name = AuthAPI.getDisplayName(view.creator)
-                    if (name != null)
-                        creators.add(name)
-                    else
-                        creators.add("not found")
-                }
+            allProjLayouts.clear()
+            allProjLayouts.addAll(allProjFlow.first())
+
+            val allViewFlow = FirebaseAPI.getAllViews()
+
+            var viewFlow = filterViewsByProjects(allViewFlow, selectedProjLayouts.value)
+
+            if (showOnlyMyViews)
+                viewFlow = filterViewsByCreator(viewFlow, AuthAPI.getUid())
+
+            viewLayouts.clear()
+            viewLayouts.addAll(viewFlow.first())
+
+            creators.clear()
+
+            viewLayouts.forEach { view ->
+                val name = AuthAPI.getDisplayName(view.creator)
+
+                if (name != null)
+                    creators.add(name)
+                else
+                    creators.add("not found")
             }
         } catch (e: Exception) {
             error = "loading error: ${e.localizedMessage}"
@@ -77,40 +105,58 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
         var name by remember { mutableStateOf("") }
         val scope = rememberCoroutineScope()
 
-        AlertDialog(
-            title = { Text("Add View") },
-            text = {
-                Column(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Name") },
-                        singleLine = true,
-                    )
+        if (selectedProjLayouts.value.size != 1) {
+            AlertDialog(
+                title = { Text("Exactly one project must be selected!") },
+                onDismissRequest = {
+                    showDialog = false
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showDialog = false
+                    }) { Text("OK") }
                 }
-            },
-            onDismissRequest = {
-                showDialog = false
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                    if (name.isNotBlank()) {
-                        scope.launch {
-                            FirebaseAPI.addView("Nql3AyhixcN2RN7M77Bm", ViewLayout(name = name, creator = AuthAPI.getUid()!!))
-                        }
+            )
+        }
+        else {
+            AlertDialog(
+                title = { Text("Add View") },
+                text = {
+                    Column(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = name,
+                            onValueChange = { name = it },
+                            label = { Text("Name") },
+                            singleLine = true,
+                        )
                     }
-                }) { Text("Add") }
-            },
-            dismissButton = {
-                TextButton(onClick = {
+                },
+                onDismissRequest = {
                     showDialog = false
-                }) { Text("Cancel") }
-            }
-        )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showDialog = false
+                        if (name.isNotBlank()) {
+                            scope.launch {
+                                val id = selectedProjLayouts.value.elementAt(0).id
+                                selectedProjLayouts.value = emptySet()
+                                FirebaseAPI.addView(id, ViewLayout(name = name, creator = AuthAPI.getUid()!!))
+                                updated = true
+                            }
+                        }
+                    }) { Text("Add") }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showDialog = false
+                    }) { Text("Cancel") }
+                }
+            )
+        }
     }
 
     Scaffold(
@@ -162,6 +208,50 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ExposedDropdownMenuBox(
+                        expanded = showDropdownMenu,
+                        onExpandedChange = { showDropdownMenu = it },
+
+                    ) {
+                        OutlinedTextField(
+                            value = "Select Projects",
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDropdownMenu) },
+                            modifier = Modifier
+                                .menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = showDropdownMenu,
+                            onDismissRequest = { showDropdownMenu = false }
+                        ) {
+                            allProjLayouts.forEach { projLayout ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            val possibleProjIds: Set<String> = selectedProjLayouts.value.map { it.id }.toSet()
+                                            Checkbox(
+                                                checked = projLayout.id in possibleProjIds,
+                                                onCheckedChange = null
+                                            )
+                                            Spacer(Modifier.width(10.dp))
+                                            Text(projLayout.name)
+                                        }
+                                    },
+                                    onClick = {
+                                        val possibleProjIds: Set<String> = selectedProjLayouts.value.map { it.id }.toSet()
+                                        selectedProjLayouts.value = if(projLayout.id in possibleProjIds) {
+                                            selectedProjLayouts.value - projLayout
+                                        }
+                                        else {
+                                            selectedProjLayouts.value + projLayout
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
                     CustomIcon(
                         iconRes = R.drawable.filter_svgrepo_com__1,
                         contentDesc = stringResource(R.string.filter_svgrepo_com__1),
@@ -196,7 +286,10 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
                         count   = view.issues.size,
                         color   = AppColors.StrongPalette[index % AppColors.StrongPalette.size],
                         onClick = {
-                            navController.navigate(Screen.ViewIssueScreen.createRoute(view.name, view.id))
+                            val projID = getProjectByView(view.id, allProjLayouts)
+
+                            if(projID != null)
+                                navController.navigate(Screen.ViewIssueScreen.createRoute(view.name, view.id, projID))
                         }
                     )
                 }

@@ -56,7 +56,7 @@ import com.example.viewboard.ui.timetable.CustomIcon2
 import kotlinx.coroutines.launch
 
 @Composable
-fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, viewName: String, viewID: String) {
+fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, viewName: String, viewID: String, projID: String) {
     val issueLayouts = remember { mutableStateListOf<IssueLayout>() }
     var showDialog by remember { mutableStateOf(false) }
 
@@ -79,7 +79,7 @@ fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, 
                 TextButton(onClick = {
                     showDialog = false
                     scope.launch {
-                        FirebaseAPI.rmView("Nql3AyhixcN2RN7M77Bm", viewID)
+                        FirebaseAPI.rmView(projID, viewID)
 
                         navController.navigateUp()
                     }
