@@ -399,17 +399,6 @@ abstract class StorageServerAPI () {
      */
     public abstract fun getViewsFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<ViewLayout>>
 
-    /**
-     * Get all views from user
-     *
-     * @param userID the id of the user
-     * @param onSuccess success callback, when the views have been successfully retrieved
-     * @param onFailure failure callback, if the views have not been retrieved
-     *
-     * @return the views when they have been successfully retrieved
-     */
-    public abstract fun getViewsFromUser(userID: String?, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<ViewLayout>>
-
     protected lateinit var m_projects: Flow<List<ProjectLayout>>
     protected lateinit var m_labels: Flow<List<LabelLayout>>
     protected lateinit var m_issues: Flow<List<IssueLayout>>

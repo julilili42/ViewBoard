@@ -237,11 +237,13 @@ fun Navigation(modifier: Modifier = Modifier) {
                 route = Screen.ViewIssueScreen.route,
                 arguments = listOf(
                     navArgument("viewName") { type = NavType.StringType },
-                    navArgument("viewID"  ) { type = NavType.StringType }
+                    navArgument("viewID")   { type = NavType.StringType },
+                    navArgument("projID")   { type = NavType.StringType }
                 )
             ) { backStack ->
                 val viewName = backStack.arguments!!.getString("viewName")!!
                 val viewID   = backStack.arguments!!.getString("viewID")!!
+                val projID   = backStack.arguments!!.getString("projID")!!
                 MainLayout(navController, currentRoute) { padding ->
                     Box(
                         modifier = Modifier
@@ -254,8 +256,9 @@ fun Navigation(modifier: Modifier = Modifier) {
                             ViewIssueScreen(
                                 mainViewModel = mainViewModel,
                                 navController = navController,
-                                viewName  = viewName,
-                                viewID    = viewID
+                                viewName = viewName,
+                                viewID = viewID,
+                                projID = projID
                             )
                         }
                     }
