@@ -97,5 +97,7 @@ class MainViewModel : ViewModel() {
     fun getItemsForCategory(category: Int): List<IssueUiItem> {
         return items.filter { it.category == category }
     }
+
+
 }
 

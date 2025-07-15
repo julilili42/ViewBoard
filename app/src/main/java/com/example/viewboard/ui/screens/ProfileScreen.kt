@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,18 @@ import com.example.viewboard.components.SectionCard
 fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     var showNotifDialog by remember { mutableStateOf(false) }
     val userName = AuthAPI.getDisplayName() ?: "failed to load username"
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
+    var notificationsEnabled by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        uid?.let {
+            Firebase.firestore.collection("users").document(it).get()
+                .addOnSuccessListener { document ->
+                    val value = document.getBoolean("notificationsEnabled") ?: false
+                    notificationsEnabled = value
+                }
+        }
+    }
 
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         LazyColumn(
@@ -118,8 +131,15 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
         }
         if (showNotifDialog) {
             NotificationsDialog(
-                enabled = false,                                // TODO: load value from settigs
-                onEnabledChange = { /* TODO: speichern */ },
+                enabled = notificationsEnabled,
+                onEnabledChange = { newValue ->
+                    notificationsEnabled = newValue
+                    uid?.let {
+                        Firebase.firestore.collection("users")
+                            .document(it)
+                            .update("notificationsEnabled", newValue)
+                    }
+                },
                 onDismiss = { showNotifDialog = false }
             )
         }

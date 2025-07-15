@@ -52,6 +52,14 @@ class Login  : AppCompatActivity() {
                         if (task.isSuccessful) {
                             val user = auth.currentUser
                             Toast.makeText(this, "Willkommen ${user?.displayName}", Toast.LENGTH_SHORT).show()
+                            com.google.firebase.messaging.FirebaseMessaging.getInstance().token
+                                .addOnSuccessListener { token ->
+                                    val uid = user?.uid ?: return@addOnSuccessListener
+                                    com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                                        .collection("users")
+                                        .document(uid)
+                                        .update("fcmToken", token)
+                                }
                         } else {
                             Toast.makeText(this, "Login fehlgeschlagen", Toast.LENGTH_SHORT).show()
                         }

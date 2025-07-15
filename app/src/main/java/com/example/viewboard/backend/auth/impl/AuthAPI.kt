@@ -34,7 +34,7 @@ object AuthAPI : AuthServerAPI() {
                     }
                     Firebase.firestore.collection("users")
                         .document(user.uid)
-                        .set(mapOf("name" to name, "email" to email))
+                        .set(mapOf("name" to name, "email" to email,"notificationsEnabled" to true))
                         .addOnSuccessListener { onSuccess() }
                         .addOnFailureListener { e -> onError(e.message ?: "Firestore error") }
                 }
@@ -134,4 +134,13 @@ object AuthAPI : AuthServerAPI() {
     public override fun isLoggedIn(): Boolean {
         return FirebaseAuth.getInstance().currentUser != null
     }
+
+    fun updateFCMToken(token: String, onComplete: (() -> Unit)? = null) {
+        val uid = getUid() ?: return
+        Firebase.firestore.collection("users")
+            .document(uid)
+            .update("fcmToken", token)
+            .addOnSuccessListener { onComplete?.invoke() }
+    }
+
 }
