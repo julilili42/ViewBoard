@@ -49,6 +49,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.example.viewboard.backend.auth.impl.FirebaseProvider
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -134,7 +135,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
         try {
             val account = task.getResult(ApiException::class.java)
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-            FirebaseAuth.getInstance().signInWithCredential(credential)
+            FirebaseProvider.auth.signInWithCredential(credential)
                 .addOnCompleteListener(activity) { authResult ->
                     if (authResult.isSuccessful) {
                         Toast.makeText(context, "Welcome ${authResult.result.user?.displayName}", Toast.LENGTH_SHORT).show()

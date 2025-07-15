@@ -16,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.example.viewboard.backend.auth.impl.FirebaseProvider
 import com.example.viewboard.ui.screens.LoginScreen
 import com.example.viewboard.ui.screens.RegistrationScreen
 import com.example.viewboard.ui.screens.HomeScreen
@@ -43,7 +44,7 @@ fun Navigation(modifier: Modifier = Modifier) {
 
     val mainViewModel = MainViewModel()
 
-    val isLoggedIn = FirebaseAuth.getInstance().currentUser != null
+    val isLoggedIn = FirebaseProvider.auth.currentUser != null
     val start = if (isLoggedIn) "main" else Screen.LoginScreen.route
 
 

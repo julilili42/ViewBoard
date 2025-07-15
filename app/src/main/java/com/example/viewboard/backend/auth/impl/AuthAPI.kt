@@ -1,19 +1,13 @@
 package com.example.viewboard.backend.auth.impl
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.navigation.NavController
 import com.example.viewboard.backend.auth.abstraction.AuthServerAPI
 import com.example.viewboard.ui.navigation.Screen
-import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
-import com.google.firebase.messaging.FirebaseMessaging
-import kotlinx.coroutines.tasks.await
+
 
 object AuthAPI : AuthServerAPI() {
     public override fun register(
@@ -23,8 +17,8 @@ object AuthAPI : AuthServerAPI() {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        val auth = FirebaseAuth.getInstance()
-        auth.createUserWithEmailAndPassword(email, password)
+        FirebaseProvider.auth
+            .createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     onError(task.exception?.message ?: "Unknown error")
@@ -41,7 +35,9 @@ object AuthAPI : AuthServerAPI() {
                         onError(updTask.exception?.message ?: "Failed to set name")
                         return@addOnCompleteListener
                     }
-                    Firebase.firestore.collection("users")
+                    FirebaseProvider
+                        .firestore
+                        .collection("users")
                         .document(user.uid)
                         .set(mapOf("name" to name, "email" to email,"notificationsEnabled" to true))
                         .addOnSuccessListener { onSuccess() }
@@ -59,10 +55,10 @@ object AuthAPI : AuthServerAPI() {
         verifyPassword(
             oldPassword,
             {
-                val user = FirebaseAuth.getInstance().currentUser!!
+                val user = FirebaseProvider.auth.currentUser!!
                 user.updateEmail(newEmail)
                     .addOnSuccessListener {
-                        Firebase.firestore
+                        FirebaseProvider.firestore
                             .collection("users")
                             .document(user.uid)
                             .update("email", newEmail)
@@ -83,7 +79,7 @@ object AuthAPI : AuthServerAPI() {
         email: String,
         onComplete: (message: String) -> Unit
     ) {
-        FirebaseAuth.getInstance()
+        FirebaseProvider.auth
             .sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
                 val msg = if (task.isSuccessful)
@@ -100,7 +96,7 @@ object AuthAPI : AuthServerAPI() {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        val user = FirebaseAuth.getInstance().currentUser
+        val user = FirebaseProvider.auth.currentUser
         if (user == null) {
             onError("No logged in user")
             return
@@ -118,7 +114,7 @@ object AuthAPI : AuthServerAPI() {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        val user = FirebaseAuth.getInstance().currentUser
+        val user = FirebaseProvider.auth.currentUser
         val email = user?.email
         if (user == null || email.isNullOrBlank()) {
             onError("No logged in user or missing email")
@@ -147,22 +143,22 @@ object AuthAPI : AuthServerAPI() {
     }
 
     public override fun getUid(): String? {
-        return FirebaseAuth.getInstance().currentUser?.uid
+        return FirebaseProvider.auth.currentUser?.uid
     }
 
     public override fun getEmail(): String? {
-        return FirebaseAuth.getInstance().currentUser?.email
+        return FirebaseProvider.auth.currentUser?.email
     }
 
     public override fun isLoggedIn(): Boolean {
-        return FirebaseAuth.getInstance().currentUser != null
+        return FirebaseProvider.auth.currentUser != null
     }
 
 
 
     public override fun updateFCMToken(token: String, onComplete: (() -> Unit)?) {
         val uid = getUid() ?: return
-        Firebase.firestore
+        FirebaseProvider.firestore
             .collection("users")
             .document(uid)
             .update("fcmToken", token)
@@ -171,7 +167,7 @@ object AuthAPI : AuthServerAPI() {
 
     public override fun fetchAndSaveFcmToken(onComplete: (() -> Unit)?) {
         val uid = getUid() ?: return
-        FirebaseMessaging.getInstance().token
+        FirebaseProvider.messaging().token
             .addOnSuccessListener { token ->
                 updateFCMToken(token) {
                     onComplete?.invoke()
@@ -191,11 +187,10 @@ object AuthAPI : AuthServerAPI() {
             return
         }
 
-        FirebaseAuth.getInstance()
+        FirebaseProvider.auth
             .signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val user = FirebaseAuth.getInstance().currentUser
                     Toast.makeText(context, "Welcome!", Toast.LENGTH_SHORT).show()
 
                     fetchAndSaveFcmToken {
@@ -213,7 +208,7 @@ object AuthAPI : AuthServerAPI() {
     }
 
     public override fun getCurrentDisplayName(): String? {
-        return FirebaseAuth.getInstance().currentUser?.displayName
+        return FirebaseProvider.auth.currentUser?.displayName
     }
 
 
@@ -222,7 +217,7 @@ object AuthAPI : AuthServerAPI() {
         onSuccess: (String) -> Unit,
         onFailure: (String) -> Unit
     ): String? {
-        val name = DisplayNameCache.get(userID)
+        val name = UserDisplayNameCache.get(userID)
         return if (name != null) {
             onSuccess(name)
             name
@@ -234,7 +229,7 @@ object AuthAPI : AuthServerAPI() {
 
 
     override fun logout(navController: NavController) {
-        FirebaseAuth.getInstance().signOut()
+        FirebaseProvider.auth.signOut()
 
         navController.navigate(Screen.LoginScreen.route) {
             popUpTo(navController.graph.id) { inclusive = true }

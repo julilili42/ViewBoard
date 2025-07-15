@@ -41,6 +41,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.material3.TextField
 import androidx.compose.ui.text.input.VisualTransformation
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import com.example.viewboard.backend.auth.impl.FirebaseProvider
 
 /**
  * Top section of the login screen displaying the background shape, logo, and headings.
@@ -141,7 +142,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
         try {
             val account = task.getResult(ApiException::class.java)
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-            FirebaseAuth.getInstance().signInWithCredential(credential)
+            FirebaseProvider.auth.signInWithCredential(credential)
                 .addOnCompleteListener(activity) { authResult ->
                     if (authResult.isSuccessful) {
                         Toast.makeText(

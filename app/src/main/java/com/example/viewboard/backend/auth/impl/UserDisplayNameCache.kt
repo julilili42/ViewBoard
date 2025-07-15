@@ -4,7 +4,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
-object DisplayNameCache {
+object UserDisplayNameCache {
     private val cache = mutableMapOf<String, String>()
 
     suspend fun get(userID: String): String? {

@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.viewboard.R
+import com.example.viewboard.backend.auth.impl.FirebaseProvider
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -31,7 +32,7 @@ class Login  : AppCompatActivity() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
-        auth = FirebaseAuth.getInstance()
+        auth = FirebaseProvider.auth
 
         findViewById<Button>(R.id.sign_in_button).setOnClickListener {
             val signInIntent = googleSignInClient.signInIntent

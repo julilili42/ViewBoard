@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import com.example.viewboard.backend.auth.impl.FirebaseProvider
 import com.example.viewboard.components.ProfilePicture
 import com.example.viewboard.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
@@ -43,7 +44,7 @@ import com.example.viewboard.components.SectionCard
 fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     var showNotifDialog by remember { mutableStateOf(false) }
     val userName = AuthAPI.getCurrentDisplayName() ?: "failed to load username"
-    val uid = FirebaseAuth.getInstance().currentUser?.uid
+    val uid = FirebaseProvider.auth.currentUser?.uid
     var notificationsEnabled by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
