@@ -137,10 +137,10 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
             FirebaseAuth.getInstance().signInWithCredential(credential)
                 .addOnCompleteListener(activity) { authResult ->
                     if (authResult.isSuccessful) {
-                        Toast.makeText(context, "Willkommen ${authResult.result.user?.displayName}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Welcome ${authResult.result.user?.displayName}", Toast.LENGTH_SHORT).show()
                         navController.navigate(Screen.HomeScreen.route)
                     } else {
-                        Toast.makeText(context, "Fehlgeschlagen", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: ApiException) {
@@ -186,7 +186,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
             ),
             shape = RoundedCornerShape(size = 4.dp)
         ) {
-            Text("Log in")
+            Text("Login")
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -210,7 +210,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
                 modifier = Modifier.size(18.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Mit Google anmelden")
+            Text("Login with Google")
         }
     }
 }

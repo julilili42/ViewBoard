@@ -230,7 +230,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
                 modifier = Modifier.size(18.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Mit Google anmelden")
+            Text("Login with Google")
         }
     }
 }
