@@ -196,35 +196,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
 
         // Login-Button
         Button(
-            onClick = {
-                if (email.isBlank() || password.isBlank()) {
-                    Toast.makeText(context, "Bitte fülle alle Felder aus", Toast.LENGTH_SHORT).show()
-                    return@Button
-                }
-
-                FirebaseAuth.getInstance()
-                    .signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val user = FirebaseAuth.getInstance().currentUser
-                            Toast.makeText(context, "Willkommen!", Toast.LENGTH_SHORT).show()
-
-                            // 🔽 FCM-Token abrufen und speichern
-                            com.google.firebase.messaging.FirebaseMessaging.getInstance().token
-                                .addOnSuccessListener { token ->
-                                    val uid = user?.uid ?: return@addOnSuccessListener
-                                    com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                                        .collection("users")
-                                        .document(uid)
-                                        .update("fcmToken", token)
-                                }
-
-                            navController.navigate(Screen.HomeScreen.route)
-                        } else {
-                            Toast.makeText(context, "Login fehlgeschlagen: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-            },
+            onClick = { AuthAPI.loginWithEmail(context, email, password, navController)},
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp),

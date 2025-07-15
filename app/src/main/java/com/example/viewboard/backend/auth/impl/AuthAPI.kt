@@ -1,12 +1,18 @@
 package com.example.viewboard.backend.auth.impl
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.navigation.NavController
 import com.example.viewboard.backend.auth.abstraction.AuthServerAPI
+import com.example.viewboard.ui.navigation.Screen
 import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.tasks.await
 
 object AuthAPI : AuthServerAPI() {
@@ -62,11 +68,11 @@ object AuthAPI : AuthServerAPI() {
                             .update("email", newEmail)
                             .addOnSuccessListener { onSuccess() }
                             .addOnFailureListener { e ->
-                                onError(e.message ?: "Firestore-Update fehlgeschlagen")
+                                onError(e.message ?: "Firestore-Update failed")
                             }
                     }
                     .addOnFailureListener { e ->
-                        onError(e.message ?: "E-Mail-Update fehlgeschlagen")
+                        onError(e.message ?: "E-Mail-Update failed")
                     }
             },
             onError
@@ -96,14 +102,14 @@ object AuthAPI : AuthServerAPI() {
     ) {
         val user = FirebaseAuth.getInstance().currentUser
         if (user == null) {
-            onError("Kein eingeloggter Nutzer")
+            onError("No logged in user")
             return
         }
 
         user.updatePassword(newPassword)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e ->
-                onError(e.message ?: "Passwort-Update fehlgeschlagen")
+                onError(e.message ?: "Password-Update failed")
             }
     }
 
@@ -115,7 +121,7 @@ object AuthAPI : AuthServerAPI() {
         val user = FirebaseAuth.getInstance().currentUser
         val email = user?.email
         if (user == null || email.isNullOrBlank()) {
-            onError("Kein eingeloggter Nutzer oder fehlende E-Mail")
+            onError("No logged in user or missing email")
             return
         }
 
@@ -123,7 +129,7 @@ object AuthAPI : AuthServerAPI() {
         user.reauthenticate(credential)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e ->
-                onError(e.message ?: "Passwort stimmt nicht")
+                onError(e.message ?: "Password is incorrect")
             }
     }
 
@@ -148,41 +154,62 @@ object AuthAPI : AuthServerAPI() {
         return FirebaseAuth.getInstance().currentUser?.email
     }
 
-    public override fun getDisplayName(): String? {
-        return FirebaseAuth.getInstance().currentUser?.displayName
-    }
-
     public override fun isLoggedIn(): Boolean {
         return FirebaseAuth.getInstance().currentUser != null
     }
 
-    fun updateFCMToken(token: String, onComplete: (() -> Unit)? = null) {
+    public override fun getDisplayName(): String? {
+        return FirebaseAuth.getInstance().currentUser?.displayName
+    }
+
+    public override fun updateFCMToken(token: String, onComplete: (() -> Unit)?) {
         val uid = getUid() ?: return
-        Firebase.firestore.collection("users")
+        Firebase.firestore
+            .collection("users")
             .document(uid)
             .update("fcmToken", token)
             .addOnSuccessListener { onComplete?.invoke() }
     }
 
+    public override fun fetchAndSaveFcmToken(onComplete: (() -> Unit)?) {
+        val uid = getUid() ?: return
+        FirebaseMessaging.getInstance().token
+            .addOnSuccessListener { token ->
+                updateFCMToken(token) {
+                    onComplete?.invoke()
+                }
+            }
+    }
+
 
     public override fun loginWithEmail(
+        context: Context,
         email: String,
         password: String,
-        onSuccess: () -> Unit,
-        onError: (String) -> Unit
+        navController: NavController
     ) {
         if (email.isBlank() || password.isBlank()) {
-            onError("Please fill all fields")
+            Toast.makeText(context, "Please fill out all fields", Toast.LENGTH_SHORT).show()
             return
         }
 
         FirebaseAuth.getInstance()
-            .signInWithEmailAndPassword(email.trim(), password)
+            .signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    onSuccess()
+                    val user = FirebaseAuth.getInstance().currentUser
+                    Toast.makeText(context, "Welcome!", Toast.LENGTH_SHORT).show()
+
+                    fetchAndSaveFcmToken {
+                        navController.navigate(Screen.HomeScreen.route)
+                    }
+
                 } else {
-                    onError(task.exception?.message ?: "Login failed")
+                    Toast.makeText(
+                        context,
+                        "Login failed: ${task.exception?.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
     }
