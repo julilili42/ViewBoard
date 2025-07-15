@@ -111,17 +111,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                 // Logout
                 Text(
                     modifier = Modifier
-                        .clickable {
-                            val uid = FirebaseAuth.getInstance().currentUser?.uid
-                            if (uid != null) {
-                                Firebase.firestore.collection("users").document(uid)
-                                    .update("isOnline", false)
-                            }
-                            FirebaseAuth.getInstance().signOut()
-                            navController.navigate(Screen.LoginScreen.route) {
-                                popUpTo(0) // zurück zum Login-Screen
-                            }
-                        }
+                        .clickable { AuthAPI.logout(navController) }
                         .padding(8.dp),
                     text = "Log out",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),

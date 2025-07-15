@@ -32,6 +32,7 @@ import com.example.viewboard.ui.screens.ProfileScreen
 import com.example.viewboard.ui.screens.ProjectCreationScreen
 import com.example.viewboard.ui.screens.ViewIssueScreen
 import com.example.viewboard.ui.screens.ViewScreen
+import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("ViewModelConstructorInComposable")
 @Composable
@@ -39,19 +40,19 @@ fun Navigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val hideOn = listOf(
-        Screen.LoginScreen.route,
-        Screen.RegistrationScreen.route
-    )
-    val showBottomBar = currentRoute !in hideOn
+
     val mainViewModel = MainViewModel()
+
+    val isLoggedIn = FirebaseAuth.getInstance().currentUser != null
+    val start = if (isLoggedIn) "main" else Screen.LoginScreen.route
+
 
     Scaffold(
         modifier = modifier,
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.LoginScreen.route,
+            startDestination = start,
             modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
         ) {
             composable(Screen.LoginScreen.route) {

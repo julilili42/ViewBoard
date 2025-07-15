@@ -234,4 +234,14 @@ object AuthAPI : AuthServerAPI() {
             .await()
             .getString("name")
     }
+
+
+    override fun logout(navController: NavController) {
+        FirebaseAuth.getInstance().signOut()
+
+        navController.navigate(Screen.LoginScreen.route) {
+            popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
 }
+
