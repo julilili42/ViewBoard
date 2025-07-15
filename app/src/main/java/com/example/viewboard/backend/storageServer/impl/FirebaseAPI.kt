@@ -505,6 +505,50 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
+    public override fun getIssuesFromAssignment(userID: String?) : Flow<List<IssueLayout>> {
+        return m_issues.map { issues ->
+            if (userID != null) {
+                issues.filter { it.assignments.contains(userID) }
+            }
+            else {
+                emptyList()
+            }
+        }
+    }
+
+    public override fun getIssuesFromAssignment(userID: String?, projID: String) : Flow<List<IssueLayout>> {
+        return getIssuesFromProject(projID).map { issues ->
+            if (userID != null) {
+                issues.filter { it.assignments.contains(userID) }
+            }
+            else {
+                emptyList()
+            }
+        }
+    }
+
+    public override fun getIssuesFromCreator(userID: String?) : Flow<List<IssueLayout>> {
+        return m_issues.map { issues ->
+            if (userID != null) {
+                issues.filter { it.creator == userID }
+            }
+            else {
+                emptyList()
+            }
+        }
+    }
+
+    public override fun getIssuesFromCreator(userID: String?, projID: String) : Flow<List<IssueLayout>> {
+        return getIssuesFromProject(projID).map { issues ->
+            if (userID != null) {
+                issues.filter { it.creator == userID }
+            }
+            else {
+                emptyList()
+            }
+        }
+    }
+
     public override fun getIssuesFromUser(userID: String?) : Flow<List<IssueLayout>> {
         return m_issues.map { issues ->
             if (userID != null) {

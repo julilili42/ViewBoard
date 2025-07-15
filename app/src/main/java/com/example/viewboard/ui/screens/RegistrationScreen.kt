@@ -71,12 +71,12 @@ fun RegisterTopSection(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.Center,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.logo),
+                    painter = painterResource(id = R.drawable.logotest),
                     contentDescription = null,
-                    modifier = Modifier.size(42.dp),
+                    modifier = Modifier.size(45.dp),
                     tint = uiColor
                 )
-                Spacer(modifier = Modifier.width(15.dp))
+                Spacer(modifier = Modifier.width(10.dp))
                 Column {
                     Text(
                         text = stringResource(R.string.viewBoard),
@@ -111,60 +111,71 @@ fun RegisterSection(navController: NavController, modifier: Modifier = Modifier)
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Text(
+            text = stringResource(R.string.Registration),
+            style = MaterialTheme.typography.headlineLarge,
+            color = uiColor
+        )
+        Spacer(modifier = Modifier.height(40.dp))
+
+        LoginTextField(
+            modifier = modifier,
+            label = "Name",
+            text = name,
+            onTextChange = { name = it })
+        Spacer(modifier = Modifier.height(15.dp))
+        LoginTextField(
+            modifier = modifier,
+            label = "Email",
+            text = email,
+            onTextChange = { email = it })
+        Spacer(modifier = Modifier.height(15.dp))
+        LoginTextField(
+            modifier = modifier,
+            label = "Password",
+            text = password,
+            onTextChange = { password = it })
+        Spacer(modifier = Modifier.height(70.dp))
+
+        Button(
+            onClick = {
+                AuthAPI.register(
+                    name = name,
+                    email = email,
+                    password = password,
+                    onSuccess = {
+                        Toast.makeText(context, "Registrierung erfolgreich", Toast.LENGTH_SHORT)
+                            .show()
+                        navController.navigate(Screen.HomeScreen.route)
+                    },
+                    onError = { msg ->
+                        Toast.makeText(context, "Fehler: $msg", Toast.LENGTH_SHORT).show()
+                    }
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .padding(horizontal = 50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isSystemInDarkTheme()) BlueGray else Black,
+                contentColor = Color.White,
+            ),
+            shape = RoundedCornerShape(size = 4.dp)
         ) {
             Text(
-                text = stringResource(R.string.Registration),
-                style = MaterialTheme.typography.headlineLarge,
-                color = uiColor
+                text = stringResource(R.string.Register),
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium)
             )
-            Spacer(modifier = Modifier.height(40.dp))
-
-            LoginTextField(label = "Name", text = name, onTextChange = { name = it })
-            Spacer(modifier = Modifier.height(30.dp))
-            LoginTextField(label = "Email", text = email, onTextChange = { email = it })
-            Spacer(modifier = Modifier.height(30.dp))
-            LoginTextField(label = "Password", text = password, onTextChange = { password = it })
-            Spacer(modifier = Modifier.height(60.dp))
-
-            Button(
-                onClick = {
-                    AuthAPI.register(
-                        name = name,
-                        email = email,
-                        password = password,
-                        onSuccess = {
-                            Toast.makeText(context, "Registrierung erfolgreich", Toast.LENGTH_SHORT).show()
-                            navController.navigate(Screen.HomeScreen.route)
-                        },
-                        onError = { msg ->
-                            Toast.makeText(context, "Fehler: $msg", Toast.LENGTH_SHORT).show()
-                        }
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .padding(horizontal = 50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSystemInDarkTheme()) BlueGray else Black,
-                    contentColor = Color.White,
-                ),
-                shape = RoundedCornerShape(size = 4.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.Register),
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium)
-                )
-            }
         }
     }
 }
+
 
 /**
  * Bottom section offering navigation back to the login screen.

@@ -1,11 +1,13 @@
 package com.example.viewboard.backend.auth.impl
 
+import android.util.Log
 import com.example.viewboard.backend.auth.abstraction.AuthServerAPI
 import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.tasks.await
 
 object AuthAPI : AuthServerAPI() {
     public override fun register(
@@ -24,9 +26,10 @@ object AuthAPI : AuthServerAPI() {
                 }
                 val user = task.result.user!!
                 // set display name
-                user.updateProfile(UserProfileChangeRequest.Builder()
-                    .setDisplayName(name)
-                    .build()
+                user.updateProfile(
+                    UserProfileChangeRequest.Builder()
+                        .setDisplayName(name)
+                        .build()
                 ).addOnCompleteListener { updTask ->
                     if (!updTask.isSuccessful) {
                         onError(updTask.exception?.message ?: "Failed to set name")
@@ -47,7 +50,8 @@ object AuthAPI : AuthServerAPI() {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        verifyPassword(oldPassword,
+        verifyPassword(
+            oldPassword,
             {
                 val user = FirebaseAuth.getInstance().currentUser!!
                 user.updateEmail(newEmail)
@@ -68,6 +72,22 @@ object AuthAPI : AuthServerAPI() {
             onError
         )
     }
+
+    public override fun sendPasswordResetMail(
+        email: String,
+        onComplete: (message: String) -> Unit
+    ) {
+        FirebaseAuth.getInstance()
+            .sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                val msg = if (task.isSuccessful)
+                    "Reset email sent to $email"
+                else
+                    "Error sending reset email: ${task.exception?.message}"
+                onComplete(msg)
+            }
+    }
+
 
     public override fun setPassword(
         newPassword: String,
@@ -113,7 +133,8 @@ object AuthAPI : AuthServerAPI() {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        verifyPassword(oldPassword,
+        verifyPassword(
+            oldPassword,
             { setPassword(newPassword, onSuccess, onError) },
             onError
         )
@@ -143,4 +164,47 @@ object AuthAPI : AuthServerAPI() {
             .addOnSuccessListener { onComplete?.invoke() }
     }
 
+
+    public override fun loginWithEmail(
+        email: String,
+        password: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (email.isBlank() || password.isBlank()) {
+            onError("Please fill all fields")
+            return
+        }
+
+        FirebaseAuth.getInstance()
+            .signInWithEmailAndPassword(email.trim(), password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onSuccess()
+                } else {
+                    onError(task.exception?.message ?: "Login failed")
+                }
+            }
+    }
+
+    public override suspend fun getDisplayName(
+        userID: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ): String? {
+        return Firebase.firestore
+            .collection("users")
+            .document(userID)
+            .get()
+            .addOnSuccessListener {
+                println("successfully retrieved display name: $userID")
+                onSuccess(userID)
+            }
+            .addOnFailureListener {
+                println("failed to retrieved display name:: $userID")
+                onFailure(userID)
+            }
+            .await()
+            .getString("name")
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.viewboard.ui.screens
 
 import android.app.Activity
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,6 +40,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.material3.TextField
 import androidx.compose.ui.text.input.VisualTransformation
+import com.example.viewboard.backend.auth.impl.AuthAPI
 
 /**
  * Top section of the login screen displaying the background shape, logo, and headings.
@@ -111,6 +113,26 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showResetDialog by remember { mutableStateOf(false) }
+
+
+    if (showResetDialog) {
+        PasswordResetDialog(
+            email = email,
+            onEmailChange = { email = it },
+            onConfirm = {
+                val normalized = email.trim()
+                AuthAPI.sendPasswordResetMail(normalized) { msg ->
+                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    email = if (email.isEmpty()) "" else email
+                    showResetDialog = false
+                }
+            },
+            onDismiss = {
+                showResetDialog = false
+            }
+        )
+    }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -122,7 +144,11 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
             FirebaseAuth.getInstance().signInWithCredential(credential)
                 .addOnCompleteListener(activity) { authResult ->
                     if (authResult.isSuccessful) {
-                        Toast.makeText(context, "Willkommen ${authResult.result.user?.displayName}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Willkommen ${authResult.result.user?.displayName}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         navController.navigate(Screen.HomeScreen.route)
                     } else {
                         Toast.makeText(context, "Fehlgeschlagen", Toast.LENGTH_SHORT).show()
@@ -161,6 +187,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
             trailing = "Forgot?",
             text = password,
             onTextChange = { password = it },
+            onTrailingClick = { showResetDialog = true },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation()
 
@@ -287,6 +314,45 @@ fun LoginRegisterSection(modifier: Modifier = Modifier, navController: NavContro
     }
 }
 
+
+@Composable
+fun PasswordResetDialog(
+    email: String,
+    onEmailChange: (String) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Reset Password") },
+        text = {
+            Column {
+                Text("Please enter your email to receive a password reset link:")
+                Spacer(modifier = Modifier.height(8.dp))
+                LoginTextField(
+                    label = "Email",
+                    text = email,
+                    onTextChange = onEmailChange,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Send")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+
 /**
  * A reusable text field for login forms that shows a label and an optional trailing action.
  *
@@ -300,10 +366,11 @@ fun LoginRegisterSection(modifier: Modifier = Modifier, navController: NavContro
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginTextField(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.fillMaxWidth(),
     label: String,
     trailing: String = "",
     text: String,
+    onTrailingClick: (() -> Unit)? = null,
     onTextChange: (String) -> Unit,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
@@ -317,7 +384,7 @@ fun LoginTextField(
         },
         trailingIcon = {
             if (trailing.isNotEmpty()) {
-                TextButton(onClick = { /* TODO */ }) {
+                TextButton(onClick = { onTrailingClick?.invoke() }) {
                     Text(
                         text = trailing,
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
@@ -329,7 +396,6 @@ fun LoginTextField(
         singleLine = true,
         maxLines = 1,
         visualTransformation = visualTransformation
-
     )
 }
 

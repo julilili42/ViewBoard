@@ -107,7 +107,7 @@ abstract class StorageServerAPI () {
     public abstract suspend fun addLabelToIssue(issueID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
 
     /**
-     * Remove a label from a issue
+     * Remove a label from issue
      *
      * @param issueID the id of an issue
      * @param id the id of the label
@@ -206,7 +206,7 @@ abstract class StorageServerAPI () {
     public abstract suspend fun addIssueToView(viewID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
 
     /**
-     * Remove an issue from a view
+     * Remove an issue from view
      *
      * @param viewID the id of the view
      * @param id the id of an issue
@@ -253,7 +253,7 @@ abstract class StorageServerAPI () {
     public abstract fun getAllIssues() : Flow<List<IssueLayout>>
 
     /**
-     * Get all issues from a view
+     * Get all issues from view
      *
      * @param viewID the id of the view
      * @param onSuccess success callback, when the issues have been successfully retrieved
@@ -275,6 +275,44 @@ abstract class StorageServerAPI () {
     public abstract fun getIssuesFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<IssueLayout>>
 
     /**
+     * Get all issues from assignment
+     *
+     * @param userID the id of the assignment
+     *
+     * @return the issues when they have been successfully retrieved
+     */
+    public abstract fun getIssuesFromAssignment(userID: String?) : Flow<List<IssueLayout>>
+
+    /**
+     * Get all issues from assignment
+     *
+     * @param userID the id of the assignment
+     * @param projID the id of the project
+     *
+     * @return the issues when they have been successfully retrieved
+     */
+    public abstract fun getIssuesFromAssignment(userID: String?, projID: String) : Flow<List<IssueLayout>>
+
+    /**
+     * Get all issues from creator
+     *
+     * @param userID the id of the creator
+     *
+     * @return the issues when they have been successfully retrieved
+     */
+    public abstract fun getIssuesFromCreator(userID: String?) : Flow<List<IssueLayout>>
+
+    /**
+     * Get all issues from creator for a project
+     *
+     * @param userID the id of the creator
+     * @param projID the id of the project
+     *
+     * @return the issues when they have been successfully retrieved
+     */
+    public abstract fun getIssuesFromCreator(userID: String?, projID: String) : Flow<List<IssueLayout>>
+
+    /**
      * Get all issues from user
      *
      * @param userID the id of the user
@@ -286,8 +324,8 @@ abstract class StorageServerAPI () {
     /**
      * Get all issues from user for a project
      *
-     * @param projID the id of the project
      * @param userID the id of the user
+     * @param projID the id of the project
      *
      * @return the issues when they have been successfully retrieved
      */
@@ -351,7 +389,7 @@ abstract class StorageServerAPI () {
     public abstract fun getAllViews() : Flow<List<ViewLayout>>
 
     /**
-     * Get all views
+     * Get all views from
      *
      * @param projID the id of the project
      * @param onSuccess success callback, when the views have been successfully retrieved

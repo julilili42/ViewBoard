@@ -30,6 +30,7 @@ import com.example.viewboard.ui.screens.ProjectsScreen
 import com.example.viewboard.ui.screens.TimetableScreen
 import com.example.viewboard.ui.screens.ProfileScreen
 import com.example.viewboard.ui.screens.ProjectCreationScreen
+import com.example.viewboard.ui.screens.ViewIssueScreen
 import com.example.viewboard.ui.screens.ViewScreen
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -227,6 +228,37 @@ fun Navigation(modifier: Modifier = Modifier) {
                                 navController,
                                 projectName  = projectName,
                                 projectId    = projectId   // jetzt mit übergeben
+                            )
+                        }
+                    }
+                }
+            }
+            composable(
+                route = Screen.ViewIssueScreen.route,
+                arguments = listOf(
+                    navArgument("viewName") { type = NavType.StringType },
+                    navArgument("viewID")   { type = NavType.StringType },
+                    navArgument("projID")   { type = NavType.StringType }
+                )
+            ) { backStack ->
+                val viewName = backStack.arguments!!.getString("viewName")!!
+                val viewID   = backStack.arguments!!.getString("viewID")!!
+                val projID   = backStack.arguments!!.getString("projID")!!
+                MainLayout(navController, currentRoute) { padding ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding)
+                    ) {
+                        DragableScreen(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            ViewIssueScreen(
+                                mainViewModel = mainViewModel,
+                                navController = navController,
+                                viewName = viewName,
+                                viewID = viewID,
+                                projID = projID
                             )
                         }
                     }
