@@ -42,7 +42,7 @@ import com.example.viewboard.components.SectionCard
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     var showNotifDialog by remember { mutableStateOf(false) }
-    val userName = AuthAPI.getDisplayName() ?: "failed to load username"
+    val userName = AuthAPI.getCurrentDisplayName() ?: "failed to load username"
     val uid = FirebaseAuth.getInstance().currentUser?.uid
     var notificationsEnabled by remember { mutableStateOf(false) }
 

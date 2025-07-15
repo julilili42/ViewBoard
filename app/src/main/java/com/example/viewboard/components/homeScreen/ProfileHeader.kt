@@ -47,7 +47,7 @@ fun ProfileHeader(
         // Name + Untertitel
         Column {
             Text(
-                text = AuthAPI.getDisplayName() ?: "failed to load username",
+                text = AuthAPI.getCurrentDisplayName() ?: "failed to load username",
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(4.dp))

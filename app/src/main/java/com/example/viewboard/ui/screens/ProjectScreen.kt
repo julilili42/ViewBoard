@@ -211,7 +211,7 @@ fun ProjectsScreen(
     Scaffold(
         topBar = {
                 ProfileHeader(
-                    name = AuthAPI.getDisplayName() ?: "failed to load username",
+                    name = AuthAPI.getCurrentDisplayName() ?: "failed to load username",
                     subtitle = "Welcome back!!",
                     navController =navController,
                     showBackButton = true,

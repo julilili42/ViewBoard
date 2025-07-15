@@ -12,11 +12,11 @@ abstract class AuthServerAPI () {
     public abstract fun getUid(): String?
     public abstract fun getEmail(): String?
     public abstract fun isLoggedIn(): Boolean
-    public abstract fun getDisplayName(): String?
     public abstract fun loginWithEmail(context: Context, email: String, password: String, navController: NavController)
     public abstract fun logout(navController: NavController)
     public abstract fun register(name: String, email: String, password: String, onSuccess: () -> Unit, onError: (String) -> Unit)
-    public abstract suspend fun getDisplayName(userID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : String?
+    public abstract suspend fun getDisplayName(userID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}): String?
+    public abstract fun getCurrentDisplayName(): String?
     public abstract fun updateFCMToken(token: String, onComplete: (() -> Unit)? = null)
     public abstract fun fetchAndSaveFcmToken(onComplete: (() -> Unit)? = null)
 }

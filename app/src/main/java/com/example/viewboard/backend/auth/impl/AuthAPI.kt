@@ -158,9 +158,7 @@ object AuthAPI : AuthServerAPI() {
         return FirebaseAuth.getInstance().currentUser != null
     }
 
-    public override fun getDisplayName(): String? {
-        return FirebaseAuth.getInstance().currentUser?.displayName
-    }
+
 
     public override fun updateFCMToken(token: String, onComplete: (() -> Unit)?) {
         val uid = getUid() ?: return
@@ -214,25 +212,24 @@ object AuthAPI : AuthServerAPI() {
             }
     }
 
+    public override fun getCurrentDisplayName(): String? {
+        return FirebaseAuth.getInstance().currentUser?.displayName
+    }
+
+
     public override suspend fun getDisplayName(
         userID: String,
         onSuccess: (String) -> Unit,
         onFailure: (String) -> Unit
     ): String? {
-        return Firebase.firestore
-            .collection("users")
-            .document(userID)
-            .get()
-            .addOnSuccessListener {
-                println("successfully retrieved display name: $userID")
-                onSuccess(userID)
-            }
-            .addOnFailureListener {
-                println("failed to retrieved display name:: $userID")
-                onFailure(userID)
-            }
-            .await()
-            .getString("name")
+        val name = DisplayNameCache.get(userID)
+        return if (name != null) {
+            onSuccess(name)
+            name
+        } else {
+            onFailure("Display name not found")
+            null
+        }
     }
 
 
