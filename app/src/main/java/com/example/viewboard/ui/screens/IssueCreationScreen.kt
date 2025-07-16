@@ -3,6 +3,7 @@ package com.example.viewboard.ui.screens
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -40,7 +41,7 @@ import com.example.viewboard.ui.navigation.ChipInputField
 @Composable
 fun IssueCreationScreen(
     navController: NavController,
-    projectId: String = "ysZaMVY24jnSyLuE5FKJ",
+    projectId: String,
     currentUserId: String = AuthAPI.getUid() ?: "",
 
     onCreate: () -> Unit = {}
@@ -63,13 +64,14 @@ fun IssueCreationScreen(
     var deadline by remember {
         mutableStateOf(Timestamp().apply { import(calendar.toInstant()) })
     }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
     val timeFormatter = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
 
     var dateText by remember { mutableStateOf(dateFormatter.format(calendar.time)) }
     var timeText by remember { mutableStateOf(timeFormatter.format(calendar.time)) }
+    val isTitleValid by derivedStateOf { title.trim().isNotEmpty() }
+    val isDescValid  by derivedStateOf { desc.trim().isNotEmpty() }
 
     // Validität prüfen
     val isDateValid by derivedStateOf {
@@ -264,8 +266,12 @@ fun IssueCreationScreen(
                 )
             }
             Spacer(Modifier.height(16.dp))
-
+            val isFormValid by derivedStateOf {
+                isTitleValid && isDescValid
+            }
             Button(
+
+                enabled = isDateValid && isTimeValid&& isFormValid,
                 onClick = {
                     // Validierung
                     if (isDateValid && isTimeValid) {
@@ -280,28 +286,30 @@ fun IssueCreationScreen(
                         })
                         // Issue anlegen und speichern
                         val newIssue = IssueLayout(
-                            title       = title.trim(),
-                            desc        = desc.trim(),
+                            title       = title,
+                            desc        = desc,
                             creator     = currentUserId,
                             assignments = ArrayList(assignments),
 //                            labels      = labelObjects,
-                            labels      = ArrayList(labels),
-                            deadlineTS  = deadline.export()
+                           // labels      = ArrayList(labels),
+                            //deadlineTS  = deadline.export()
                         )
 
 
                         coroutineScope.launch {
                             try {
-                                FirebaseAPI.addIssue(projID = projectId, issueLayout = newIssue)
+                                val cleanId = projectId.trim('{', '}')
+                                FirebaseAPI.addIssue(projID = cleanId , issueLayout = newIssue)
+                                Log.d("Upload", "Upload: =$projectId und $currentUserId")
+                                Log.d("Upload", "projectId raw='[$projectId]' length=${projectId.length}")
+                                // addIssue(projID = projectId, issueLayout = newIssue)
                                 navController.popBackStack()
                             } catch (e: Exception) {
-                                // z.B. Fehler anzeigen:
-                                errorMessage = "Speichern fehlgeschlagen: ${e.localizedMessage}"
+
                             }
                         }
                     }
                 },
-                enabled = isDateValid && isTimeValid,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),

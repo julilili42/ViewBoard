@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -44,11 +43,9 @@ import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.components.homeScreen.ProfileHeader
 import com.example.viewboard.ui.issue.IssueItemCard
-import com.example.viewboard.ui.issue.IssueUiItem
 import com.example.viewboard.ui.issue.MainViewModel
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.timetable.CustomIcon
@@ -56,8 +53,7 @@ import com.example.viewboard.ui.timetable.CustomIcon2
 import kotlinx.coroutines.launch
 
 @Composable
-fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, viewName: String, viewID: String, projID: String) {
-    val issueLayouts = remember { mutableStateListOf<IssueLayout>() }
+fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, viewID: String, projID: String) {
     var showDialog by remember { mutableStateOf(false) }
 
     val categories = listOf("New", "Ongoing", "Done")
@@ -164,13 +160,14 @@ fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, 
                 ) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         categories.forEachIndexed { idx, label ->
-                            DropItem<IssueUiItem>(
+                            DropItem<IssueLayout>(
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(48.dp)
                                     .padding(horizontal = 4.dp),
                                 onDrop = { item ->
-                                    mainViewModel.moveItemToCategory(item, idx)
+                                    val state = stateFromIndex(idx)
+                                    mainViewModel.moveItemToState(item, state)
                                 }
                             ) { isOver, _ ->
                                 Box(
@@ -223,7 +220,7 @@ fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, 
                             Uri.parse("https://picsum.photos/seed/4/64"),
                             Uri.parse("https://picsum.photos/seed/5/64")
                         )
-                        mainViewModel.getItemsForCategory(selectedTab).forEach { item ->
+                        mainViewModel.getItemsForCategory(stateFromIndex(selectedTab)).forEach { item ->
                             key(item.id) {
                                 DragTarget(
                                     dataToDrop = item,
@@ -231,11 +228,9 @@ fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, 
                                 ) {
                                     IssueItemCard(
                                         title = item.title,
-                                        priority = item.priority,
-                                        status = item.status,
-                                        date = item.date,
-                                        attachments = item.attachments,
-                                        comments = item.comments,
+                                        state = stateToString(item.state),
+                                        date = item.deadlineTS,
+                                        attachments = 5,
                                         avatarUris = dummyAvatarUris,
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(12.dp))
@@ -249,3 +244,5 @@ fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, 
         }
     }
 }
+
+

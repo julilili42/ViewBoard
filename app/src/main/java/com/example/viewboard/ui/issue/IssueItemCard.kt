@@ -30,19 +30,15 @@ import androidx.compose.runtime.Composable
 @Composable
 fun IssueItemCard(
     title: String,
-    priority: String,
-    status: String,
     date: String,
     attachments: Int,
-    comments: Int,
+    state: String="",
     modifier: Modifier = Modifier,
     avatarUris: List<Uri>,
     onOptionsClick: () -> Unit = {}
 ) {
     val showCount = avatarUris.size.coerceAtMost(3)
     val avatarSize = 18.dp
-    val firstAvatar: Uri = avatarUris.first()
-
     Box(
         modifier
             .fillMaxWidth()
@@ -92,11 +88,11 @@ fun IssueItemCard(
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    Text(
+                   /* Text(
                         text = priority,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
-                    )
+                    )*/
                 }
                 Box(
                     Modifier
@@ -106,11 +102,11 @@ fun IssueItemCard(
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    Text(
+                   /* Text(
                         text = status,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.secondary
-                    )
+                    )*/
                 }
             }
             Row(

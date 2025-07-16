@@ -40,12 +40,13 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
+import colorFromCode
+import generateProjectCode
 import java.time.LocalDate
 
 @Composable
 fun VerticalTimelineSchedule(
     projects: List<Project>,
-    phases:   List<String>,
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
@@ -60,7 +61,6 @@ fun VerticalTimelineSchedule(
         val monthFrac = (today.dayOfMonth - 1) / today.lengthOfMonth().toFloat()
         val todayPx   = ((today.monthValue - 1) + monthFrac) * monthPx
         val todayDp   = with(density) { todayPx.toDp() }
-
         Box(modifier = Modifier.fillMaxSize()) {
             Row(modifier = Modifier.fillMaxSize()) {
                 // 1) Feste Monats-Labels (nicht scrollbar)
@@ -91,7 +91,7 @@ fun VerticalTimelineSchedule(
 
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(m, style = MaterialTheme.typography.bodySmall,color = MaterialTheme.colorScheme.surface)
+                            Text(m, style = MaterialTheme.typography.bodySmall,color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
@@ -122,62 +122,62 @@ fun VerticalTimelineSchedule(
                         modifier = Modifier.fillMaxSize(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        phases.forEach { phase ->
-                            val phaseProjects = projects.filter { it.phase == phase }
+                        projects.forEach { project ->
+                            // Berechne hier pro Projekt direkt deine Offsets
+                            val startDp  = ((project.startMonth - 1) * monthPx).toDp()
+                            val heightDp = ((project.endMonth - project.startMonth + 1) * monthPx).toDp()
+
+                            val projectNameCode = generateProjectCode(project.name)
+                            val projectNamecolor = colorFromCode(projectNameCode)
+
+
+
                             Column(
                                 modifier = Modifier
-                                    .width(45.dp)
+                                    .width(47.dp)
                                     .fillMaxHeight()
                                     .padding(vertical = 4.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                // Phase-Label
-                                if (phaseProjects.isNotEmpty()) {
-                                    val firstStartDp = ((phaseProjects.minOf { it.startMonth } - 1) * monthPx).toDp()
-                                    ProjectLabel(
-                                        name = phase,
-                                        modifier = Modifier
-                                            .offset(y = firstStartDp)
-                                            .widthIn(min = 40.dp)
-                                    )
-                                }
+                                // Phase‑Label für dieses eine Projekt
+                                ProjectLabel(
+                                    name = projectNameCode,
+                                    modifier = Modifier
+                                        .offset(y = startDp)
+                                        .widthIn(min = 45.dp)
+                                        .background(
+                                            brush = Brush.linearGradient(listOf(projectNamecolor, projectNamecolor.copy(alpha = 0.8f))),
+                                            shape = RoundedCornerShape(4.dp)
+                                        )
+                                )
 
                                 Spacer(Modifier.height(8.dp))
 
-                                // Projekt-Balken
-                                phaseProjects.forEach { p ->
-                                    val startDp  = ((p.startMonth - 1) * monthPx).toDp()
-                                    val heightDp = ((p.endMonth - p.startMonth + 1) * monthPx).toDp()
-
-                                    Box(
-                                        modifier = Modifier
-                                            .offset(y = startDp)
-                                            .height(heightDp)
-                                            .width(8.dp)
-                                            .clip(RoundedCornerShape(4.dp))
-                                            .background(p.color.copy(alpha = 0.1f)),
-                                        contentAlignment = Alignment.BottomCenter
-                                    ) {
-                                        val primaryGradient = listOf(
-
-                                            MaterialTheme.colorScheme.secondary.copy(alpha = 1.0f),
-
-                                            MaterialTheme.colorScheme.primary.copy(alpha = 1.0f),
-
-
-                                        )
-                                        VerticalMilestoneBar(
-                                            total     = p.totalMilestones,
-                                            completed = p.completedMilestones,
-                                            colors    =  primaryGradient,
-                                            modifier  = Modifier
-                                                .fillMaxSize()
-                                                .padding(vertical = 1.dp),
-                                            width     = 8.dp,
-                                            spacing   = 1.dp,
-                                            corner    = 4.dp
-                                        )
-                                    }
+                                // Balken **nur** für dieses eine Projekt
+                                Box(
+                                    modifier = Modifier
+                                        .offset(y = startDp)
+                                        .height(heightDp)
+                                        .width(8.dp)
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(project.color.copy(alpha = 0.1f)),
+                                    contentAlignment = Alignment.BottomCenter
+                                ) {
+                                    val primaryGradient = listOf(
+                                        MaterialTheme.colorScheme.secondary,
+                                        MaterialTheme.colorScheme.primary
+                                    )
+                                    VerticalMilestoneBar(
+                                        total     = project.totalMilestones,
+                                        completed = project.completedMilestones,
+                                        colors    = primaryGradient,
+                                        modifier  = Modifier
+                                            .fillMaxSize()
+                                            .padding(vertical = 1.dp),
+                                        width     = 8.dp,
+                                        spacing   = 1.dp,
+                                        corner    = 4.dp
+                                    )
                                 }
                             }
                         }
@@ -273,13 +273,9 @@ fun ProjectLabel(
     modifier: Modifier = Modifier
 ) {
     // 1) Read your primary color here, in a Composable context:
-    val arrowColor = MaterialTheme.colorScheme.surface
+    val arrowColor = Color.Black
     Box(
         modifier = modifier
-            .background(
-                color = arrowColor,
-                shape = RoundedCornerShape(4.dp)
-            )
             .drawBehind {
                 // 2) Now use the captured arrowColor inside DrawScope
                 val pointerWidth  = with(density) { 12.dp.toPx() }
@@ -295,7 +291,7 @@ fun ProjectLabel(
                 }
                 drawPath(path, color = arrowColor)
             }
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .padding(horizontal = 6.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -305,60 +301,6 @@ fun ProjectLabel(
             color = MaterialTheme.colorScheme.onBackground //MaterialTheme.colorScheme.primary
         )
     }
-}
-
-
-@Composable
-fun LabeledBar(
-    label: @Composable () -> Unit,
-    bar:   @Composable () -> Unit
-) {
-    Layout(
-        content = {
-            // Reihenfolge wichtig: Erst das Label, dann die Bar
-            Box(Modifier) { label() }
-            Box(Modifier) { bar() }
-        }
-    ) { measurables, constraints ->
-        // 1) Miss Label (unbegrenzt breit, unbegrenzt hoch)
-        val labelPlaceable = measurables[0].measure(constraints)
-
-        // 2) Miss die Bar, beschränke Höhe auf verbleibenden Platz
-        //    (hier: Bar darf maximal constraints.maxHeight - labelHeight hoch sein)
-        val barConstraints = constraints.copy(
-            maxWidth  = constraints.maxWidth,
-            maxHeight = (constraints.maxHeight - labelPlaceable.height).coerceAtLeast(0)
-        )
-        val barPlaceable = measurables[1].measure(barConstraints)
-
-        // 3) Gesamtgröße: Breite = max(Label, Bar), Höhe = Label + Bar
-        val width  = maxOf(labelPlaceable.width, barPlaceable.width)
-        val height = labelPlaceable.height + barPlaceable.height
-
-        layout(width, height) {
-            // Label oben zentriert
-            val labelX = (width - labelPlaceable.width) / 2
-            labelPlaceable.placeRelative(x = labelX, y = 0)
-
-            // Bar direkt darunter, ebenfalls zentriert
-            val barX = (width - barPlaceable.width) / 2
-            barPlaceable.placeRelative(x = barX, y = labelPlaceable.height)
-        }
-    }
-}
-fun gradientBrushBetween(
-    startColor: Color,
-    endColor:   Color,
-    steps:      Int
-): Brush {
-    // 1) Erstelle die List von (Position, Color) Stops
-    val stops = List(steps + 1) { i ->
-        val fraction = i / steps.toFloat()     // 0f .. 1f
-        fraction to lerp(startColor, endColor, fraction)
-    }.toTypedArray()
-
-    // 2) Rückgabe des Brushes mit den Stops
-    return Brush.verticalGradient(colorStops = stops)
 }
 
 fun gradientColorList(

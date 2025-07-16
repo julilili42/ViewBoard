@@ -23,7 +23,13 @@ import java.time.temporal.ChronoUnit
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import generateProjectCode
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import colorFromCode
 
 /**
  * A card representing a single task with dynamic timestamp (date label + time),
@@ -69,7 +75,7 @@ fun ProjectCardTasks(
                 .height(70.dp)
                 // 1) dünner grauer Rand
                 .border(
-                    BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)),
+                    BorderStroke(1.dp,Color.Black.copy(alpha = 0.2f)),// MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)),
                     shape = MaterialTheme.shapes.medium,
 
                 )
@@ -92,20 +98,27 @@ fun ProjectCardTasks(
                 ) {
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            val initials = "#A15"
+                            val projectNameCode = generateProjectCode(name)
+                            val projectNamecolor = colorFromCode(projectNameCode)
 
                             Box(
                                 modifier = Modifier
+                                    .background(
+                                        brush = Brush.linearGradient(listOf(projectNamecolor, projectNamecolor.copy(alpha = 0.8f))),
+                                        shape = RoundedCornerShape(4.dp)
+                                    )
                                     .padding(0.dp)
                                     .height(80.dp)
-                                    .background(
+                                    .fillMaxWidth(0.2f)
+                                    /*.background(
+                                        brush = Brush.linearGradient(listOf(color, color.copy(alpha = 0.6f))),
                                         color = MaterialTheme.colorScheme.surfaceVariant,
                                         shape = RoundedCornerShape(4.dp)
-                                    ),
+                                    )*/,
                                 contentAlignment = Alignment.TopStart
                             ) {
                                 Text(
-                                    text = initials,
+                                    text = projectNameCode,
                                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                                     color = Color.White,
                                     modifier = Modifier

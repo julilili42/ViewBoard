@@ -29,6 +29,7 @@ import com.example.viewboard.components.homeScreen.ProjectGrid
 import com.example.viewboard.ui.navigation.Screen
 import java.time.LocalDateTime
 import com.example.viewboard.components.homeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.ViewSelectorDropdown
 import com.example.viewboard.ui.navigation.BottomBarScreen
 
 val tasks: List<Pair<String, LocalDateTime>> = listOf(
@@ -124,6 +125,9 @@ fun DraggableMyTasksSection(
 ) {
     val density = LocalDensity.current
     var currentSheetHeightPx by remember { mutableStateOf(0f) }
+    val viewNames = listOf("Dashboard", "Reports", "Settings", "Profile")
+    // State, um die Auswahl ggf. weiterzuverwenden
+    var currentView by remember { mutableStateOf(viewNames.first()) }
     BoxWithConstraints(modifier = modifier) {
         val maxHeightPx = with(density) { maxHeight.toPx() }
 
@@ -167,10 +171,12 @@ fun DraggableMyTasksSection(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = stringResource(R.string.my_tasks),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.surfaceVariant,
+                    ViewSelectorDropdown(
+                        viewNames       = viewNames,
+                        selectedView    = currentView,
+                        onViewSelected  = { currentView = it },
+                        modifier        = Modifier
+                            .fillMaxWidth(0.4f)
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     val onFirstClick = fun(){}

@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.viewboard.dataclass.Project
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.res.stringResource
@@ -49,94 +48,6 @@ import com.example.viewboard.ui.project.CustomSearchField
  * Beispiel-Liste von Projekten für Preview und Tests.
  */
 
-val sampleProjectList = listOf(
-    Project(
-        projectId = "",
-        name = "Fintech App",
-        description = "Mobile Banking & Investing",
-        phase = "#A23",
-        startMonth = 12,
-        endMonth = 1,
-        color = Color(0xFFBEDBFF),
-        totalMilestones = 8,
-        completedMilestones = 5f
-    ),
-    Project(
-        projectId = "",
-        name = "E-Commerce Platform",
-        description = "Online-Marktplatz für Kleinunternehmen",
-        phase = "#B17",
-        startMonth = 2,
-        endMonth = 5,
-        color = Color(0xFF81C784),
-        totalMilestones = 10,
-        completedMilestones = 3f
-    ),
-    Project(
-        projectId = "",
-        name = "Social Media App",
-        description = "Chat, Stories & Feed",
-        phase = "#C09",
-        startMonth = 3,
-        endMonth = 7,
-        color = Color(0xFFFFB74D),
-        totalMilestones = 12,
-        completedMilestones = 7f
-    ),
-    Project(projectId = "",
-        name = "Health Tracker",
-        description = "Fitness & Wellness Monitoring",
-        phase = "#D34",
-        startMonth = 6,
-        endMonth = 9,
-        color = Color(0xFF64B5F6),
-        totalMilestones = 6,
-        completedMilestones = 2.5f
-    ),
-    Project(projectId = "",
-        name = "Fintech App",
-        description = "Mobile Banking & Investing",
-        phase = "#A23",
-        startMonth = 12,
-        endMonth = 1,
-        color = Color(0xFFBEDBFF),
-        totalMilestones = 8,
-        completedMilestones = 5f
-    ),
-    Project(
-        projectId = "",
-        name = "E-Commerce Platform",
-        description = "Online-Marktplatz für Kleinunternehmen",
-        phase = "#B17",
-        startMonth = 2,
-        endMonth = 5,
-        color = Color(0xFF81C784),
-        totalMilestones = 10,
-        completedMilestones = 3f
-    ),
-    Project(projectId = "",
-        name = "Social Media App",
-        description = "Chat, Stories & Feed",
-        phase = "#C09",
-        startMonth = 3,
-        endMonth = 7,
-        color = Color(0xFFFFB74D),
-        totalMilestones = 12,
-        completedMilestones = 7f
-    ),
-    Project(
-        projectId = "Health Tracker",
-        name = "Health Tracker",
-        description = "Fitness & Wellness Monitoring",
-        phase = "#D34",
-        startMonth = 6,
-        endMonth = 9,
-        color = Color(0xFF64B5F6),
-        totalMilestones = 6,
-        completedMilestones = 2.5f
-    )
-)
-
 object AppColors {
     // Deine Basisfarben
     val Orange      = Color(0xFFFFB74D)  // kräftiges Orange
@@ -166,13 +77,7 @@ object AppColors {
         Mint
     )
 }
-private val dummyAvatarUris = listOf(
-    Uri.parse("https://picsum.photos/seed/1/64"),
-    Uri.parse("https://picsum.photos/seed/2/64"),
-    Uri.parse("https://picsum.photos/seed/3/64"),
-    Uri.parse("https://picsum.photos/seed/4/64"),
-    Uri.parse("https://picsum.photos/seed/5/64")
-)
+
 /**
  * Zeigt eine anpassbare Grid-Liste von Projekten.
  *
@@ -185,11 +90,8 @@ private val dummyAvatarUris = listOf(
 fun ProjectsScreen(
     navController: NavController,
     projectName: String,
-    projects: List<ProjectLayout> = emptyList(),
     columns: Int = 2,
-    onAddProject: () -> Unit = {},
     onSort: () -> Unit = {},
-    onFilter: () -> Unit = {}
 ) {
     var showOnlyMyProjects by remember { mutableStateOf(true) }
     val projectLayouts = remember { mutableStateListOf<ProjectLayout>() }
@@ -316,12 +218,6 @@ fun ProjectsScreen(
                     .fillMaxHeight()
                     .fillMaxWidth()
             ) {
-                val p = ProjectLayout(name = "first project", creator = "ich", issues = arrayListOf("SlIsrElzBCUuNoPG3G7K", "OplQrgTrggRIW9yDNQ8a", "f7DmLeYkwfQ7IkA6tze3"))
-                val layoutsToShow = if (projectLayouts.isEmpty()) {
-                    listOf(p)
-                } else {
-                    projectLayouts
-                }
                 itemsIndexed(projectLayouts) {index, project ->
                     ProjectItem(
                         name                = project.name,
@@ -331,8 +227,8 @@ fun ProjectsScreen(
                         color               = AppColors.StrongPalette[index % AppColors.StrongPalette.size],
                         totalMilestones     = project.totalMilestones,
                         completedMilestones = project.completedMilestones,
-                        avatarUris          = dummyAvatarUris,
-                        onClick             = {navController.navigate(Screen.IssueScreen.createRoute(project.name,"project.id "))}
+                        avatarUris          = emptyList(),
+                        onClick             = {navController.navigate(Screen.IssueScreen.createRoute(project.name,project.id))}
                     )
                 }
             }

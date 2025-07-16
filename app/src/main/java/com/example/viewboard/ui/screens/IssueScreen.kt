@@ -1,6 +1,7 @@
 package com.example.viewboard.ui.screens
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,9 +25,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.IssueState
 import com.example.viewboard.components.homeScreen.ProfileHeader
 import com.example.viewboard.ui.issue.IssueItemCard
-import com.example.viewboard.ui.issue.IssueUiItem
 import com.example.viewboard.ui.issue.MainViewModel
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.navigation.Screen
@@ -39,7 +41,7 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
 
     val categories = listOf("New", "Ongoing", "Completed")
     var selectedTab by remember { mutableStateOf(0) }
-
+    Log.d("NavigationArgs", "projectId: $projectId, projectName: $projectName")
     LaunchedEffect(projectId, showOnlyMyIssues) {
         if (showOnlyMyIssues) {
             mainViewModel.loadMyIssues(projectId)
@@ -77,7 +79,8 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                     .offset(y = 40.dp)     // verschiebt den FAB 24dp weiter nach unten
                     .padding(16.dp)
                     .clip(CircleShape), // behält rechts 16dp Abstand,
-                onClick = {navController.navigate(Screen.IssueCreationScreen.route)},
+                onClick = {navController.navigate(Screen.IssueCreationScreen.createRoute(projectId))},
+
 
                 )
         }
@@ -165,14 +168,16 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
             // Tabs als Drop-Ziele
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 categories.forEachIndexed { idx, label ->
-                    DropItem<IssueUiItem>(
+                    DropItem<IssueLayout>(
                         modifier = Modifier
                             .weight(1f)
                             .height(48.dp)
                             .padding(horizontal = 4.dp),
                         onDrop = { item ->
                             // einzig relevante Logik: Kategorie ändern
-                            mainViewModel.moveItemToCategory(item, idx)
+                            val state = stateFromIndex(idx)
+                            mainViewModel.moveItemToState(item,state)
+
                         }
                     ) { isOver, _ ->
                         Box(
@@ -222,7 +227,7 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                     Uri.parse("https://picsum.photos/seed/4/64"),
                     Uri.parse("https://picsum.photos/seed/5/64")
                 )
-               mainViewModel.getItemsForCategory(selectedTab).forEach { item ->
+               mainViewModel.getItemsForCategory(stateFromIndex(selectedTab)).forEach { item ->
                     key(item.id) {      // <-- HIER der wichtigste Schritt
                         DragTarget(
                             dataToDrop = item,
@@ -230,11 +235,10 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                         ) {
                             IssueItemCard(
                                 title = item.title,
-                                priority = item.priority,
-                                status = item.status,
-                                date = item.date,
-                                attachments = item.attachments,
-                                comments = item.comments,
+
+                                state = stateToString(item.state),
+                                date = item.deadlineTS,
+                                attachments = 3,
                                 avatarUris = dummyAvatarUris,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
@@ -248,4 +252,18 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
         }
     }
 }
+
+fun stateFromIndex(idx: Int): IssueState = when (idx) {
+    0    -> IssueState.NEW
+    1    -> IssueState.ONGOING
+    2    -> IssueState.DONE
+    else -> throw IllegalArgumentException("Ungültiger Index für IssueState: $idx")
+}
+
+fun stateToString(state: IssueState): String = when (state) {
+    IssueState.NEW     -> "New"
+    IssueState.ONGOING -> "Ongoing"
+    IssueState.DONE    -> "Done"
+}
+
 
