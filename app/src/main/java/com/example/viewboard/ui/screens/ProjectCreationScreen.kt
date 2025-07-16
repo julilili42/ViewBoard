@@ -2,6 +2,7 @@ package com.example.viewboard.ui.screens
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import com.example.viewboard.R
+import com.example.viewboard.backend.auth.impl.FirebaseProvider
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import java.text.SimpleDateFormat
@@ -131,7 +133,7 @@ fun ProjectCreationScreen(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
             if (!isNameValid && name.isNotBlank()) {
-                Text("Name darf nicht leer sein", color = MaterialTheme.colorScheme.error)
+                Text("Name is not allowed to be empty", color = MaterialTheme.colorScheme.error)
             }
             Spacer(Modifier.height(16.dp))
 
@@ -139,7 +141,7 @@ fun ProjectCreationScreen(
             OutlinedTextField(
                 value = desc,
                 onValueChange = { desc = it },
-                label = { Text("Beschreibung") },
+                label = { Text("Description") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .defaultMinSize(minHeight = 120.dp),
@@ -154,13 +156,13 @@ fun ProjectCreationScreen(
                     "$startDate – $endDate" else "",
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Zeitraum") },
+                label = { Text("Time period") },
                 isError = !isDateRangeValid && (startDate.isNotBlank() || endDate.isNotBlank()),
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     Icon(
                         painter = painterResource(R.drawable.calender_svgrepo_com),
-                        contentDescription = "Pick Zeitraum",
+                        contentDescription = "Pick time period",
                         modifier = Modifier
                             .size(24.dp)
                             .clickable { pickDateRange() },
@@ -169,7 +171,7 @@ fun ProjectCreationScreen(
                 }
             )
             if (!isDateRangeValid && (startDate.isNotBlank() || endDate.isNotBlank())) {
-                Text("Ungültiger Zeitraum", color = MaterialTheme.colorScheme.error)
+                Text("Invalid time period", color = MaterialTheme.colorScheme.error)
             }
             Spacer(Modifier.height(24.dp))
 
@@ -177,7 +179,7 @@ fun ProjectCreationScreen(
             ChipInputField(
                 entries = assignments,
                 newEntry = newParticipant,
-                inhaltText = "Team-Mitglied hinzufügen…",
+                inhaltText = "Add team member..-",
                 onNewEntryChange = { newParticipant = it },
                 onEntryConfirmed = {
                     if (newParticipant.isNotBlank()) {
@@ -191,7 +193,7 @@ fun ProjectCreationScreen(
             Spacer(Modifier.height(24.dp))
 
             // Meilensteine
-            Text("Meilensteine", style = MaterialTheme.typography.labelLarge, color = uiColor)
+            Text("Milestone", style = MaterialTheme.typography.labelLarge, color = uiColor)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
@@ -207,7 +209,7 @@ fun ProjectCreationScreen(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.minus_svgrepo_com),
-                        contentDescription = "Weniger",
+                        contentDescription = "Less",
                         tint = uiColor
                     )
                 }
@@ -226,13 +228,13 @@ fun ProjectCreationScreen(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.plus_large_svgrepo_com),
-                        contentDescription = "Mehr",
+                        contentDescription = "More",
                         tint = uiColor
                     )
                 }
             }
             if (!isTotalMilestonesValid) {
-                Text("Mindestens ein Meilenstein erforderlich", color = MaterialTheme.colorScheme.error)
+                Text("At least one milestone necessary", color = MaterialTheme.colorScheme.error)
             }
             Spacer(Modifier.height(32.dp))
 
@@ -262,12 +264,12 @@ fun ProjectCreationScreen(
                         users = ArrayList(assignments),
                     )
 
-                    // 3) Speichern in Firestore
-                    FirebaseAPI.addProject(p)
-
-                    // 4) zurück zur Übersicht
-                    navController.popBackStack()
-                    onCreate()
+                    val user = FirebaseProvider.auth.currentUser
+                    if (user != null) {
+                        FirebaseAPI.addProject(p)
+                        navController.popBackStack()
+                        onCreate()
+                    }
                 },
                 enabled = allValid,
                 modifier = Modifier
