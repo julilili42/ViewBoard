@@ -191,12 +191,9 @@ object AuthAPI : AuthServerAPI() {
             .signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    navController.navigate(Screen.HomeScreen.route)
                     Toast.makeText(context, "Welcome!", Toast.LENGTH_SHORT).show()
-
-                    fetchAndSaveFcmToken {
-                        navController.navigate(Screen.HomeScreen.route)
-                    }
-
+                    fetchAndSaveFcmToken()
                 } else {
                     Toast.makeText(
                         context,

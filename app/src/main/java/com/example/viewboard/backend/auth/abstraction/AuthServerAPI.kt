@@ -161,7 +161,7 @@ abstract class AuthServerAPI {
      */
     public abstract fun updateFCMToken(
         token: String,
-        onComplete: (() -> Unit)? = null
+        onComplete: (() -> Unit)? = {}
     )
 
     /**
@@ -169,5 +169,5 @@ abstract class AuthServerAPI {
      *
      * @param onComplete optional callback when the token is fetched and saved
      */
-    public abstract fun fetchAndSaveFcmToken(onComplete: (() -> Unit)? = null)
+    public abstract fun fetchAndSaveFcmToken(onComplete: (() -> Unit)? = {})
 }
