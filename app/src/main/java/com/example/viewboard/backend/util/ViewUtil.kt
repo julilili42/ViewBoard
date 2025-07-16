@@ -2,6 +2,7 @@ package com.example.viewboard.backend.util
 
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.ViewLayout
+import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -37,11 +38,34 @@ fun filterViewsByProjects(views: Flow<List<ViewLayout>>, projs: Flow<List<Projec
  *
  * @return the views that have been filtered
  */
-fun filterViewsByProjects(views: Flow<List<ViewLayout>>, projs: Set<ProjectLayout>) : Flow<List<ViewLayout>> {
-    val possibleViewIds: Set<String> = projs.flatMap { it.views }.toSet()
+//fun filterViewsByProjects(views: Flow<List<ViewLayout>>, projs: Set<ProjectLayout>) : Flow<List<ViewLayout>> {
+//    val possibleViewIds: Set<String> = projs.flatMap { it.views }.toSet()
+//
+//    return views.map { view ->
+//        view.filter { it.id in possibleViewIds }
+//    }
+//}
 
-    return views.map { view ->
-        view.filter { it.id in possibleViewIds }
+/**
+ * Get all views from projects
+ *
+ * @param views the views to be filtered
+ * @param projs the projects
+ *
+ * @return the views that have been filtered
+ */
+fun filterViewsByProjects(views: Flow<List<ViewLayout>>, projs: Set<String>) : Flow<List<ViewLayout>> {
+    val projList = FirebaseAPI.getAllProjects().map { proj ->
+        proj.filter { it.id in projs }
+    }
+
+    val possibleViewIds = projList.map { proj ->
+        proj.flatMap { it.views }
+    }
+
+    return views.combine(possibleViewIds) { viewList, idList ->
+        viewList.filter { it.id in idList }
+            .ifEmpty { emptyList() }
     }
 }
 

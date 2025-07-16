@@ -8,6 +8,6 @@ data class LabelLayout (
     var id: String = "",
     var name: String = "",
     var creator: String = "",
-    var refCounter: Int = 0,
+    var refCounter: Int = 0, // TODO not used
     var creationTS: String = Timestamp().export()
 )

@@ -276,7 +276,7 @@ fun TimetableScreen(navController: NavHostController) {
                 if (showProjects) {
                     VerticalTimelineSchedule(
                         projects = projects,
-                        phases   = listOf("#A13", "#B13","#D13","#G13","#F13","#M13","#N13"),
+//                        phases   = listOf("#A13", "#B13","#D13","#G13","#F13","#M13","#N13"),
                         modifier = Modifier.fillMaxSize()
                     )
                 } else {
