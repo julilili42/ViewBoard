@@ -16,6 +16,9 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +31,11 @@ import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
 import coil.compose.AsyncImage
+import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.components.homeScreen.IssueProgress
+import com.example.viewboard.components.homeScreen.IssueProgressCalculator
+import com.example.viewboard.components.homeScreen.TimeSpanFilter
+
 /**
  * Ein Project-Item mit Gradient-Hintergrund, Pill-Phase, Titel, Zeitraum,
  * Fortschrittsbalken und unten links überlappenden Avataren.
@@ -42,26 +50,30 @@ import coil.compose.AsyncImage
  * @param avatarUris          Liste von URIs zu lokalen Profilbildern
  * @param onClick             Callback bei Klick auf die gesamte Card
  */
+
 @Composable
 fun ProjectItem(
-    name: String,
-    phase: String,
-    startMonth: Int,
-    endMonth: Int,
+    project: ProjectLayout,
     color: Color,
-    totalMilestones: Int,
-    completedMilestones: Float,
+    calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },
     avatarUris: List<Uri>,
     onClick: () -> Unit
 ) {
-    // Progress als Float berechnen (sonst Integer-Division)
-    val progress = (completedMilestones.toFloat() / totalMilestones.toFloat())
-        .coerceIn(0f, 1f)
+    val progress by produceState<IssueProgress>(
+        initialValue = IssueProgress(0,0,0f),
+        key1 = project.id,
+        key2 = TimeSpanFilter.ALL_TIME
+    ) {
+        calculator
+            .getProjectProgressFlow(project.id, TimeSpanFilter.ALL_TIME)
+            .collect { value = it }
+    }
+
 
 // Calendar.MONTH liefert 0–11, Month.of erwartet 1–12
-    val startLabel = Month.of(startMonth + 1)
+    val startLabel = Month.of(project.startMonth + 1)
         .getDisplayName(TextStyle.SHORT, Locale.getDefault())
-    val endLabel   = Month.of(endMonth   + 1)
+    val endLabel   = Month.of(project.endMonth   + 1)
         .getDisplayName(TextStyle.SHORT, Locale.getDefault())
 
 // Avatare: maximal 3 anzeigen
@@ -96,7 +108,7 @@ fun ProjectItem(
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = phase,
+                            text = project.phase,
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                             color = Color.White
                         )
@@ -111,7 +123,7 @@ fun ProjectItem(
 
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    text = name,
+                    text = project.name,
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     color = Color.White
                 )
@@ -161,7 +173,7 @@ fun ProjectItem(
                     }
                     Spacer(Modifier.weight(1f))
                     LinearProgressIndicator(
-                        progress = progress,
+                        progress =progress.completedIssues.toFloat()/ progress.totalIssues.toFloat(),
                         modifier = Modifier
                             .width(80.dp)
                             .height(8.dp),

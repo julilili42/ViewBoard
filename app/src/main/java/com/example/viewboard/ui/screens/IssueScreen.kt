@@ -49,8 +49,14 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
             mainViewModel.loadAllIssues(projectId)
         }
     }
-
-
+    var query by remember { mutableStateOf("") }
+    // 1) Hol dir alle Issues für den aktiven Tab
+    val baseList = mainViewModel.getItemsForCategory(stateFromIndex(selectedTab))
+    // 2) Filtere nach Such‑Query
+    val displayed = remember(baseList, query) {
+        if (query.isBlank()) baseList
+        else baseList.filter { it.title.contains(query, ignoreCase = true) }
+    }
 
 
     Scaffold(
@@ -105,7 +111,6 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                var query by remember { mutableStateOf("") }
                 val items = listOf("Apple", "Banana", "Cherry").filter {
                     it.contains(query, ignoreCase = true)
                 }
@@ -115,21 +120,6 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                     modifier = Modifier
                         .height(40.dp)
                         .width(200.dp),
-                    suggestionContent = { q ->
-                        Column {
-                            items.forEach { item ->
-                                Text(
-                                    text = item,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            query = item
-                                        }
-                                        .padding(12.dp)
-                                )
-                            }
-                        }
-                    }
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -227,7 +217,7 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                     Uri.parse("https://picsum.photos/seed/4/64"),
                     Uri.parse("https://picsum.photos/seed/5/64")
                 )
-               mainViewModel.getItemsForCategory(stateFromIndex(selectedTab)).forEach { item ->
+                displayed.forEach { item ->
                     key(item.id) {      // <-- HIER der wichtigste Schritt
                         DragTarget(
                             dataToDrop = item,

@@ -43,6 +43,7 @@ import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.project.CustomSearchField
+import kotlinx.coroutines.flow.map
 
 /**
  * Beispiel-Liste von Projekten für Preview und Tests.
@@ -93,14 +94,34 @@ fun ProjectsScreen(
     columns: Int = 2,
     onSort: () -> Unit = {},
 ) {
-    var showOnlyMyProjects by remember { mutableStateOf(true) }
+
     val projectLayouts = remember { mutableStateListOf<ProjectLayout>() }
     var error by remember { mutableStateOf<String?>(null) }
-    // startet automatisch beim ersten Composable-Aufruf
-    LaunchedEffect(showOnlyMyProjects) {
+
+    // 1) Lege den Modus anhand von projectName fest
+    val filterMode = when (projectName.lowercase()) {
+        "created" -> ProjectFilter.CREATED
+        "shared"  -> ProjectFilter.SHARED
+        "all"     -> ProjectFilter.ALL
+        else      -> ProjectFilter.CREATED
+    }
+
+    // 2) Lade jedes Mal neu, wenn sich projectName (bzw. filterMode) ändert
+    LaunchedEffect(filterMode) {
         try {
-            val flow = if (showOnlyMyProjects) FirebaseAPI.getProjectsFromUser(AuthAPI.getUid())
-            else FirebaseAPI.getAllProjects()
+            // 3) Baue die richtige Flow‑Quelle
+            val flow = when (filterMode) {
+                ProjectFilter.CREATED ->
+                    FirebaseAPI.getProjectsFromUser(AuthAPI.getUid())
+                ProjectFilter.SHARED ->
+                    FirebaseAPI.getAllProjects().map { list ->
+                        list.filterNot { it.creator == AuthAPI.getUid() }
+                    }
+                ProjectFilter.ALL ->
+                    FirebaseAPI.getAllProjects()
+            }
+
+            // 4) Sammle und fülle deine Liste
             flow.collect { layouts ->
                 projectLayouts.clear()
                 projectLayouts.addAll(layouts)
@@ -108,6 +129,12 @@ fun ProjectsScreen(
         } catch (e: Exception) {
             error = "Ladefehler: ${e.localizedMessage}"
         }
+    }
+    var query by remember { mutableStateOf("") }
+    // 2) Filtere nach Such‑Query
+    val displayed = remember(projectLayouts, query) {
+        if (query.isBlank()) projectLayouts
+        else projectLayouts.filter { it.name.contains(query, ignoreCase = true) }
     }
 
     Scaffold(
@@ -160,7 +187,6 @@ fun ProjectsScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                var query by remember { mutableStateOf("") }
                 val items = listOf("Apple", "Banana", "Cherry").filter {
                     it.contains(query, ignoreCase = true)    }
                     CustomSearchField(
@@ -200,11 +226,11 @@ fun ProjectsScreen(
                     CustomIcon(
                         iconRes = R.drawable.filter_svgrepo_com__1,
                         contentDesc = stringResource(R.string.filter_svgrepo_com__1),
-                        backgroundColor = if (showOnlyMyProjects) Color.Green else Color.Gray,
+                        backgroundColor= Color.Gray,
                         iconTint = Color.White,
                         width = 40.dp,
                         height = 40.dp,
-                        onClick = { showOnlyMyProjects = !showOnlyMyProjects },
+                        onClick = { },
                         modifier = Modifier
                     )
                 }
@@ -218,15 +244,10 @@ fun ProjectsScreen(
                     .fillMaxHeight()
                     .fillMaxWidth()
             ) {
-                itemsIndexed(projectLayouts) {index, project ->
+                itemsIndexed(displayed) {index, project ->
                     ProjectItem(
-                        name                = project.name,
-                        phase               = project.phase,
-                        startMonth          = project.startMonth,
-                        endMonth            = project.endMonth,
+                        project = project,
                         color               = AppColors.StrongPalette[index % AppColors.StrongPalette.size],
-                        totalMilestones     = project.totalMilestones,
-                        completedMilestones = project.completedMilestones,
                         avatarUris          = emptyList(),
                         onClick             = {navController.navigate(Screen.IssueScreen.createRoute(project.name,project.id))}
                     )
@@ -235,3 +256,5 @@ fun ProjectsScreen(
         }
     }
 }
+
+enum class ProjectFilter { CREATED, SHARED, ALL }

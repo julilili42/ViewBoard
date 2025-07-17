@@ -68,10 +68,11 @@ fun Navigation(modifier: Modifier = Modifier) {
                     MainLayout(navController, currentRoute) { padding ->
                         Box(modifier = Modifier
                             .fillMaxWidth()
-                            .padding(padding) // ✅ korrekt
+                            .padding(padding)
                         ) {
                             HomeScreen(
                                 navController = navController,
+                                viewModel = mainViewModel ,
                                 modifier = Modifier
                             )
                         }
@@ -82,7 +83,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                     MainLayout(navController, currentRoute) { padding ->
                         Box(modifier = Modifier
                             .fillMaxWidth()
-                            .padding(padding) // ✅ korrekt
+                            .padding(padding)
                         ) {
                             TimetableScreen(navController = navController)
                         }
@@ -92,7 +93,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                     MainLayout(navController, currentRoute) { padding ->
                         Box(modifier = Modifier
                             .fillMaxWidth()
-                            .padding(padding) // ✅ korrekt
+                            .padding(padding)
                         ) {
                             ViewScreen(navController = navController)
                         }
@@ -102,7 +103,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                     MainLayout(navController, currentRoute) { padding ->
                         Box(modifier = Modifier
                             .fillMaxWidth()
-                            .padding(padding) // ✅ korrekt
+                            .padding(padding)
                         ) {
                             ProfileScreen(navController = navController)
                         }
@@ -114,12 +115,12 @@ fun Navigation(modifier: Modifier = Modifier) {
                 MainLayout(navController, currentRoute) { padding ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
-                        .padding(padding) // ✅ korrekt
+                        .padding(padding)
                     ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(padding) // ✅ korrekt
+                            .padding(padding)
                     ) {
                         ProfileScreen(navController = navController)
                     }
@@ -136,7 +137,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                 MainLayout(navController, currentRoute) { padding ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
-                        .padding(padding) // ✅ korrekt
+                        .padding(padding)
                     ) {
                         ProjectsScreen(navController = navController, projectName = projectName)
                     }
@@ -146,7 +147,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                 MainLayout(navController, currentRoute) { padding ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
-                        .padding(padding) // ✅ korrekt
+                        .padding(padding)
                     ) {
                         HelpSupportScreen(navController = navController)
                     }
@@ -258,7 +259,6 @@ fun Navigation(modifier: Modifier = Modifier) {
                             ViewIssueScreen(
                                 mainViewModel = mainViewModel,
                                 navController = navController,
-                                viewName = viewName,
                                 viewID = viewID,
                                 projID = projID
                             )

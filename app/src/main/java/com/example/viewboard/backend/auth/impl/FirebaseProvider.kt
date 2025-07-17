@@ -5,7 +5,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.messaging.FirebaseMessaging
 
-object FirebaseProvider {
+object
+FirebaseProvider {
     val auth by lazy { FirebaseAuth.getInstance() }
     val firestore by lazy { Firebase.firestore }
     fun messaging() = FirebaseMessaging.getInstance()

@@ -292,7 +292,7 @@ fun IssueCreationScreen(
                             assignments = ArrayList(assignments),
 //                            labels      = labelObjects,
                            // labels      = ArrayList(labels),
-                            //deadlineTS  = deadline.export()
+                            deadlineTS  = deadline.export()
                         )
 
 
@@ -300,8 +300,6 @@ fun IssueCreationScreen(
                             try {
                                 val cleanId = projectId.trim('{', '}')
                                 FirebaseAPI.addIssue(projID = cleanId , issueLayout = newIssue)
-                                Log.d("Upload", "Upload: =$projectId und $currentUserId")
-                                Log.d("Upload", "projectId raw='[$projectId]' length=${projectId.length}")
                                 // addIssue(projID = projectId, issueLayout = newIssue)
                                 navController.popBackStack()
                             } catch (e: Exception) {

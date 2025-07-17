@@ -1,5 +1,8 @@
 package com.example.viewboard.components.homeScreen
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -39,12 +42,21 @@ private enum class Period(val label: String, val short: String) {
 fun ProgressCard(
     progress: Float,
     modifier: Modifier = Modifier,
-    title: String
+    title: TimeSpanFilter,
+    onClick: () -> Unit = {}
 ) {
-    var period by remember { mutableStateOf(Period.WEEKLY) }
+    var period by remember { mutableStateOf(title) }
     val title = "${period.label} Targets"
-    val percent = (progress.coerceIn(0f,1f) * 100f).roundToInt()
-
+    val percent = progress.roundToInt()
+    val targetFraction = (progress.coerceIn(0f, 100f)) / 100f
+    // 2) Animate den Float-Wert, wenn sich targetFraction ändert
+    val animatedProgress by animateFloatAsState(
+        targetValue = targetFraction,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = FastOutSlowInEasing
+        )
+    )
     Card(
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -61,7 +73,9 @@ fun ProgressCard(
                         .size(24.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary)
-                        .clickable { period = period.next() },
+                        .clickable {onClick()
+                            period = period.next()
+                             },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -79,7 +93,7 @@ fun ProgressCard(
             }
             Spacer(modifier = Modifier.height(12.dp))
             LinearProgressIndicator(
-                progress = progress.coerceIn(0f, 1f),
+                progress = animatedProgress,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp),

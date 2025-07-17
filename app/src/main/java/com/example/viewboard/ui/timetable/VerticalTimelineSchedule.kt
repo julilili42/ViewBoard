@@ -30,6 +30,9 @@ import com.example.viewboard.dataclass.Project
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.TextUnit
@@ -41,25 +44,32 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
 import colorFromCode
+import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.components.homeScreen.IssueProgress
+import com.example.viewboard.components.homeScreen.IssueProgressCalculator
+import com.example.viewboard.components.homeScreen.TimeSpanFilter
 import generateProjectCode
 import java.time.LocalDate
+import java.time.Year
+import java.time.YearMonth
+import kotlin.random.Random
 
 @Composable
 fun VerticalTimelineSchedule(
-    projects: List<Project>,
+    projects: List<ProjectLayout>,
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val primaryColor = MaterialTheme.colorScheme.primary
         val totalPx          = constraints.maxHeight.toFloat()
-        val monthPx          = totalPx / 12f
+        val monthPx          = totalPx / 365f
         val scrollState      = rememberScrollState()
         val density          = LocalDensity.current
 
         // Heute-Linie berechnen
         val today     = LocalDate.now()
         val monthFrac = (today.dayOfMonth - 1) / today.lengthOfMonth().toFloat()
-        val todayPx   = ((today.monthValue - 1) + monthFrac) * monthPx
+        val todayPx   = ((today.monthValue - 1)*30 + monthFrac) * monthPx
         val todayDp   = with(density) { todayPx.toDp() }
         Box(modifier = Modifier.fillMaxSize()) {
             Row(modifier = Modifier.fillMaxSize()) {
@@ -76,7 +86,7 @@ fun VerticalTimelineSchedule(
                     ).forEach { m ->
                         Box(
                             modifier = Modifier
-                                .height(monthPx.toDp())
+                                .height(monthPx.toDp()*30)
                                 .fillMaxWidth()
                                 .drawBehind {
                                     val stroke = 2.dp.toPx()
@@ -124,8 +134,8 @@ fun VerticalTimelineSchedule(
                     ) {
                         projects.forEach { project ->
                             // Berechne hier pro Projekt direkt deine Offsets
-                            val startDp  = ((project.startMonth - 1) * monthPx).toDp()
-                            val heightDp = ((project.endMonth - project.startMonth + 1) * monthPx).toDp()
+                            val startDp  = (randomAccumulatedDays(project.startMonth - 1) * monthPx).toDp()
+                            val heightDp = (randomAccumulatedDays(project.endMonth - project.startMonth + 1) * monthPx).toDp()
 
                             val projectNameCode = generateProjectCode(project.name)
                             val projectNamecolor = colorFromCode(projectNameCode)
@@ -160,7 +170,7 @@ fun VerticalTimelineSchedule(
                                         .height(heightDp)
                                         .width(8.dp)
                                         .clip(RoundedCornerShape(4.dp))
-                                        .background(project.color.copy(alpha = 0.1f)),
+                                        .background(projectNamecolor.copy(alpha = 0.1f)),
                                     contentAlignment = Alignment.BottomCenter
                                 ) {
                                     val primaryGradient = listOf(
@@ -168,9 +178,10 @@ fun VerticalTimelineSchedule(
                                         MaterialTheme.colorScheme.primary
                                     )
                                     VerticalMilestoneBar(
-                                        total     = project.totalMilestones,
-                                        completed = project.completedMilestones,
+                                        project = project,
+                                        total     = 4,
                                         colors    = primaryGradient,
+                                        timeSpan = TimeSpanFilter.ALL_TIME,
                                         modifier  = Modifier
                                             .fillMaxSize()
                                             .padding(vertical = 1.dp),
@@ -214,8 +225,10 @@ fun VerticalTimelineSchedule(
 // VerticalMilestoneBar bleibt unverändert
 @Composable
 fun VerticalMilestoneBar(
-    total: Int,
-    completed: Float,
+    project: ProjectLayout,
+    timeSpan: TimeSpanFilter,
+    total: Int=4,
+    calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },
     colors: List<Color>,
     modifier: Modifier = Modifier,
     width: Dp = 8.dp,
@@ -223,12 +236,22 @@ fun VerticalMilestoneBar(
     corner: Dp = 4.dp
 ) {
     val brush = gradientColorList(colors.first(), colors.last(), total)
+    val progress by produceState<IssueProgress>(
+        initialValue = IssueProgress(0,0,0f),
+        key1 = project.id,
+        key2 = timeSpan
+    ) {
+        calculator
+            .getProjectProgressFlow(project.id, timeSpan)
+            .collect { value = it }
+    }
+
     Column(
         modifier = modifier.width(width),
         verticalArrangement = Arrangement.spacedBy(spacing)
     ) {
         repeat(total) { idx ->
-            val fillFrac = ((completed - idx).coerceIn(0f,1f))
+            val fillFrac = (progress.completedIssues.toFloat() - idx).coerceIn(0f,1f)
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -313,4 +336,22 @@ fun gradientColorList(
         val fraction = i / steps.toFloat()      // 0f .. 1f
         lerp(startColor, endColor, fraction)
     }
+}
+
+fun randomAccumulatedDays(month: Int): Int {
+    // Aktuelles Jahr
+    val year = Year.now().value
+
+    // Clamp month auf 1..12
+    val m = month.coerceIn(1, 12)
+
+    // 1) Summe der Tage von Monat 1 bis m
+    val daysSum = (1..m).sumOf { mo ->
+        YearMonth.of(year, mo).lengthOfMonth()
+    }
+
+    // 2) Zufallszugabe 0..31
+    val randomExtra = Random.nextInt(from = 0, until = 32)
+
+    return daysSum + randomExtra
 }

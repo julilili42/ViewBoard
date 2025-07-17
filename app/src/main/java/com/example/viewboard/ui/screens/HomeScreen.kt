@@ -1,5 +1,6 @@
 package com.example.viewboard.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -29,7 +30,9 @@ import com.example.viewboard.components.homeScreen.ProjectGrid
 import com.example.viewboard.ui.navigation.Screen
 import java.time.LocalDateTime
 import com.example.viewboard.components.homeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.TimeSpanFilter
 import com.example.viewboard.components.homeScreen.ViewSelectorDropdown
+import com.example.viewboard.ui.issue.MainViewModel
 import com.example.viewboard.ui.navigation.BottomBarScreen
 
 val tasks: List<Pair<String, LocalDateTime>> = listOf(
@@ -46,12 +49,16 @@ fun HomeScreen(
     navController: NavController,
     activeProjects: List<String> = listOf("Created", "Shared", "Archived", "All"),
     myTasks: List<Pair<String, LocalDateTime>> = tasks,
+    viewModel: MainViewModel,
     modifier: Modifier,
     onSortTasks: () -> Unit = {}
 ) {
     var columnHeightPx    by remember { mutableStateOf(0) }
     var screenHeightPx by remember { mutableStateOf(0) }
     val density = LocalDensity.current
+    val span by viewModel.timeSpan.collectAsState(
+        initial = TimeSpanFilter.CURRENT_MONTH
+    )
     val topBlockHeightPx = with(density) { 400.dp.toPx() }
     Scaffold(
         topBar = {
@@ -98,11 +105,15 @@ fun HomeScreen(
                 Spacer(Modifier.height(24.dp))
                 val completedTasks = 5
                 val totalTasks = myTasks.size.coerceAtLeast(1)
-                ProgressCard(
-                    title = "Weekly Targets",
-                    progress = completedTasks / totalTasks.toFloat()
-                )
+                val progress by viewModel.progress.collectAsState()
+                val percentCompleted = progress.percentComplete
 
+                Log.d("IssueProgress", "Progress: total=${progress.totalIssues}, done=${progress.completedIssues}, percent=${progress.percentComplete},span=${span}")
+                ProgressCard(
+                    title = span,
+                    progress = percentCompleted,
+                    onClick={viewModel.advanceTimeSpan()}
+                )
             }
             DraggableMyTasksSection(
                 navController = navController,
@@ -225,4 +236,11 @@ fun DraggableMyTasksSection(
             )
         }
     }
+}
+
+fun TimeSpanFilter.next(): TimeSpanFilter = when (this) {
+    TimeSpanFilter.CURRENT_YEAR  -> TimeSpanFilter.CURRENT_MONTH
+    TimeSpanFilter.CURRENT_MONTH -> TimeSpanFilter.CURRENT_WEEK
+    TimeSpanFilter.CURRENT_WEEK  -> TimeSpanFilter.CURRENT_YEAR
+    TimeSpanFilter.ALL_TIME -> TimeSpanFilter.ALL_TIME
 }

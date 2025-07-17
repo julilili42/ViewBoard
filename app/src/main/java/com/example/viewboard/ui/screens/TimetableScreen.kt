@@ -84,64 +84,6 @@ fun TimetableScreen(navController: NavHostController) {
     var month by remember { mutableStateOf(today.monthValue) } // 1..12
     var selectedDate by remember { mutableStateOf<LocalDate?>(today) }
     // Beispieldaten
-    val dummyIssues = listOf(
-        IssueUiItem(
-            title = "UI Bug in Kalender",
-            priority = "Hoch",
-            status = "Offen",
-            date = "2025-07-01",
-            attachments = 2,
-            comments = 3,
-            assignees = listOf("RA", "EM"),
-            backgroundColor = Color(0xFFEF5350) // Rot
-        ),
-        IssueUiItem(
-            title = "Backend-Timeout",
-            priority = "Mittel",
-            status = "In Arbeit",
-            date = "2025-07-01",
-            attachments = 1,
-            comments = 5,
-            assignees = listOf("JS"),
-            backgroundColor = Color(0xFFFFA726) // Orange
-        ),
-        IssueUiItem(
-            title = "Onboarding-Flow testen",
-            priority = "Niedrig",
-            status = "Geschlossen",
-            date = "2025-07-03",
-            attachments = 0,
-            comments = 1,
-            assignees = listOf("AL"),
-            backgroundColor = Color(0xFF66BB6A) // Grün
-        ),
-        IssueUiItem(
-            title = "Design Review",
-            priority = "Mittel",
-            status = "Offen",
-            date = "2025-07-04",
-            attachments = 3,
-            comments = 2,
-            assignees = listOf("LD", "EM"),
-            backgroundColor = Color(0xFF42A5F5) // Blau
-        ),IssueUiItem(
-            title = "Design Review",
-            priority = "Mittel",
-            status = "Offen",
-            date = "2025-07-04",
-            attachments = 3,
-            comments = 2,
-            assignees = listOf("LD", "EM"),
-            backgroundColor = Color(0xFF42A5F5) // Blau
-        )
-
-    )
-
-    val issues = listOf(
-        Project("Wdeadwadwaw","Issue 1", "Fix crash", "Backlog", 2, 2, Color(0xFFFF5722),4,1.53f),
-        Project("Wdeadwadwaw","Issue 2", "Add tests", "Backlog", 3, 4, Color(0xFFFFC107),5,4.53f)
-    )
-
     Scaffold(
         topBar = {
 
@@ -255,17 +197,6 @@ fun TimetableScreen(navController: NavHostController) {
                 }
             }
 
-            val projects = listOf(
-                    Project("dfsa","A", "Desc A", "#A13", 1, 3, Color(0xFF00BCD4),5,2.53f),
-                    Project("dfsa","B", "Desc B", "#B13", 4, 6, Color(0xFF8BC34A),4,1.53f),
-                    Project("dfsa","C", "Desc C", "#D13", 3, 9, Color(0xFF8BC34A),4,3.53f),
-                    Project("dfsa","D", "Desc D", "#G13", 2, 5, Color(0xFF8BC34A),4,1.53f),
-                    Project("dfsa","E", "Desc E", "#F13", 2, 5, Color(0xFF8BC34A),4,3.53f),
-                    Project("dfsa","F", "Desc F", "#M13", 4, 5, Color(0xFF8BC34A),4,1.53f),
-                    Project("dfsa","G", "Desc G", "#N13", 8, 12, Color(0xFF8BC34A),4,1.53f),
-                )
-
-            // Content-Bereich: weißen Hintergrund bereits gesetzt
             Box(
                 modifier = Modifier
                     //.weight(1f)
@@ -275,8 +206,7 @@ fun TimetableScreen(navController: NavHostController) {
             ) {
                 if (showProjects) {
                     VerticalTimelineSchedule(
-                        projects = projects,
-                        phases   = listOf("#A13", "#B13","#D13","#G13","#F13","#M13","#N13"),
+                        projects = projectLayouts,
                         modifier = Modifier.fillMaxSize()
                     )
                 } else {
