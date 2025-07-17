@@ -38,6 +38,8 @@ fun CustomIcon(
             .clip(RoundedCornerShape(cornerRadius))
             .background(backgroundColor)
             .clickable(onClick = onClick)
+            .width(width)
+            .height(height)
     ) {
         // Icon auf 60% der kleineren Dimension skalieren
         val iconSize = min(width, height) * 0.6f
