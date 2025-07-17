@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
 import androidx.compose.runtime.key
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.viewboard.R
@@ -37,10 +38,10 @@ import com.example.viewboard.ui.timetable.CustomIcon
 
 @Composable
 fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,projectName:String,projectId : String, modifier: Modifier = Modifier)  {
-    var showOnlyMyIssues by remember { mutableStateOf(true) }
+    var showOnlyMyIssues by rememberSaveable { mutableStateOf(true) }
 
     val categories = listOf("New", "Ongoing", "Completed")
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by rememberSaveable { mutableStateOf(0) }
     Log.d("NavigationArgs", "projectId: $projectId, projectName: $projectName")
     LaunchedEffect(projectId, showOnlyMyIssues) {
         if (showOnlyMyIssues) {
