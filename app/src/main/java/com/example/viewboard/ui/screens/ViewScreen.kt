@@ -205,11 +205,11 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
                     ExposedDropdownMenuBox(
                         expanded = showDropdownMenu,
                         onExpandedChange = { showDropdownMenu = it },
-
+                        modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
                     ) {
                         OutlinedTextField(
                             value = "Select Projects",
@@ -218,6 +218,7 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDropdownMenu) },
                             modifier = Modifier
                                 .menuAnchor()
+                                .fillMaxWidth()
                         )
 
                         ExposedDropdownMenu(
@@ -256,15 +257,15 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
                         contentDesc = stringResource(R.string.filter_svgrepo_com__1),
                         backgroundColor = if (showOnlyMyViews) Color.Green else Color.Gray,
                         iconTint = Color.White,
-                        width = 40.dp,
-                        height = 40.dp,
+                        width = 70.dp,
+                        height = 70.dp,
                         onClick = {
                             showOnlyMyViews = !showOnlyMyViews
                             doUpdate = !doUpdate
                         },
                         modifier = Modifier
                     )
-                }
+
             }
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),

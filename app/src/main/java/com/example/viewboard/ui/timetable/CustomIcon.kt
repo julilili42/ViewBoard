@@ -35,8 +35,6 @@ fun CustomIcon(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .width(width)
-            .height(height)
             .clip(RoundedCornerShape(cornerRadius))
             .background(backgroundColor)
             .clickable(onClick = onClick)

@@ -22,17 +22,6 @@ class MainActivity : ComponentActivity() {
         NotificationHelper.createNotificationChannel(this)
 
         lifecycleScope.launch {
-            AuthAPI.getListOfAllUsers().onSuccess { users ->
-                // Hier hast du deine Liste
-                users.forEach { user ->
-                    Log.d("USERS", "${user.uid}: ${user.name} (${user.email})")
-                }
-            }.onFailure { e ->
-                Log.e("USERS", "Fehler: ${e.message}")
-            }
-        }
-
-        lifecycleScope.launch {
             NotificationHelper.checkUpcomingDeadlines(this@MainActivity)
             NotificationHelper.checkNewIssueAssignments(this@MainActivity)
             NotificationHelper.checkNewProjectAssignments(this@MainActivity)
