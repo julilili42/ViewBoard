@@ -39,6 +39,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.example.viewboard.components.SectionCard
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
+import androidx.compose.ui.platform.LocalContext
+
 
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
@@ -46,6 +54,15 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     val userName = AuthAPI.getCurrentDisplayName() ?: "failed to load username"
     val uid = FirebaseProvider.auth.currentUser?.uid
     var notificationsEnabled by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            // Nur Logging oder UI Feedback, falls du willst
+        }
+    )
+
 
     LaunchedEffect(Unit) {
         uid?.let {
@@ -125,6 +142,18 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                 enabled = notificationsEnabled,
                 onEnabledChange = { newValue ->
                     notificationsEnabled = newValue
+
+                    if (newValue && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val permissionGranted = ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
+
+                        if (!permissionGranted) {
+                            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                    }
+
                     uid?.let {
                         Firebase.firestore.collection("users")
                             .document(it)
