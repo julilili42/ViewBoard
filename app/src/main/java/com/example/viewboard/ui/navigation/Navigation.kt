@@ -239,12 +239,10 @@ fun Navigation(modifier: Modifier = Modifier) {
             composable(
                 route = Screen.ViewIssueScreen.route,
                 arguments = listOf(
-                    navArgument("viewName") { type = NavType.StringType },
                     navArgument("viewID")   { type = NavType.StringType },
                     navArgument("projID")   { type = NavType.StringType }
                 )
             ) { backStack ->
-                val viewName = backStack.arguments!!.getString("viewName")!!
                 val viewID   = backStack.arguments!!.getString("viewID")!!
                 val projID   = backStack.arguments!!.getString("projID")!!
                 MainLayout(navController, currentRoute) { padding ->

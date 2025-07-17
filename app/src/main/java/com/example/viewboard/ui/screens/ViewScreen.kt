@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import com.example.viewboard.backend.auth.impl.AuthAPI
@@ -50,26 +51,25 @@ import com.example.viewboard.backend.util.filterViewsByProjects
 import com.example.viewboard.backend.util.getProjectByView
 import com.example.viewboard.components.view.ViewItem
 import com.example.viewboard.ui.navigation.Screen
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlin.collections.toSet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
-    var updated by remember { mutableStateOf(false) }
-    var showOnlyMyViews by remember { mutableStateOf(true) }
+    var doUpdate by remember { mutableStateOf(true) }
+    var showOnlyMyViews by rememberSaveable { mutableStateOf(true) }
     var showDropdownMenu by remember { mutableStateOf(false) }
     val viewLayouts = remember { mutableStateListOf<ViewLayout>() }
     val allProjLayouts = remember { mutableStateListOf<ProjectLayout>() }
-    val selectedProjLayouts = remember { mutableStateOf(setOf<ProjectLayout>()) }
+    val selectedProjLayouts = rememberSaveable { mutableStateOf(setOf<String>()) }
     val creators = remember { mutableStateListOf<String>() }
     var error by remember { mutableStateOf<String?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect (showOnlyMyViews, showDropdownMenu, updated) {
-        updated = false
+    LaunchedEffect (doUpdate) {
+        doUpdate = false
+
         try {
             val allProjFlow = FirebaseAPI.getAllProjects()
 
@@ -142,10 +142,8 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
                         showDialog = false
                         if (name.isNotBlank()) {
                             scope.launch {
-                                val id = selectedProjLayouts.value.elementAt(0).id
-                                selectedProjLayouts.value = emptySet()
-                                FirebaseAPI.addView(id, ViewLayout(name = name, creator = AuthAPI.getUid()!!))
-                                updated = true
+                                FirebaseAPI.addView(selectedProjLayouts.value.elementAt(0), ViewLayout(name = name, creator = AuthAPI.getUid()!!))
+                                doUpdate = !doUpdate
                             }
                         }
                     }) { Text("Add") }
@@ -224,15 +222,17 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
 
                         ExposedDropdownMenu(
                             expanded = showDropdownMenu,
-                            onDismissRequest = { showDropdownMenu = false }
+                            onDismissRequest = {
+                                showDropdownMenu = false
+                                doUpdate = !doUpdate
+                            }
                         ) {
                             allProjLayouts.forEach { projLayout ->
                                 DropdownMenuItem(
                                     text = {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            val possibleProjIds: Set<String> = selectedProjLayouts.value.map { it.id }.toSet()
                                             Checkbox(
-                                                checked = projLayout.id in possibleProjIds,
+                                                checked = projLayout.id in selectedProjLayouts.value,
                                                 onCheckedChange = null
                                             )
                                             Spacer(Modifier.width(10.dp))
@@ -240,12 +240,11 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
                                         }
                                     },
                                     onClick = {
-                                        val possibleProjIds: Set<String> = selectedProjLayouts.value.map { it.id }.toSet()
-                                        selectedProjLayouts.value = if(projLayout.id in possibleProjIds) {
-                                            selectedProjLayouts.value - projLayout
+                                        selectedProjLayouts.value = if(projLayout.id in selectedProjLayouts.value) {
+                                            selectedProjLayouts.value - projLayout.id
                                         }
                                         else {
-                                            selectedProjLayouts.value + projLayout
+                                            selectedProjLayouts.value + projLayout.id
                                         }
                                     }
                                 )
@@ -259,7 +258,10 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
                         iconTint = Color.White,
                         width = 40.dp,
                         height = 40.dp,
-                        onClick = { showOnlyMyViews = !showOnlyMyViews },
+                        onClick = {
+                            showOnlyMyViews = !showOnlyMyViews
+                            doUpdate = !doUpdate
+                        },
                         modifier = Modifier
                     )
                 }
@@ -289,7 +291,7 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
                             val projID = getProjectByView(view.id, allProjLayouts)
 
                             if(projID != null)
-                                navController.navigate(Screen.ViewIssueScreen.createRoute(view.name, view.id, projID))
+                                navController.navigate(Screen.ViewIssueScreen.createRoute(view.id, projID))
                         }
                     )
                 }

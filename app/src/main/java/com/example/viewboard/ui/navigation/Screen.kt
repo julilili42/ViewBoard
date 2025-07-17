@@ -53,7 +53,7 @@ sealed class Screen(val route: String) {
         fun createRoute(projectName: String, projectId: String) = "issue/$projectName/$projectId"
     }
 
-    object ViewIssueScreen : Screen("viewIssue/{viewName}/{viewID}/{projID}"){
-        fun createRoute(viewName: String, viewID: String, projID: String) = "viewIssue/$viewName/$viewID/$projID"
+    object ViewIssueScreen : Screen("viewIssue/{viewID}/{projID}"){
+        fun createRoute(viewID: String, projID: String) = "viewIssue/$viewID/$projID"
     }
 }
