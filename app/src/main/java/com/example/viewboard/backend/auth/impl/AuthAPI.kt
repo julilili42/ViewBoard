@@ -4,9 +4,11 @@ import android.content.Context
 import android.widget.Toast
 import androidx.navigation.NavController
 import com.example.viewboard.backend.auth.abstraction.AuthServerAPI
+import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.ui.navigation.Screen
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.tasks.await
 
 
 object AuthAPI : AuthServerAPI() {
@@ -154,7 +156,17 @@ object AuthAPI : AuthServerAPI() {
         return FirebaseProvider.auth.currentUser != null
     }
 
+    public override suspend fun getListOfAllUsers(): Result<List<UserLayout>> = runCatching {
+        val ref = FirebaseProvider.firestore
+            .collection("users")
+            .get()
+            .await()
 
+        ref.documents.mapNotNull { user ->
+            user.toObject(UserLayout::class.java)
+                ?.copy(uid = user.id)
+        }
+    }
 
     public override fun updateFCMToken(token: String, onComplete: (() -> Unit)?) {
         val uid = getUid() ?: return

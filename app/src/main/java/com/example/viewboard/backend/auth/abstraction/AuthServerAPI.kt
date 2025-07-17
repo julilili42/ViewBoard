@@ -2,6 +2,7 @@ package com.example.viewboard.backend.auth.abstraction
 
 import android.content.Context
 import androidx.navigation.NavController
+import com.example.viewboard.backend.dataLayout.UserLayout
 
 abstract class AuthServerAPI {
 
@@ -170,4 +171,6 @@ abstract class AuthServerAPI {
      * @param onComplete optional callback when the token is fetched and saved
      */
     public abstract fun fetchAndSaveFcmToken(onComplete: (() -> Unit)? = {})
+
+    public abstract suspend fun getListOfAllUsers(): Result<List<UserLayout>>
 }
