@@ -2,7 +2,6 @@ package com.example.viewboard.ui.screens
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import com.example.viewboard.dataclass.Project
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,7 +37,6 @@ import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
-import com.example.viewboard.ui.issue.IssueUiItem
 import com.example.viewboard.ui.timetable.CustomIcon
 import com.example.viewboard.ui.timetable.TimelineSchedule
 import com.example.viewboard.ui.timetable.VerticalTimelineSchedule
@@ -47,14 +45,11 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableScreen(navController: NavHostController) {
-    // Projekte
     val projectLayouts = remember { mutableStateListOf<ProjectLayout>() }
-    // Issues
     val issuesList = remember { mutableStateListOf<IssueLayout>() }
     var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
-        // Projekte laden
         try {
             FirebaseAPI.getProjectsFromUser(AuthAPI.getUid()).collect { layouts ->
                 projectLayouts.clear()
@@ -66,7 +61,6 @@ fun TimetableScreen(navController: NavHostController) {
     }
 
     LaunchedEffect(Unit) {
-        // Issues laden
         try {
             FirebaseAPI.getAllIssues(/* hier ggf. projectId oder leer für alle */).collect { list ->
                 issuesList.clear()
@@ -76,14 +70,11 @@ fun TimetableScreen(navController: NavHostController) {
             error = "Issues-Ladefehler: ${e.localizedMessage}"
         }
     }
-
-
     var showProjects by remember { mutableStateOf(true) }
     val today = LocalDate.now()
     var year by remember { mutableStateOf(today.year) }
     var month by remember { mutableStateOf(today.monthValue) } // 1..12
     var selectedDate by remember { mutableStateOf<LocalDate?>(today) }
-    // Beispieldaten
     Scaffold(
         topBar = {
 
@@ -98,7 +89,6 @@ fun TimetableScreen(navController: NavHostController) {
                 onBackClick = {navController.navigateUp()}
             )
         },
-        //containerColor = Color.White // sorgt dafür, dass Scaffold-Hintergrund weiß ist
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -121,33 +111,12 @@ fun TimetableScreen(navController: NavHostController) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Switch ganz links
                 SegmentedSwitch(
                     options = "Projects" to "Issues",
                     selectedLeft = showProjects,
                     onSelectionChange = { showProjects = it }
                 )
-
-                // Icons ganz rechts
                 Row {
-                    /*IconButton(
-                        onClick = { /* sort */ },
-                        modifier = Modifier
-                            .size(14.dp)
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.small
-                            )
-
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.sort_desc_svgrepo_com),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }*/
                     CustomIcon(
                         iconRes = R.drawable.sort_desc_svgrepo_com,
                         contentDesc = stringResource(R.string.sort_desc_svgrepo_com),
@@ -173,27 +142,6 @@ fun TimetableScreen(navController: NavHostController) {
                         modifier = Modifier
 
                     )
-                    /*IconButton(
-                        onClick = { /* filter */ },
-                        modifier = Modifier
-                            .size(14.dp)
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.small
-                            )
-
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.filter_svgrepo_com__1),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(32.dp)
-                                .fillMaxSize()
-                               ,
-                            tint =  Color.White
-                        )
-                    }*/
                 }
             }
 
