@@ -1,6 +1,7 @@
 package com.example.viewboard.ui.navigation
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -31,9 +32,11 @@ fun ChipInputField(
     entries: List<String>,
     newEntry: String,
     inhaltText: String,
-    onNewEntryChange: (String) -> Unit,
-    onEntryConfirmed: () -> Unit,
-    onEntryRemove: (String) -> Unit,
+    suggestions: List<String> = emptyList(),                       // jetzt String-Liste
+    onSuggestionClick: (String) -> Unit={},             // Callback mit String
+    onNewEntryChange: (String) -> Unit={},
+    onEntryConfirmed: () -> Unit={},
+    onEntryRemove: (String) -> Unit={},
     modifier: Modifier = Modifier
 ) {
     BasicTextField(
@@ -52,7 +55,7 @@ fun ChipInputField(
             .padding(4.dp),
         decorationBox = { innerTextField ->
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Zeile 1: Chips
+                // 1) Chips für bestehende Einträge
                 FlowRow(modifier = Modifier.fillMaxWidth()) {
                     entries.forEach { entry ->
                         AssistChip(
@@ -64,8 +67,10 @@ fun ChipInputField(
                         )
                     }
                 }
+
                 Spacer(modifier = Modifier.height(4.dp))
-                // Zeile 2: Eingabefeld mit Padding
+
+                // 2) Eingabefeld mit Placeholder
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -82,8 +87,36 @@ fun ChipInputField(
                             )
                         )
                     }
-                    Box(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 8.dp)
+                    ) {
                         innerTextField()
+                    }
+                }
+
+                // 3) Suggestion‑Liste als String-Array
+                if (suggestions.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
+                    ) {
+                        suggestions.forEach { suggestion ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onSuggestionClick(suggestion) }
+                                    .padding(vertical = 8.dp, horizontal = 12.dp)
+                            ) {
+                                Text(
+                                    text = suggestion,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
                     }
                 }
             }

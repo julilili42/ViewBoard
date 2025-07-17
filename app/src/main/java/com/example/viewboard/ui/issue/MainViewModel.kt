@@ -14,22 +14,33 @@ import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.IssueState
 import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.components.homeScreen.IssueProgress
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
 import com.example.viewboard.components.homeScreen.TimeSpanFilter
 import com.example.viewboard.components.homeScreen.next
 import com.example.viewboard.ui.screens.ProjectFilter
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainViewModel : ViewModel() {
     val items = mutableStateListOf<IssueLayout>()
     val Project = mutableStateListOf<ProjectLayout>()
+    val Views = mutableStateListOf<ViewLayout>()
+
     var isDragging by mutableStateOf(false)
         private set
     // 1) Eingabe‑State für Filter und Zeitspanne
@@ -54,13 +65,55 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    private val _viewsFlow: StateFlow<List<ViewLayout>> =
+        FirebaseAPI
+            .getAllViews()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList()
+            )
+    val views: StateFlow<List<ViewLayout>> = _viewsFlow
+
+
+
+    private val _selectedViewId = MutableStateFlow<String?>(null)
+    val selectedViewId: StateFlow<String?> = _selectedViewId.asStateFlow()
+
+    fun selectView(id: String) {
+        _selectedViewId.value = id
+    }
+    init {
+        // 3️⃣ Nur beim ersten Mal, wenn views non‑empty wird, setze den ersten Wert
+        viewModelScope.launch {
+            _viewsFlow
+                .filter { it.isNotEmpty() }    // warte bis Liste nicht mehr leer ist
+                .first()                        // nimm nur die allererste Emission
+                .let { nonEmptyList ->
+                    _selectedViewId.value = nonEmptyList.first().id
+                }
+        }
+    }
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val issuesForSelectedView: StateFlow<List<IssueLayout>> =
+        _selectedViewId
+            .filterNotNull()
+            .flatMapLatest { viewId ->
+                FirebaseAPI.getIssuesFromView(viewId)
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList()
+            )
+
+
     init {
         viewModelScope.launch {
-            // Nur auf Änderungen von _timeSpan reagieren
             _timeSpan
                 .flatMapLatest { span ->
-                    Log.d("IssueVM", ">>> current TimeSpanFilter: $span")
-                    // getProgressFlow braucht nur noch den span
                     calculator.getProgressFlow(span)
                 }
                 .collectLatest { issueProgress ->
@@ -102,6 +155,14 @@ class MainViewModel : ViewModel() {
             FirebaseAPI.getIssuesFromView(viewID).collectLatest { issueList ->
                 items.clear()
                 items .addAll(issueList)
+            }
+        }
+    }
+    fun loadViews() {
+        viewModelScope.launch {
+            FirebaseAPI.getAllViews().collectLatest { issueList ->
+                Views.clear()
+                Views .addAll(issueList)
             }
         }
     }

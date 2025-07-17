@@ -7,14 +7,19 @@ import androidx.compose.ui.graphics.Color
 import android.graphics.Color as AndroidColor
 
 
+/**
+ * Generiert einen vierstelligen Base36‑Code aus Projektname und Datum‑String.
+ *
+ * @param projectName der Name des Projekts
+ * @param creationDate ein ISO‑Datum im Format "YYYY-MM-DD"
+ * @return Code wie "#1A2B"
+ */
 fun generateProjectCode(
     projectName: String,
-    creationInstant: Instant = Instant.now()
+    creationDate: String
 ): String {
-    // 1) Basis-String: Name + ISO-Zeit
-    val timestamp = creationInstant
-        .atZone(ZoneId.systemDefault())
-        .format(DateTimeFormatter.ISO_INSTANT)
+    // 1) Basis-String: Name + "|" + Datum+"T00:00:00Z"
+    val timestamp = creationDate + "T00:00:00Z"
     val base = projectName.trim() + "|" + timestamp
 
     // 2) SHA-256-Hash

@@ -178,7 +178,7 @@ fun IssueCreationScreen(
                 maxLines = Int.MAX_VALUE
             )
             Spacer(Modifier.height(16.dp))
-
+/*
             ChipInputField(
                 entries = assignments,
                 newEntry = newParticipant,
@@ -208,7 +208,7 @@ fun IssueCreationScreen(
                 },
                 onEntryRemove = { removed -> labels = labels - removed },
                 modifier = Modifier.fillMaxWidth()
-            )
+            )*/
             Spacer(Modifier.height(16.dp))
 
             OutlinedTextField(
@@ -269,6 +269,7 @@ fun IssueCreationScreen(
             val isFormValid by derivedStateOf {
                 isTitleValid && isDescValid
             }
+
             Button(
 
                 enabled = isDateValid && isTimeValid&& isFormValid,
@@ -290,12 +291,11 @@ fun IssueCreationScreen(
                             desc        = desc,
                             creator     = currentUserId,
                             assignments = ArrayList(assignments),
+                            projectid = projectId,
 //                            labels      = labelObjects,
                            // labels      = ArrayList(labels),
                             deadlineTS  = deadline.export()
                         )
-
-
                         coroutineScope.launch {
                             try {
                                 val cleanId = projectId.trim('{', '}')

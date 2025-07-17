@@ -18,5 +18,7 @@ data class ProjectLayout (
     var labels: ArrayList<String> = ArrayList<String>(),
     var views: ArrayList<String> = ArrayList<String>(),
     var users: ArrayList<String> = ArrayList<String>(),
-    var creationTS: String = Timestamp().export()
+    var creationTS: String = Timestamp().export(),
+    var startTS: String = Timestamp().export(),
+    var deadlineTS: String = Timestamp().export()
 )

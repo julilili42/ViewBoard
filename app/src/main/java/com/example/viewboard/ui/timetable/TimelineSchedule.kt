@@ -141,7 +141,7 @@ fun TimelineSchedule(
 
                                 ProjectCardTasks(
                                     name = issue.title,
-                                    dueDateTime = dueDateTime,
+                                    dueDate = issue.deadlineTS,
                                     onClick = {
                                         navController.navigate(Screen.IssueScreen.createRoute(
                                             issue.title,

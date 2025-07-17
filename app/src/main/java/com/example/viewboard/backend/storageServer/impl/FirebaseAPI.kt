@@ -43,9 +43,14 @@ object FirebaseAPI : StorageServerAPI() {
     public override fun addProject(projectLayout: ProjectLayout, onSuccess: (String) -> Unit, onFailure: (ProjectLayout) -> Unit) {
         val uid = AuthAPI.getUid() ?: return
 
+        val updatedUsers = ArrayList(projectLayout.users).apply {
+            if (!contains(uid)) {
+                add(uid)
+            }
+        }
         val projectWithUser = projectLayout.copy(
             creator = uid,
-            users = arrayListOf(uid)
+            users = updatedUsers
         )
         m_projectTable.add(projectWithUser)
 

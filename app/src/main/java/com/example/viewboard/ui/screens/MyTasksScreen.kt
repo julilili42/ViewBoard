@@ -1,5 +1,6 @@
 package com.example.viewboard.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -12,6 +13,9 @@ import androidx.navigation.NavController
 import java.time.LocalDateTime
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.components.homeScreen.ProjectCardTasks
 import com.example.viewboard.ui.navigation.Screen
 
@@ -26,7 +30,7 @@ import com.example.viewboard.ui.navigation.Screen
 @Composable
 fun MyTasksScreen(
     navController: NavController,
-    myTasks: List<Pair<String, LocalDateTime>>,
+    issues: List<IssueLayout>,
     onSortClick: () -> Unit = {}
 ) {
     // Root-Container ohne Scaffold
@@ -34,25 +38,6 @@ fun MyTasksScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // Optional: eigener TopBar-Bereich
-        /*Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "My Tasks",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            IconButton(onClick = onSortClick) {
-                Icon(Icons.Default.Star, contentDescription = "Sort Tasks")
-            }
-        }*/
-
-        // Grid der Tasks, beginnt exakt oben im Box
         LazyVerticalGrid(
             columns = GridCells.Fixed(1),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -60,7 +45,7 @@ fun MyTasksScreen(
             contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(myTasks) { (name, dueDateTime) ->
+            items(issues) { issue ->
                 var dismissed by remember { mutableStateOf(false) }
                 if (!dismissed) {
                     Box(
@@ -71,18 +56,29 @@ fun MyTasksScreen(
                                 }
                             }
                     ) {
-                        ProjectCardTasks(
-                            name = name,
-                            dueDateTime = dueDateTime,
-                            onClick = { navController.navigate(Screen.IssueScreen.createRoute(
-                                name,
-                                   ""
-                            )) },
-                            onMenuClick = {navController.navigate(Screen.IssueScreen.createRoute(
-                                name,
-                                ""
-                            ))}
-                        )
+                        val cleanId = issue.projectid.trim('{', '}')
+                        var project by remember { mutableStateOf<ProjectLayout?>(null) }
+                        LaunchedEffect(issue.projectid) {
+                            try {
+                            project = FirebaseAPI.getProject(cleanId)
+                                Log.d("IssueWithProject", "Loaded project for issue ${issue.projectid}: $project")
+                            } catch (e: Exception) {
+                                Log.e("IssueWithProject", "Failed to load project ${issue.projectid}", e)
+                            }// suspend call
+                        }
+
+                        project?.let {
+                            ProjectCardTasks(
+                                name = it.name,
+                                dueDate = it.deadlineTS,
+                                onClick = { navController.navigate(Screen.IssueScreen.createRoute(
+                                    it.name,
+                                    cleanId))
+                                },
+                                onMenuClick = {
+                                }
+                            )
+                        }
                     }
                 }
             }

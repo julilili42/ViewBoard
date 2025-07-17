@@ -1,5 +1,6 @@
 package com.example.viewboard.components.project
 
+import OptionsMenuButton
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -31,10 +33,16 @@ import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
 import coil.compose.AsyncImage
+import colorFromCode
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.components.homeScreen.IssueProgress
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
 import com.example.viewboard.components.homeScreen.TimeSpanFilter
+import generateProjectCode
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 /**
  * Ein Project-Item mit Gradient-Hintergrund, Pill-Phase, Titel, Zeitraum,
@@ -69,17 +77,17 @@ fun ProjectItem(
             .collect { value = it }
     }
 
-
-// Calendar.MONTH liefert 0–11, Month.of erwartet 1–12
-    val startLabel = Month.of(project.startMonth + 1)
-        .getDisplayName(TextStyle.SHORT, Locale.getDefault())
-    val endLabel   = Month.of(project.endMonth   + 1)
-        .getDisplayName(TextStyle.SHORT, Locale.getDefault())
-
+    val start = project.startTS
+    val end   = project.deadlineTS
+    val startLabel = labelFromIsoDate(start) // z. B. "Jan 25"
+    val endLabel   = labelFromIsoDate(end)   // z. B. "Dez 25"
+    val projectNameCode = generateProjectCode(project.name,project.deadlineTS)
+    val projectNamecolor = colorFromCode(projectNameCode)
 // Avatare: maximal 3 anzeigen
     val showCount     = avatarUris.size.coerceAtMost(3)
     val avatarSize    = 18.dp
     val avatarOverlap = 12.dp
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -91,7 +99,7 @@ fun ProjectItem(
         Box(
             Modifier
                 .background(
-                    brush = Brush.linearGradient(listOf(color, color.copy(alpha = 0.6f))),
+                    brush = Brush.linearGradient(listOf(projectNamecolor, projectNamecolor.copy(alpha = 0.6f))),
                     shape = RoundedCornerShape(16.dp)
                 )
                 .fillMaxSize()
@@ -104,35 +112,39 @@ fun ProjectItem(
                 ) {
                     Box(
                         Modifier
-                            .background(color, RoundedCornerShape(8.dp))
+                            .background(projectNamecolor, RoundedCornerShape(8.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = project.phase,
+                            text = projectNameCode,
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                             color = Color.White
                         )
                     }
                     Spacer(Modifier.weight(1f))
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "Details",
-                        tint = Color.White
+                    OptionsMenuButton(
+                        options = listOf(
+                            "Bearbeiten" to { },
+                            "Löschen"   to {},
+                        ),
+                        modifier = Modifier
                     )
-                }
 
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    text = project.name,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = Color.White
-                )
+                }
                 Text(
                     text = "$startLabel – $endLabel",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.9f)
                 )
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    text = project.name,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = Color.White
+                )
+
                 Spacer(Modifier.weight(1f))
+                val totalParticipants = project.users.size
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -140,37 +152,21 @@ fun ProjectItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Avatar-Stack (überlappend)
-                    Box {
-                        avatarUris.take(showCount).forEachIndexed { index, uri ->
-                            AsyncImage(
-                                model = uri,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(avatarSize)
-                                    .offset(x = index * avatarOverlap)
-                                    .clip(CircleShape)
-                                    .border(1.dp, Color.White, CircleShape)
-                            )
-                        }
-                        val extra = avatarUris.size - showCount
-                        if (extra > 0) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .size(avatarSize)
-                                    .offset(x = showCount * avatarOverlap)
-                                    .clip(CircleShape)
-                                    .background(Color.White)
-                                    .border(1.dp, Color.White, CircleShape)
-                            ) {
-                                Text(
-                                    text = "+$extra",
-                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                    color = Color.Black
-                                )
-                            }
-                        }
-                    }
+
+
+
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Teilnehmer",
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "$totalParticipants",
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Light),
+                            color = Color.White
+                        )
+
                     Spacer(Modifier.weight(1f))
                     LinearProgressIndicator(
                         progress =progress.completedIssues.toFloat()/ progress.totalIssues.toFloat(),
@@ -186,3 +182,10 @@ fun ProjectItem(
     }
 }
 
+fun labelFromIsoDate(dateStr: String): String {
+    // Nur den Datums‑Teil vorne nehmen (falls mehr hinten dran stünde)
+    val iso = dateStr.substringBefore('T').substringBefore(' ')
+    val date = LocalDate.parse(iso)
+    val formatter = DateTimeFormatter.ofPattern("LLL yy", Locale("de"))
+    return date.format(formatter)
+}

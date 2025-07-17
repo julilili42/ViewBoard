@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.components.homeScreen.ProgressCard
 import com.example.viewboard.components.homeScreen.ProjectGrid
 import com.example.viewboard.ui.navigation.Screen
@@ -117,8 +118,8 @@ fun HomeScreen(
             }
             DraggableMyTasksSection(
                 navController = navController,
-                myTasks = myTasks,
                 onSortClick = onSortTasks,
+                viewModel= viewModel,
                 modifier = Modifier.fillMaxSize(),
                 minSheetHeightPx =  (screenHeightPx - topBlockHeightPx).coerceAtLeast(0f),
             )
@@ -129,16 +130,27 @@ fun HomeScreen(
 @Composable
 fun DraggableMyTasksSection(
     navController: NavController,
-    myTasks: List<Pair<String, LocalDateTime>>,
     onSortClick: () -> Unit,
+    viewModel: MainViewModel,
     modifier: Modifier = Modifier,
     minSheetHeightPx: Float = 0f
 ) {
     val density = LocalDensity.current
+    val selectedId by viewModel.selectedViewId.collectAsState()
+    val views by viewModel.views.collectAsState()
+    var viewNames by remember { mutableStateOf<List<String>>(emptyList()) }
+    LaunchedEffect(views) {
+        viewNames = views.map { it.name }
+    }
+    val selectedName = views
+        .firstOrNull { it.id == selectedId }
+        ?.name
+        ?: "No views"
+    val viewIssues by viewModel.issuesForSelectedView.collectAsState()
     var currentSheetHeightPx by remember { mutableStateOf(0f) }
-    val viewNames = listOf("Dashboard", "Reports", "Settings", "Profile")
     // State, um die Auswahl ggf. weiterzuverwenden
-    var currentView by remember { mutableStateOf(viewNames.first()) }
+
+
     BoxWithConstraints(modifier = modifier) {
         val maxHeightPx = with(density) { maxHeight.toPx() }
 
@@ -184,8 +196,11 @@ fun DraggableMyTasksSection(
                 ) {
                     ViewSelectorDropdown(
                         viewNames       = viewNames,
-                        selectedView    = currentView,
-                        onViewSelected  = { currentView = it },
+                        selectedView    = selectedName,
+                        onViewSelected  = { viewName ->
+                            // finde das ViewLayout zur Auswahl und setze es im VM
+                            views.firstOrNull { it.name == viewName }?.let { view ->
+                                viewModel.selectView(view.id)}},
                         modifier        = Modifier
                             .fillMaxWidth(0.4f)
                     )
@@ -231,7 +246,7 @@ fun DraggableMyTasksSection(
             }
             MyTasksScreen(
                 navController = navController,
-                myTasks = myTasks,
+                issues = viewIssues,
                 onSortClick = onSortClick,
             )
         }

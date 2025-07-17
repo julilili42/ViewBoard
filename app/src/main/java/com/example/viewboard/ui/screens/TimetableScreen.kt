@@ -37,6 +37,7 @@ import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.ui.issue.MainViewModel
 import com.example.viewboard.ui.timetable.CustomIcon
 import com.example.viewboard.ui.timetable.TimelineSchedule
 import com.example.viewboard.ui.timetable.VerticalTimelineSchedule

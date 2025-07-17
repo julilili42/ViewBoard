@@ -15,6 +15,7 @@ data class IssueLayout (
     var title: String = "",
     var desc: String = "",
     var creator: String = "",
+    var projectid: String = "",
     var state: IssueState = IssueState.NEW,
     var assignments: ArrayList<String> = ArrayList<String>(),
     var labels: ArrayList<String> = ArrayList<String>(),

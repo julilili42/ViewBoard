@@ -54,8 +54,6 @@ object AppColors {
     val Orange      = Color(0xFFFFB74D)  // kräftiges Orange
     val Green       = Color(0xFF81C784)  // sattes Grün
     val LightBlue   = Color(0xFFBEDBFF)  // helles, aber lebhaftes Blau
-
-    // Ergänzende kräftige Farben in ähnlicher Richtung
     val DeepOrange  = Color(0xFFFF8A65)
     val LimeGreen   = Color(0xFF9CCC65)
     val SkyBlue     = Color(0xFF64B5F6)
@@ -64,7 +62,6 @@ object AppColors {
     val Coral       = Color(0xFFFF7043)
     val Mint        = Color(0xFF4CAF50)
 
-    // Die gesamte Palette
     val StrongPalette = listOf(
         Orange,
         Green,
@@ -86,6 +83,7 @@ object AppColors {
  * @param projects      Liste der Projekte
  * @param columns       Anzahl der Spalten im Grid (z. B. 1, 2, 3…)
  */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen(
@@ -98,7 +96,6 @@ fun ProjectsScreen(
     val projectLayouts = remember { mutableStateListOf<ProjectLayout>() }
     var error by remember { mutableStateOf<String?>(null) }
 
-    // 1) Lege den Modus anhand von projectName fest
     val filterMode = when (projectName.lowercase()) {
         "created" -> ProjectFilter.CREATED
         "shared"  -> ProjectFilter.SHARED
@@ -106,7 +103,7 @@ fun ProjectsScreen(
         else      -> ProjectFilter.CREATED
     }
 
-    // 2) Lade jedes Mal neu, wenn sich projectName (bzw. filterMode) ändert
+
     LaunchedEffect(filterMode) {
         try {
             // 3) Baue die richtige Flow‑Quelle
@@ -131,7 +128,6 @@ fun ProjectsScreen(
         }
     }
     var query by remember { mutableStateOf("") }
-    // 2) Filtere nach Such‑Query
     val displayed = remember(projectLayouts, query) {
         if (query.isBlank()) projectLayouts
         else projectLayouts.filter { it.name.contains(query, ignoreCase = true) }
@@ -160,9 +156,9 @@ fun ProjectsScreen(
                 width = 50.dp,
                 height = 50.dp,
                 modifier = Modifier
-                    .offset(y = 40.dp)     // verschiebt den FAB 24dp weiter nach unten
+                    .offset(y = 40.dp)
                     .padding(16.dp)
-                    .clip(CircleShape), // behält rechts 16dp Abstand,
+                    .clip(CircleShape),
                 onClick = { navController.navigate(Screen.ProjectCreationScreen.route) },
 
             )
@@ -256,5 +252,6 @@ fun ProjectsScreen(
         }
     }
 }
+
 
 enum class ProjectFilter { CREATED, SHARED, ALL }

@@ -31,60 +31,50 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import colorFromCode
 
-/**
- * A card representing a single task with dynamic timestamp (date label + time),
- * gradient background, and a menu placeholder. Swipe-to-dismiss logic remains external.
- *
- * @param name The task title
- * @param dueDateTime The due date and time of the task
- * @param onClick Called when the card is clicked
- * @param onMenuClick Called when the menu icon is clicked
- */
 @Composable
 fun ProjectCardTasks(
     name: String,
-    dueDateTime: LocalDateTime,
+    dueDate: String,
     onClick: () -> Unit,
     onMenuClick: () -> Unit
 ) {
-    // Date relative label
+    // 1) Parsen des Datums-Strings (nur der Datums-Teil)
+    val datePart = dueDate
+        .substringBefore('T')
+        .substringBefore(' ')
+        .trim()
+    val dueLocalDate = LocalDate.parse(datePart)
+
+    // 2) Label für Datum (relativ oder fix)
     val todayDate = LocalDate.now()
-    val dueDate = dueDateTime.toLocalDate()
-    val daysBetween = ChronoUnit.DAYS.between(todayDate, dueDate).toInt()
+    val daysBetween = ChronoUnit.DAYS.between(todayDate, dueLocalDate).toInt()
     val dateLabel = when {
-        daysBetween <= 1 -> "Today"
-        daysBetween in 2..7 -> "${daysBetween} days"
-        else -> dueDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+        daysBetween == 0 -> "Today"
+        daysBetween == 1 -> "Tomorrow"
+        daysBetween in 2..7 -> "$daysBetween days"
+        else -> dueLocalDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
     }
-    // Time label
-    val timeLabel = dueDateTime.format(DateTimeFormatter.ofPattern("h:mm a"))
 
     Card(
         shape = MaterialTheme.shapes.medium,
-
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp)
             .clickable(onClick = onClick)
     ) {
-        // Gradient background for the card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                // 1) dünner grauer Rand
                 .border(
-                    BorderStroke(1.dp,Color.Black.copy(alpha = 0.2f)),// MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)),
-                    shape = MaterialTheme.shapes.medium,
-
+                    BorderStroke(1.dp, Color.Black.copy(alpha = 0.2f)),
+                    shape = MaterialTheme.shapes.medium
                 )
-                // 2) weißer Hintergrund
                 .background(
                     color = Color.White,
                     shape = MaterialTheme.shapes.medium
                 )
-
         ) {
             Column(
                 modifier = Modifier
@@ -96,56 +86,49 @@ fun ProjectCardTasks(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        val projectNameCode = generateProjectCode(name,dueDate)
+                        val projectColor = colorFromCode(projectNameCode)
 
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            val projectNameCode = generateProjectCode(name)
-                            val projectNamecolor = colorFromCode(projectNameCode)
-
-                            Box(
-                                modifier = Modifier
-                                    .background(
-                                        brush = Brush.linearGradient(listOf(projectNamecolor, projectNamecolor.copy(alpha = 0.8f))),
-                                        shape = RoundedCornerShape(4.dp)
-                                    )
-                                    .padding(0.dp)
-                                    .height(80.dp)
-                                    .fillMaxWidth(0.2f)
-                                    /*.background(
-                                        brush = Brush.linearGradient(listOf(color, color.copy(alpha = 0.6f))),
-                                        color = MaterialTheme.colorScheme.surfaceVariant,
-                                        shape = RoundedCornerShape(4.dp)
-                                    )*/,
-                                contentAlignment = Alignment.TopStart
-                            ) {
-                                Text(
-                                    text = projectNameCode,
-                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                    color = Color.White,
-                                    modifier = Modifier
-                                        .align(Alignment.Center)  // <— Position im Box-Koordinatensystem
-                                        .padding(10.dp)
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        listOf(projectColor, projectColor.copy(alpha = 1f))
+                                    ),
+                                    shape = RoundedCornerShape(4.dp)
                                 )
-                            }
-                            Column(
-                                verticalArrangement = Arrangement.Center,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = 8.dp)
-                            ) {
-                            Spacer(modifier = Modifier.width(4.dp))
+                                .padding(0.dp)
+                                .height(80.dp)
+                                .fillMaxWidth(0.2f),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Text(
-                                text = "$dateLabel • $timeLabel",
+                                text = projectNameCode,
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                color = Color.White,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 8.dp)
+                        ) {
+                            Text(
+                                text = dateLabel,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color(0xFF000113)
-
                             )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                            color = Color(0xFF000113)
-                        )
-                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = name,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                color = Color(0xFF000113)
+                            )
+                        }
                     }
                     IconButton(onClick = onMenuClick) {
                         Icon(
@@ -159,3 +142,4 @@ fun ProjectCardTasks(
         }
     }
 }
+

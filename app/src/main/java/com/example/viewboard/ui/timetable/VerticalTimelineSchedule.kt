@@ -1,5 +1,6 @@
 package com.example.viewboard.ui.timetable
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -134,13 +135,13 @@ fun VerticalTimelineSchedule(
                     ) {
                         projects.forEach { project ->
                             // Berechne hier pro Projekt direkt deine Offsets
-                            val startDp  = (randomAccumulatedDays(project.startMonth - 1) * monthPx).toDp()
-                            val heightDp = (randomAccumulatedDays(project.endMonth - project.startMonth + 1) * monthPx).toDp()
-
-                            val projectNameCode = generateProjectCode(project.name)
+                            val startDateToDays = dayOfYearFromIso(project.startTS,)
+                            val endDateToDays = dayOfYearFromIso(project.deadlineTS,)
+                            val dayDiff = endDateToDays - startDateToDays
+                            val startDp  = (startDateToDays  * monthPx).toDp()
+                            val heightDp = (dayDiff * monthPx).toDp()
+                            val projectNameCode = generateProjectCode(project.name,project.deadlineTS)
                             val projectNamecolor = colorFromCode(projectNameCode)
-
-
 
                             Column(
                                 modifier = Modifier
@@ -354,4 +355,21 @@ fun randomAccumulatedDays(month: Int): Int {
     val randomExtra = Random.nextInt(from = 0, until = 32)
 
     return daysSum + randomExtra
+}
+
+fun dayOfYearFromIso(
+    dateTimeStr: String,
+    monthOffset: Long = 0L
+): Int {
+    // Nur den Datums‑Teil übernehmen
+    val datePart = dateTimeStr
+        .substringBefore('T')
+        .substringBefore(' ')
+        .trim()
+
+    // Parsen und Monats‑Verschiebung
+    val adjusted = LocalDate.parse(datePart)
+        .plusMonths(monthOffset)
+
+    return adjusted.dayOfYear
 }

@@ -25,8 +25,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import com.example.viewboard.R
+import com.example.viewboard.backend.auth.impl.AuthAPI.getListOfAllUsers
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
 import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -43,22 +45,12 @@ fun ProjectCreationScreen(
     val uiColor = uiColor()
     val scroll = rememberScrollState()
 
-    // Eingabe-States
     var name by remember { mutableStateOf("") }
     var desc by remember { mutableStateOf("") }
-
-    // Datum-Range-States
     var startDate by remember { mutableStateOf("") }
     var endDate   by remember { mutableStateOf("") }
-
-    // Teilnehmer-Chips
     var assignments by remember { mutableStateOf(listOf<String>()) }
-    var newParticipant by remember { mutableStateOf("") }
-
-    // Meilensteine
-    var totalMilestones by remember { mutableStateOf(0) }
-
-    // Validierungs-States
+    var users by remember { mutableStateOf<List<UserLayout>>(emptyList()) }
     val datePattern = Regex("\\d{4}-\\d{2}-\\d{2}")
     val isNameValid by derivedStateOf { name.isNotBlank() }
     val isDateRangeValid by derivedStateOf {
@@ -69,12 +61,10 @@ fun ProjectCreationScreen(
                     fmt.parse(startDate)!!.time <= fmt.parse(endDate)!!.time
                 }.getOrDefault(false)
     }
-    val isTotalMilestonesValid by derivedStateOf { totalMilestones > 0 }
     val allValid by derivedStateOf {
-        isNameValid && isDateRangeValid && isTotalMilestonesValid
+        isNameValid && isDateRangeValid
     }
 
-    // DatePicker für Range
     val context = LocalContext.current
     val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     fun pickDateRange() {
@@ -136,20 +126,13 @@ fun ProjectCreationScreen(
                 Text("Name is not allowed to be empty", color = MaterialTheme.colorScheme.error)
             }
             Spacer(Modifier.height(16.dp))
-
-            // Beschreibung
-            OutlinedTextField(
-                value = desc,
-                onValueChange = { desc = it },
-                label = { Text("Description") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = 120.dp),
-                maxLines = Int.MAX_VALUE,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-            )
-            Spacer(Modifier.height(16.dp))
-
+            LaunchedEffect(users) {
+                try {
+                    val result: Result<List<UserLayout>> = getListOfAllUsers()
+                    users = result.getOrNull() ?: emptyList()
+                } catch (e: Exception) {
+                }
+            }
             // Zeitraum
             OutlinedTextField(
                 value = if (startDate.isNotBlank() && endDate.isNotBlank())
@@ -175,25 +158,64 @@ fun ProjectCreationScreen(
             }
             Spacer(Modifier.height(24.dp))
 
-            // Teilnehmer
+            val allNames = listOf("Alice", "Bob", "Charlie", "David")
+
+            var newParticipant by remember { mutableStateOf("") }
+
+            val filteredUsers = remember(newParticipant, users) {
+                if (newParticipant.isBlank()) emptyList()
+                else users.filter { user ->
+                    user.name.contains(newParticipant, ignoreCase = true) ||
+                            user.email.contains(newParticipant, ignoreCase = true)
+                }
+            }
+            val suggestionNames  = filteredUsers.map { it.name }
+            val suggestionEmails = filteredUsers.map { it.email }
+
+            val suggestionList = remember(newParticipant, assignments, suggestionEmails) {
+                if (newParticipant.isBlank()) {
+                    emptyList()
+                } else {
+                    suggestionEmails.filter { email ->
+                        // enthält eingegebene Zeichen
+                        email.contains(newParticipant, ignoreCase = true)
+                                // und ist noch nicht in assignments
+                                && assignments.none { it.equals(email, ignoreCase = true) }
+                    }
+                }
+            }
             ChipInputField(
                 entries = assignments,
                 newEntry = newParticipant,
-                inhaltText = "Add team member..-",
+                inhaltText = "Add team member…",
+                suggestions = suggestionList,
+                onSuggestionClick = { name ->
+                    // wenn Name ausgewählt wird, als Chip hinzufügen
+                    if (name !in assignments) {
+                        assignments = assignments + name
+                    }
+                    newParticipant = ""
+                },
                 onNewEntryChange = { newParticipant = it },
                 onEntryConfirmed = {
-                    if (newParticipant.isNotBlank()) {
-                        assignments = assignments + newParticipant.trim()
-                        newParticipant = ""
+                    // Option: Akzeptiere nur exakte Übereinstimmung
+                    val match = allNames.find { it.equals(newParticipant.trim(), ignoreCase = true) }
+                    if (match != null && match !in assignments) {
+                        assignments = assignments + match
                     }
+                    newParticipant = ""
                 },
-                onEntryRemove = { removed -> assignments = assignments - removed },
+                onEntryRemove = { removed ->
+                    assignments = assignments - removed
+                },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(24.dp))
 
-            // Meilensteine
-            Text("Milestone", style = MaterialTheme.typography.labelLarge, color = uiColor)
+
+
+            Spacer(Modifier.height(16.dp))
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
@@ -201,54 +223,23 @@ fun ProjectCreationScreen(
                     .fillMaxWidth()
                     .padding(top = 8.dp)
             ) {
-                IconButton(
-                    onClick = { if (totalMilestones > 0) totalMilestones-- },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(uiColor.copy(alpha = 0.1f), CircleShape)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.minus_svgrepo_com),
-                        contentDescription = "Less",
-                        tint = uiColor
-                    )
-                }
-                Spacer(Modifier.width(16.dp))
-                Text(
-                    text = totalMilestones.toString(),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = uiColor
-                )
-                Spacer(Modifier.width(16.dp))
-                IconButton(
-                    onClick = { totalMilestones++ },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(uiColor.copy(alpha = 0.1f), CircleShape)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.plus_large_svgrepo_com),
-                        contentDescription = "More",
-                        tint = uiColor
-                    )
-                }
-            }
-            if (!isTotalMilestonesValid) {
-                Text("At least one milestone necessary", color = MaterialTheme.colorScheme.error)
+
             }
             Spacer(Modifier.height(32.dp))
-
-            // Create-Button mit FirebaseAPI-Aufruf
+            val assignmentIds: ArrayList<String> = remember(assignments, users) {
+                val ids = assignments.mapNotNull { email ->
+                    users.find { it.email.equals(email, ignoreCase = true) }?.uid
+                }
+                ArrayList(ids)
+            }
             Button(
+
                 onClick = {
-                    // 1) Monate extrahieren
                     val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                     val cal1 = Calendar.getInstance().apply { time = fmt.parse(startDate)!! }
                     val cal2 = Calendar.getInstance().apply { time = fmt.parse(endDate)!! }
                     val startMonth = cal1.get(Calendar.MONTH) + 1
                     val endMonth   = cal2.get(Calendar.MONTH) + 1
-
-                    // 2) Projekt-Objekt bauen
                     val p = ProjectLayout(
                         name = name,
                         desc = desc,
@@ -256,12 +247,13 @@ fun ProjectCreationScreen(
                         phase = "",
                         startMonth = startMonth,
                         endMonth = endMonth,
-                        totalMilestones = totalMilestones,
                         completedMilestones = 0f,
                         issues = arrayListOf(),
                         labels = arrayListOf(),
                         views = arrayListOf(),
-                        users = ArrayList(assignments),
+                        users = assignmentIds,
+                        startTS = startDate,
+                        deadlineTS = endDate,
                     )
 
                     val user = FirebaseProvider.auth.currentUser

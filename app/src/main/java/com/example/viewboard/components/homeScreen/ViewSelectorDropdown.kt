@@ -20,53 +20,58 @@ import com.example.viewboard.R
 @Composable
 fun ViewSelectorDropdown(
     viewNames: List<String>,
-    selectedView: String,
+    selectedView: String?,
     onViewSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    labelRes: Int = R.string.my_tasks
+    noViewsLabel: String = "No views"
 ) {
     var expanded by remember { mutableStateOf(false) }
 
+    // Anzeige-Text: entweder der aktuell selektierte View oder der Default-Text
+    val displayText = selectedView ?: noViewsLabel
+
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
+        onExpandedChange = {
+            // nur öffnen, wenn es Views gibt
+            if (viewNames.isNotEmpty()) expanded = !expanded
+        },
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
         TextField(
-            value = selectedView,
+            value = displayText,
             onValueChange = { /* readOnly */ },
             readOnly = true,
-            label = {
-                Text(
-                    text = selectedView,
-                    style = MaterialTheme.typography.titleMedium,
-                    color =Color.Black //MaterialTheme.colorScheme.surfaceVariant
-                )
-            },
+            enabled = viewNames.isNotEmpty(),      // deaktiviert, wenn keine Views
+            label = { Text(text = displayText, style = MaterialTheme.typography.titleMedium) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            textStyle = MaterialTheme.typography.titleMedium.copy(
-                color = MaterialTheme.colorScheme.surfaceVariant
-            ),
+            modifier = Modifier.menuAnchor(),
             colors = ExposedDropdownMenuDefaults.textFieldColors(
-                unfocusedLabelColor = MaterialTheme.colorScheme.surfaceVariant
-            ),
-            modifier = Modifier.menuAnchor()
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         )
 
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            viewNames.forEach { name ->
+            if (viewNames.isEmpty()) {
                 DropdownMenuItem(
-                    text = { Text(name) },
-                    onClick = {
-                        onViewSelected(name)
-                        expanded = false
-                    }
+                    text = { Text(noViewsLabel) },
+                    onClick = { expanded = false }
                 )
+            } else {
+                viewNames.forEach { name ->
+                    DropdownMenuItem(
+                        text = { Text(name) },
+                        onClick = {
+                            onViewSelected(name)
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }
