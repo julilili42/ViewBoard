@@ -12,6 +12,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -25,6 +27,13 @@ import coil.compose.AsyncImage
 import androidx.compose.ui.res.painterResource
 import com.example.viewboard.R
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.ui.navigation.BottomBarScreen
+import com.example.viewboard.ui.navigation.Screen
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -32,13 +41,18 @@ fun IssueItemCard(
     title: String,
     date: String,
     attachments: Int,
+    projectId: String,
+    issueId: String,
     state: String="",
     modifier: Modifier = Modifier,
+    navController: NavController,
     avatarUris: List<Uri>,
     onOptionsClick: () -> Unit = {}
 ) {
     val showCount = avatarUris.size.coerceAtMost(3)
     val avatarSize = 18.dp
+    val scope = rememberCoroutineScope()
+    var expanded by remember { mutableStateOf(false) }
     Box(
         modifier
             .fillMaxWidth()
@@ -66,19 +80,63 @@ fun IssueItemCard(
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "Mehr Optionen",
-                    modifier = Modifier
-                        .combinedClickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onOptionsClick,
-                            onLongClick = {}
+                Column {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Mehr Optionen",
+                        modifier = Modifier
+                            .combinedClickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = {
+                                    expanded = true
+                                    onOptionsClick()
+                                },
+                                onLongClick = {}
+                            )
+                            .size(24.dp)
+                    )
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Edit") },
+                            // z.B. in deinem DropdownMenuItem “Edit”
+                            onClick = {
+                                expanded = false
+                                val cleanProj = projectId.trim('{','}')
+
+                                navController.navigate(
+                                    Screen.IssueEditScreen.createRoute(projectId.trim('{','}'), issueId)
+                                )
+
+                            }
+
                         )
-                        .size(24.dp)
-                )
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                expanded = false
+
+                                scope.launch {
+                                    try {
+                                        val cleanId = projectId.trim('{', '}')
+                                        FirebaseAPI.rmIssue(projID = cleanId , id = issueId)
+                                    } catch (e: Exception) {
+
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+
             }
+
+
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Box(
                     Modifier

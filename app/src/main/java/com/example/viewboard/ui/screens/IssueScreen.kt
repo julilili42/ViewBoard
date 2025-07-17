@@ -82,12 +82,10 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                 width = 50.dp,
                 height = 50.dp,
                 modifier = Modifier
-                    .offset(y = 40.dp)     // verschiebt den FAB 24dp weiter nach unten
+                    .offset(y = 40.dp)
                     .padding(16.dp)
-                    .clip(CircleShape), // behält rechts 16dp Abstand,
+                    .clip(CircleShape),
                 onClick = {navController.navigate(Screen.IssueCreationScreen.createRoute(projectId))},
-
-
                 )
         }
     ) { paddingValues ->
@@ -97,13 +95,13 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             Text(
-                text = projectName +" - Issues", // z.B. "My Projects"
+                text = projectName +" - Issues",
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp)
             )
-            // Aktionsleiste unter der Überschrift
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -218,18 +216,20 @@ fun IssueScreen(mainViewModel: MainViewModel, navController: NavController,proje
                     Uri.parse("https://picsum.photos/seed/5/64")
                 )
                 displayed.forEach { item ->
-                    key(item.id) {      // <-- HIER der wichtigste Schritt
+                    key(item.id) {
                         DragTarget(
                             dataToDrop = item,
                             viewModel = mainViewModel
                         ) {
                             IssueItemCard(
                                 title = item.title,
-
                                 state = stateToString(item.state),
                                 date = item.deadlineTS,
                                 attachments = 3,
+                                projectId = projectId,
+                                issueId = item.id,
                                 avatarUris = dummyAvatarUris,
+                                navController = navController,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
                             )

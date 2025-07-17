@@ -5,9 +5,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -17,6 +23,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.screens.LoginScreen
 import com.example.viewboard.ui.screens.RegistrationScreen
 import com.example.viewboard.ui.screens.HomeScreen
@@ -27,6 +35,7 @@ import com.example.viewboard.ui.screens.ChangeEmailScreen
 import com.example.viewboard.ui.screens.ChangePasswordScreen
 import com.example.viewboard.ui.screens.HelpSupportScreen
 import com.example.viewboard.ui.screens.IssueCreationScreen
+import com.example.viewboard.ui.screens.IssueEditScreen
 import com.example.viewboard.ui.screens.ProjectsScreen
 import com.example.viewboard.ui.screens.TimetableScreen
 import com.example.viewboard.ui.screens.ProfileScreen
@@ -34,6 +43,7 @@ import com.example.viewboard.ui.screens.ProjectCreationScreen
 import com.example.viewboard.ui.screens.ViewIssueScreen
 import com.example.viewboard.ui.screens.ViewScreen
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @SuppressLint("ViewModelConstructorInComposable")
 @Composable
@@ -172,6 +182,36 @@ fun Navigation(modifier: Modifier = Modifier) {
                     }
                 }
             }
+
+            composable(
+                route = Screen.IssueEditScreen.route,
+                arguments = listOf(
+                    navArgument("projectId") { type = NavType.StringType },
+                    navArgument("issueId"  ) { type = NavType.StringType }
+                )
+            ) { backStack ->
+                val projId = backStack.arguments!!.getString("projectId")!!
+                val issueId = backStack.arguments!!.getString("issueId")!!
+                var issue by remember { mutableStateOf<IssueLayout?>(null) }
+
+                LaunchedEffect(issueId) {
+                    issue = FirebaseAPI.getIssue(id = issueId)
+                }
+
+                if (issue != null) {
+                    IssueEditScreen(
+                        navController = navController,
+                        projectId     = projId,
+                        issue         = issue!!
+                    )
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+
+
 
             composable(
                 route = Screen.IssueCreationScreen.route,

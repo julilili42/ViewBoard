@@ -45,6 +45,11 @@ sealed class Screen(val route: String) {
         fun createRoute(projectId: String) = "issueCreation{$projectId}"
     }
 
+    object IssueEditScreen : Screen("issueEdit/{projectId}/{issueId}") {
+        fun createRoute(projectId: String, issueId: String) =
+            "issueEdit/$projectId/$issueId"
+    }
+
     /** Screen for the adding an Projects */
     object ProjectCreationScreen : Screen(route = "projectsCreation")
 

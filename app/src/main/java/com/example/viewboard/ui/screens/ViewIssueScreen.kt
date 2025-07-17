@@ -229,9 +229,12 @@ fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, 
                                     IssueItemCard(
                                         title = item.title,
                                         state = stateToString(item.state),
+                                        projectId = projID,
+                                        issueId = item.id,
                                         date = item.deadlineTS,
                                         attachments = 5,
                                         avatarUris = dummyAvatarUris,
+                                        navController = navController,
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(12.dp))
                                     )
