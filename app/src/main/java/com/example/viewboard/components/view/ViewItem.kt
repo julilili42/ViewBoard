@@ -16,6 +16,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,7 +29,14 @@ import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
 import coil.compose.AsyncImage
+import colorFromCode
+import com.example.viewboard.backend.Timestamp
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import com.example.viewboard.backend.dataLayout.IssueState
+import com.example.viewboard.backend.dataLayout.ViewLayout
+import com.example.viewboard.backend.util.filterIssuesByStates
+import generateProjectCode
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @param name is the view name
@@ -38,7 +46,10 @@ import com.example.viewboard.backend.auth.impl.AuthAPI
  * @param onClick is the click event of the ui element
  */
 @Composable
-fun ViewItem(name: String, creator: String, count: Int, color: Color, onClick: () -> Unit) {
+fun ViewItem(view: ViewLayout, creator: String, color: Color, onClick: () -> Unit) {
+    val viewNameCode = generateProjectCode(view.name, view.creationTS)
+    val viewNamecolor = colorFromCode(viewNameCode)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,7 +61,7 @@ fun ViewItem(name: String, creator: String, count: Int, color: Color, onClick: (
         Box(
             Modifier
                 .background(
-                    brush = Brush.linearGradient(listOf(color, color.copy(alpha = 0.6f))),
+                    brush = Brush.linearGradient(listOf(viewNamecolor, viewNamecolor.copy(alpha = 0.6f))),
                     shape = RoundedCornerShape(16.dp)
                 )
                 .fillMaxSize()
@@ -61,6 +72,17 @@ fun ViewItem(name: String, creator: String, count: Int, color: Color, onClick: (
                     Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Box(
+                        Modifier
+                            .background(viewNamecolor, RoundedCornerShape(8.dp))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = viewNameCode,
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                            color = Color.White
+                        )
+                    }
                     Spacer(Modifier.weight(1f))
                     Icon(
                         imageVector = Icons.Default.ArrowForward,
@@ -68,10 +90,14 @@ fun ViewItem(name: String, creator: String, count: Int, color: Color, onClick: (
                         tint = Color.White
                     )
                 }
-
+                Text(
+                    text = Timestamp(data = view.creationTS).getDate(),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    text = name,
+                    text = view.name,
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     color = Color.White
                 )
@@ -92,7 +118,7 @@ fun ViewItem(name: String, creator: String, count: Int, color: Color, onClick: (
                     }
                     Spacer(Modifier.weight(1f))
                     Text(
-                        text = count.toString(),
+                        text = view.issues.size.toString(),
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         color = Color.White
                     )

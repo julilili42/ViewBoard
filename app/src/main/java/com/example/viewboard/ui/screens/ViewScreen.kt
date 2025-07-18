@@ -67,14 +67,16 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
     var error by remember { mutableStateOf<String?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect (doUpdate) {
+    val allProjFlow = remember { mutableStateListOf(FirebaseAPI.getAllProjects()) }
+
+    LaunchedEffect (doUpdate, allProjFlow) {
         doUpdate = false
 
         try {
-            val allProjFlow = FirebaseAPI.getAllProjects()
+//            val allProjFlow = FirebaseAPI.getAllProjects()
 
             allProjLayouts.clear()
-            allProjLayouts.addAll(allProjFlow.first())
+            allProjLayouts.addAll(allProjFlow.first().first()) // TODO updating bug fixed ???
 
             val allViewFlow = FirebaseAPI.getAllViews()
 
@@ -284,9 +286,8 @@ fun ViewScreen(modifier: Modifier = Modifier, navController: NavController) {
 
                 itemsIndexed(viewLayouts) { index, view ->
                     ViewItem (
-                        name    = view.name,
+                        view = view,
                         creator = creators.getOrNull(index) ?: "loading...",
-                        count   = view.issues.size,
                         color   = AppColors.StrongPalette[index % AppColors.StrongPalette.size],
                         onClick = {
                             val projID = getProjectByView(view.id, allProjLayouts)
