@@ -5,6 +5,7 @@ import android.app.TimePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -16,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.viewboard.backend.Timestamp
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 import com.example.viewboard.ui.theme.uiColor
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,14 +43,24 @@ fun IssueEditScreen(
     var title by remember { mutableStateOf(issue.title) }
     var desc by remember { mutableStateOf(issue.desc) }
     var assignments by remember { mutableStateOf(issue.assignments.toList()) }
-    var labels by remember { mutableStateOf(issue.labels.toList()) }
 
-    // Parse existing deadline
-    val calendar = remember { Calendar.getInstance().apply { /* parse issue.deadlineTS if needed */ } }
+
+
+    val calendar = remember {
+        Calendar.getInstance().apply {
+            val instant = Instant.parse(issue.deadlineTS)
+            time = Date.from(instant)
+        }
+    }
     val dateFmt = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
     val timeFmt = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
     var dateText by remember { mutableStateOf(dateFmt.format(calendar.time)) }
     var timeText by remember { mutableStateOf(timeFmt.format(calendar.time)) }
+
+
+    var newDeadlineTS by remember { mutableStateOf(issue.deadlineTS) }
+
+
 
     val scope = rememberCoroutineScope()
 
@@ -58,7 +71,8 @@ fun IssueEditScreen(
         val tmp = Calendar.getInstance().apply { time = t }
         calendar.set(Calendar.HOUR_OF_DAY, tmp.get(Calendar.HOUR_OF_DAY))
         calendar.set(Calendar.MINUTE, tmp.get(Calendar.MINUTE))
-        issue.deadlineTS = issue.deadlineTS // if you need to convert calendar to deadlineTS, do it here
+        val ts = Timestamp().apply { import(calendar.toInstant()) }
+        newDeadlineTS = ts.export()
     }
 
     fun pickDate() {
@@ -140,16 +154,6 @@ fun IssueEditScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(12.dp))
-            ChipInputField(
-                entries = labels,
-                newEntry = "",
-                inhaltText = "Add Label…",
-                onNewEntryChange = {},
-                onEntryConfirmed = { /* implement */ },
-                onEntryRemove = { /* implement */ },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(12.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = dateText,
@@ -167,15 +171,18 @@ fun IssueEditScreen(
                 )
                 OutlinedTextField(
                     value = timeText,
-                    onValueChange = { timeText = it },
+                    onValueChange = {
+                        timeText = it
+                        updateDeadline()
+                    },
                     label = { Text("Time") },
                     singleLine = true,
+                    keyboardActions = KeyboardActions(
+                        onDone = { updateDeadline() }
+                    ),
                     trailingIcon = {
-                        Icon(
-                            Icons.Default.DateRange,
-                            contentDescription = null,
-                            modifier = Modifier.clickable { pickTime() }
-                        )
+                        Icon(Icons.Default.DateRange, null,
+                            Modifier.clickable { pickTime() })
                     },
                     modifier = Modifier.weight(1f)
                 )
@@ -184,13 +191,12 @@ fun IssueEditScreen(
             Button(
                 onClick = {
                     updateDeadline()
-                    // Nutze Callback-basierte API
                     val updatedIssue = issue.copy(
                         title = title,
                         desc = desc,
                         assignments = ArrayList(assignments),
-                        labels = ArrayList(labels),
-                        deadlineTS = issue.deadlineTS
+                        labels = ArrayList(),
+                        deadlineTS = newDeadlineTS
                     )
                     FirebaseAPI.updIssue(
                         updatedIssue,
@@ -198,9 +204,7 @@ fun IssueEditScreen(
                             onUpdated()
                             navController.popBackStack()
                         },
-                        onFailure = { id ->
-                            // Fehlerbehandlung, z.B. Snackbar anzeigen
-                        }
+                        onFailure = { id -> }
                     )
                 },
                 modifier = Modifier

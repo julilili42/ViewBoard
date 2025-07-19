@@ -34,6 +34,9 @@ import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.navigation.Screen
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -53,6 +56,18 @@ fun IssueItemCard(
     val avatarSize = 18.dp
     val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
+
+    val instant = remember(date) { Instant.parse(date) }
+    val localDt = remember(instant) {
+        instant.atZone(ZoneId.systemDefault())
+    }
+    val fmt = remember {
+        DateTimeFormatter.ofPattern("yyyy‑MM‑dd HH:mm")
+    }
+    val display = remember(localDt) {
+        localDt.format(fmt)
+    }
+
     Box(
         modifier
             .fillMaxWidth()
@@ -182,7 +197,7 @@ fun IssueItemCard(
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
-                        text = date,
+                        text = display,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
