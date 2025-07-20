@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-//import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.example.viewboard.backend.NotificationHelper
 import com.example.viewboard.backend.auth.impl.AuthAPI
@@ -32,8 +31,6 @@ class MainActivity : ComponentActivity() {
             NotificationHelper.checkNewIssueAssignments(this@MainActivity)
             NotificationHelper.checkNewProjectAssignments(this@MainActivity)
         }
-
-
         setContent {
             ComposeLoginScreenInitTheme {
                 Navigation()

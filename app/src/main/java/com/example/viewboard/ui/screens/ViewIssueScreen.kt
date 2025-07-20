@@ -1,6 +1,7 @@
 package com.example.viewboard.ui.screens
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -55,7 +56,7 @@ import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.timetable.CustomIcon
 
 import kotlinx.coroutines.launch
-
+import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -70,12 +71,14 @@ fun ViewIssueScreen(
     viewID: String,
     projID: String
 ) {
+    val projects by ProjectViewModel.displayedProjects.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val issues by IssueViewModel.displayedIssues.collectAsState(initial = emptyList())
-    // Load issues when viewID changes
+    IssueViewModel.setCurrentViewId(viewID)
+    val issues  by IssueViewModel.displayedIssuesFromViews.collectAsState()
     LaunchedEffect(viewID) {
         IssueViewModel.loadIssuesFromView(viewID)
+        Log.d("ViewIssueScreen", "Composable sees ${issues.size} issues for viewID=$viewID")
     }
     Scaffold(
         topBar = {
@@ -115,7 +118,7 @@ fun ViewIssueScreen(
         ) {
             // Optionally delete view dialog
             if (showDialog) {
-                AlertDialog(
+               /* AlertDialog(
                     onDismissRequest = { showDialog = false },
                     title = { Text("Delete View") },
                     confirmButton = {
@@ -130,6 +133,13 @@ fun ViewIssueScreen(
                     dismissButton = {
                         TextButton(onClick = { showDialog = false }) { Text("Cancel") }
                     }
+                )*/
+                ProjectIssueDialog(
+                    viewId = viewID,
+                    projects = projects,
+                    viewViewModel=  ViewsViewModel,
+                    issueViewModel = IssueViewModel,
+                    onDismiss = { showDialog = false }
                 )
             }
 
@@ -137,7 +147,7 @@ fun ViewIssueScreen(
             issues.forEach { issue: IssueLayout ->
                 IssueItemCard(
                     title = issue.title,
-                    date = Timestamp(data = issue.creationTS).getDate(),
+                    date = issue.creationTS,
                     attachments = issue.assignments.size ?: 0,
                     projectId = projID,
                     issueId = issue.id,

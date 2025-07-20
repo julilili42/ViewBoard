@@ -68,8 +68,9 @@ fun ViewScreen(
     issueViewModel: IssueViewModel,
     projectViewModel: ProjectViewModel
 ) {
-    // States
+
     val viewLayouts by viewsViewModel.displayedViews.collectAsState()
+    val selectedViewId by viewsViewModel.selectedViewId.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var newName by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
@@ -162,7 +163,7 @@ fun ViewScreen(
                                             creator = uid,
                                             issues = ArrayList()
                                         ),
-                                        onSuccess = { _ -> viewsViewModel.reload() },
+                                        onSuccess = { _ ->  },
                                         onFailure = { err -> /* handle error, e.g. Toast */ }
                                     )
                                 }

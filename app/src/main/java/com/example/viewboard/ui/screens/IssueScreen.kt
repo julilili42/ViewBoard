@@ -70,6 +70,9 @@ fun IssueScreen(
     }
     val baseList = issueViewModel.getItemsForCategory(stateFromIndex(selectedTab))
     val displayed by issueViewModel.displayedIssues.collectAsState()
+    LaunchedEffect(displayed) {
+        Log.d("IssueListScreen", "Displayed issues (${displayed.size}): ${displayed.map { it.id }}")
+    }
     /*val displayed = remember(baseList, query) {
         if (query.isBlank()) baseList
         else baseList.filter { it.title.contains(query, ignoreCase = true) }
@@ -168,6 +171,7 @@ fun IssueScreen(
                                 .padding(horizontal = 4.dp),
                             onDrop = { item ->
                                 filterMode = stateFromIndex(idx)
+                                issueViewModel.setState( stateFromIndex(idx))
                                 selectedTab  = idx
                                 issueViewModel.moveItemToState(item, stateFromIndex(idx))
                             }
@@ -191,7 +195,8 @@ fun IssueScreen(
                                             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                         RoundedCornerShape(8.dp)
                                     )
-                                    .clickable { selectedTab = idx },
+                                    .clickable { selectedTab = idx
+                                        issueViewModel.setState( stateFromIndex(idx))},
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(

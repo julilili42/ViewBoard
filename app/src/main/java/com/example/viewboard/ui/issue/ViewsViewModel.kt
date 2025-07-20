@@ -9,6 +9,7 @@ import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,136 +17,100 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 class ViewsViewModel : ViewModel() {
-
-    companion object {
-        private const val TAG = "ViewsViewModel"
-    }
-
-    // Alle geladenen Views
-    private val _allViews = MutableStateFlow<List<ViewLayout>>(emptyList())
-    val allViews: StateFlow<List<ViewLayout>> = _allViews.asStateFlow()
-
-    // Such‑Query
+    // RAW: Flow aller Views aus Firebase
+    // RAW: Flow aller Views aus Firebase
+    val viewFlow: Flow<List<ViewLayout>> =
+        FirebaseAPI.getAllViews()
+    private val myId: String = AuthAPI.getUid() ?: ""
+    // StateFlows für Filter, Suche und Sortierung
+    private val _filter = MutableStateFlow<String?>(null)
     private val _query = MutableStateFlow("")
-    val query: StateFlow<String> = _query.asStateFlow()
-
-    // Sortierkriterien: nach Erstellungsdatum oder Name
-    enum class SortField { DATE, NAME }
+    enum class SortField { NAME, CREATED }
     enum class SortOrder { ASC, DESC }
-
-    private val _sortField = MutableStateFlow(SortField.DATE)
+    private val _sortField = MutableStateFlow(SortField.NAME)
     private val _sortOrder = MutableStateFlow(SortOrder.ASC)
-    val sortField: StateFlow<SortField> = _sortField.asStateFlow()
-    val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
-
-    // Kombiniere Suche und Sort‑Feld
-    private val _filtered = combine(
-        _allViews,
+    // UI-Ausgabe: Views nach Filter, Suche und Sortierung
+    val displayedViews: StateFlow<List<ViewLayout>> = combine(
+        viewFlow,
+        _filter,
         _query,
-        _sortField
-    ) { list, q, sortField ->
-        // Log ob wir filtern
-        Log.d(TAG, "Applying filter – query='$q', sortField=$sortField")
-        val filtered = if (q.isBlank()) list
-        else list.filter { it.name.contains(q, ignoreCase = true) }
-        Pair(filtered, sortField)
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.Lazily,
-        Pair(emptyList(), SortField.DATE)
-    )
-
-    // Endgültige Auslieferung mit SortOrder
-    val displayedViews = combine(
-        _filtered,
+        _sortField,
         _sortOrder
-    ) { (list, sortField), sortOrder ->
-        Log.d(TAG, "Sorting – field=$sortField, order=$sortOrder, inputSize=${list.size}")
-        list.sortedWith(
+    ) { list, filter, query, sortField, sortOrder ->
+        // a) Filter nach Name (wenn angegeben)
+        val byFilter = filter?.let { f ->
+            list.filter { it.name.contains(f, ignoreCase = true) }
+        } ?: list
+        // b) Suche nach Query im Namen
+        val byQuery = if (query.isBlank()) byFilter
+        else byFilter.filter { it.name.contains(query, ignoreCase = true) }
+        // c) Sortierung
+        val sorted = byQuery.sortedWith(
             compareBy<ViewLayout> {
                 when (sortField) {
-                    SortField.DATE -> it.creationTS
-                    SortField.NAME -> it.name.lowercase()
+                    SortField.NAME      -> it.name.lowercase()
+                    SortField.CREATED   -> it.creationTS
                 }
             }.let { cmp -> if (sortOrder == SortOrder.DESC) cmp.reversed() else cmp }
         )
+        sorted
     }.stateIn(
-        viewModelScope,
-        SharingStarted.Lazily,
-        emptyList()
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
     )
 
-    /** Setze die Such‑Query */
-    fun setQuery(q: String) {
-        Log.d(TAG, "setQuery: '$q'")
-        _query.value = q
-    }
+    // Aktuell ausgewählte View-ID
+    private val _selectedViewId = MutableStateFlow<String?>(null)
+    val selectedViewId: StateFlow<String?> = _selectedViewId
 
-    /** Toggle Sort‑Feld (ASC↔DESC oder neues Feld) */
-    fun toggleSort(field: SortField) {
-        val newOrder = if (_sortField.value == field) {
-            if (_sortOrder.value == SortOrder.ASC) SortOrder.DESC else SortOrder.ASC
-        } else {
-            SortOrder.ASC
+    // Issues für die ausgewählte View
+    val issuesForSelectedView: StateFlow<List<IssueLayout>> = _selectedViewId
+        .filterNotNull()
+        .flatMapLatest { viewId ->
+            FirebaseAPI.getIssuesFromView(viewId)
         }
-        Log.d(TAG, "toggleSort: field=$field -> order=$newOrder")
-        _sortField.value = field
-        _sortOrder.value = newOrder
-    }
-
-    /** Lade nur die Views dieses Users */
-    fun reload() {
-        viewModelScope.launch {
-            val uid = AuthAPI.getUid()
-            Log.d(TAG, "Starting reload() for user=$uid")
-            if (uid == null) {
-                Log.w(TAG, "No user ID, skipping load")
-                _allViews.value = emptyList()
-                return@launch
-            }
-            try {
-                val views = FirebaseAPI.getViewsFromUser(uid)
-                Log.d(TAG, "Loaded ${views.size} views from remote for user=$uid")
-                _allViews.value = views
-            } catch (e: Exception) {
-                Log.e(TAG, "Error loading views for user=$uid", e)
-            }
-        }
-    }
-    private val _issues = MutableStateFlow<List<IssueLayout>>(emptyList())
-    val issues: StateFlow<List<IssueLayout>> = _issues.asStateFlow()
-
-    fun loadIssuesFromView(viewID: String) {
-        viewModelScope.launch {
-            FirebaseAPI.getIssuesFromView(viewID)
-                .collectLatest { _issues.value = it }
-        }
-    }
-    // 1) StateFlows für geladene Views
-    private val _viewLayouts = MutableStateFlow<List<ViewLayout>>(emptyList())
-    val viewLayouts: StateFlow<List<ViewLayout>> = _viewLayouts.asStateFlow()
-
-    /**
-     * Lädt alle ViewLayout-Objekte für die gegebenen viewIDs.
-     */
-    fun loadViewsByIds(ids: List<String>) {
-        viewModelScope.launch {
-            val loaded = ids.mapNotNull { id ->
-                // FirebaseAPI.getView ist suspend und liefert ViewLayout?
-                FirebaseAPI.getView(
-                    id,
-                    onSuccess = { /* ignorieren */ },
-                    onFailure = { /* hier könntest du loggen */ }
-                )
-            }
-            _viewLayouts.value = loaded
-        }
-    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     init {
-        reload()
+        // Automatische Auswahl der ersten View
+
     }
+
+    /** Setze Filter-String */
+    fun setFilter(f: String?) { _filter.value = f }
+
+    /** Setze Such-Query */
+    fun setQuery(q: String) { _query.value = q }
+
+    /** Toggle oder setze Sortierfeld */
+    fun setSortField(field: SortField) { _sortField.value = field }
+    fun toggleSortOrder() {
+        _sortOrder.value = if (_sortOrder.value == SortOrder.ASC) SortOrder.DESC else SortOrder.ASC
+    }
+
+    /** Wechselt die aktuell ausgewählte View */
+    fun selectView(viewId: String) {
+        _selectedViewId.value = viewId
+    }
+
+    /** Erneuert die Views (nennt die API erneut) */
+    fun reloadViews() {
+        // viewFlow liefert automatisch Updates
+    }
+
+    /** Erneuert die Issues der aktuellen View */
+
 }

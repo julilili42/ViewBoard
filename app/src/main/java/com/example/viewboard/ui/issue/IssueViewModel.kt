@@ -32,13 +32,17 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flattenMerge
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.State
 
 class IssueViewModel : ViewModel() {
 
-
+    companion object {
+        private const val TAG = "IssueViewModel"
+    }
     // Aktuelle User‑ID
     private val myId = AuthAPI.getUid() ?: ""
 
@@ -57,6 +61,7 @@ class IssueViewModel : ViewModel() {
     enum class SortOrder { ASC, DESC }
     // Aktuelle Project-ID
     private val _projectId = MutableStateFlow<String?>(null)
+    private val _viewId = MutableStateFlow<String?>(null)
     private val projectId: StateFlow<String?> = _projectId
 
     private val _sortField = MutableStateFlow(SortField.DATE)
@@ -64,6 +69,9 @@ class IssueViewModel : ViewModel() {
     private val _showOnlyMyIssues  = MutableStateFlow(true)
     val sortField: StateFlow<SortField> = _sortField.asStateFlow()
     val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
+    private val _items = mutableStateListOf<IssueLayout>()
+    val items: List<IssueLayout> get() = _items
+
     private val _filterState       = MutableStateFlow<IssueState?>(null)
     // Kombiniere Filter-, Such- und Sortfeld-States
     private val _filtered = combine(
@@ -86,19 +94,32 @@ class IssueViewModel : ViewModel() {
         SharingStarted.Lazily,
         Pair(emptyList(), SortField.DATE)
     )
+    private val _state = MutableStateFlow<IssueState>(IssueState.NEW)
+    fun setState(newState: IssueState) {
+        _state.value = newState
+    }
+    // 2) öffentlicher, readonly State für die UI
+    val state: StateFlow<IssueState> = _state
 
     private val rawIssuesFlow: Flow<List<IssueLayout>> =
         combine(
             _projectId.filterNotNull(),
-            _showOnlyMyIssues
-        ) { projId, onlyMine ->
-            Pair(projId, onlyMine)
+            _showOnlyMyIssues,
+            _state
+        ) { projId, onlyMine, stateFilter ->
+            Triple(projId, onlyMine, stateFilter)
         }
-            .flatMapLatest { (projId, onlyMine) ->
-                if (onlyMine) {
-                    FirebaseAPI.getIssuesFromUser(myId)
-                } else {
-                    FirebaseAPI.getIssuesFromProject(projId)
+            .flatMapLatest { (projId, onlyMine, stateFilter) ->
+                // 1) Hol die Issues
+                val sourceFlow: Flow<List<IssueLayout>> =
+                    if (onlyMine) FirebaseAPI.getIssuesFromUser(myId)
+                    else             FirebaseAPI.getIssuesFromProject(projId)
+
+                // 2) Filtere nach IssueState, falls stateFilter != null
+                sourceFlow.map { list ->
+                    stateFilter
+                        ?.let { s -> list.filter { it.state == s } }
+                        ?: list
                 }
             }
 
@@ -112,6 +133,9 @@ class IssueViewModel : ViewModel() {
     ) { list, filterState, q, sortField, sortOrder ->
         // a) IssueState‑Filter
         val byState = filterState
+            ?.let { s -> list.filter { it.state == s } }
+            ?: list
+        val byState2 = filterState
             ?.let { s -> list.filter { it.state == s } }
             ?: list
 
@@ -237,12 +261,12 @@ class IssueViewModel : ViewModel() {
         }
     }
 
-    val items = mutableStateListOf<IssueLayout>()
     val Project = mutableStateListOf<ProjectLayout>()
     val Views = mutableStateListOf<ViewLayout>()
     private val _issues = MutableStateFlow<List<IssueLayout>>(emptyList())
     var isDragging by mutableStateOf(false)
         private set
+
     // 1) Eingabe‑State für Filter und Zeitspanne
     private val _filterMode = MutableStateFlow(ProjectFilter.ALL)
     private val _timeSpan   = MutableStateFlow(TimeSpanFilter.CURRENT_MONTH)
@@ -344,23 +368,27 @@ class IssueViewModel : ViewModel() {
     fun loadMyIssues(projectId: String) {
         viewModelScope.launch {
             FirebaseAPI.getIssuesFromUser(AuthAPI.getUid(), projectId).collectLatest { issueList ->
-                items.clear()
-                items .addAll(issueList)
+                _items.clear()
+                _items .addAll(issueList)
 
             }
         }
     }
 
     fun loadIssuesFromView(viewID: String) {
+        Log.d(TAG, "loadIssuesFromView: start loading issues for viewID=$viewID")
         viewModelScope.launch {
-            FirebaseAPI.getIssuesFromView(viewID).collectLatest { issueList ->
-                items.clear()
-                items .addAll(issueList)
-            }
             FirebaseAPI.getIssuesFromView(viewID)
-                .collectLatest { _issues.value = it }
+                .collectLatest { list ->
+                    Log.d(
+                        TAG,
+                        "loadIssuesFromView: loaded ${list.size} issues for viewID=$viewID"
+                    )
+                    _allIssues.value = list
+                }
         }
     }
+
     fun loadViews() {
         viewModelScope.launch {
             FirebaseAPI.getAllViews().collectLatest { issueList ->
@@ -373,8 +401,8 @@ class IssueViewModel : ViewModel() {
     fun loadAllIssues(projectId: String) {
         viewModelScope.launch {
             FirebaseAPI.getIssuesFromProject(projectId).collectLatest { issueList ->
-                items.clear()
-                items .addAll(issueList)
+                _items.clear()
+                _items .addAll(issueList)
             }
         }
     }
@@ -392,7 +420,88 @@ class IssueViewModel : ViewModel() {
         FirebaseAPI.updIssue(item)
     }
     fun getItemsForCategory(state: IssueState): List<IssueLayout> {
-        return items.filter { it.state == state }
+        return _items.filter { it.state == state }
     }
 
+    fun getIssuesFlowForView(
+        viewId: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    ): Flow<List<IssueLayout>> {
+        return FirebaseAPI.getIssuesFromView(
+            viewID    = viewId,
+            onSuccess = onSuccess,
+            onFailure = onFailure
+        )
+    }
+    fun setCurrentViewId(viewId: String) {
+        _viewId.value = viewId
+        Log.d(TAG, "Current viewId set to: $viewId")
+    }
+    val issuesFlow: Flow<List<IssueLayout>> = _viewId
+        .filterNotNull()
+        .flatMapLatest { viewId ->
+            if (viewId.isBlank()) {
+                Log.w(TAG, "getIssuesForCurrentView called before setting viewId")
+                flowOf(emptyList())
+            } else {
+                FirebaseAPI.getIssuesFromView(
+                    viewID    = viewId,
+                    onSuccess = { Log.d(TAG, "Issues for view loaded: $viewId") },
+                    onFailure = { Log.e(TAG, "Failed to load view issues: $viewId") }
+                )
+            }
+        }
+    val displayedIssuesFromViews: StateFlow<List<IssueLayout>> = combine(
+        issuesFlow,
+        _filter,
+        _query,
+        _sortField,
+        _sortOrder
+    ) { list, filterState, q, sortField, sortOrder ->
+        // a) IssueState‑Filter
+        val byState = filterState
+            ?.let { s -> list.filter { it.state == s } }
+            ?: list
+
+        // b) Such‑Filter
+        val byQuery = if (q.isBlank()) byState
+        else byState.filter { it.title.contains(q, ignoreCase = true) }
+
+        // c) Sortierung
+        byQuery.sortedWith(
+            compareBy<IssueLayout> {
+                when (sortField) {
+                    SortField.DATE  -> it.deadlineTS
+                    SortField.NAME -> it.title.lowercase()
+                }
+            }.let { cmp ->
+                if (sortOrder == SortOrder.DESC) cmp.reversed() else cmp
+            }
+        )
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = emptyList()
+        )
+    private val _issuesForSelectedProject = MutableStateFlow<List<IssueLayout>>(emptyList())
+    val issuesForSelectedProject: StateFlow<List<IssueLayout>> = _issuesForSelectedProject
+
+    private val _selectedProject = MutableStateFlow<String?>(null)
+    val selectedProject: StateFlow<String?> = _selectedProject
+    fun selectProject(projectId: String) {
+        _selectedProject.value = projectId
+    }
+    fun loadIssuesForProject() {
+        // nur wenn eine Projekt‑ID ausgewählt ist
+        selectedProject.value?.let { projectId ->
+            viewModelScope.launch {
+                FirebaseAPI.getIssuesFromProject(projectId)
+                    .collectLatest { list ->
+                        _issuesForSelectedProject.value = list
+                    }
+            }
+        }
+    }
 }

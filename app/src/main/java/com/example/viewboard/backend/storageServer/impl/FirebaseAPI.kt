@@ -15,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.firestore.snapshots
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -270,11 +271,8 @@ object FirebaseAPI : StorageServerAPI() {
         // parallel alle Docs holen
         return coroutineScope {
             viewIds.map { id ->
-                async {
                     m_viewTable.document(id).get().await().toObject(ViewLayout::class.java)
-                }
             }
-                .awaitAll()
                 .filterNotNull()
         }
     }
@@ -524,39 +522,9 @@ object FirebaseAPI : StorageServerAPI() {
     public override fun getAllIssues() : Flow<List<IssueLayout>> {
         return m_issues
     }
+    private const val TAG = "FirebaseAPI"
 
-    public override fun getIssuesFromView(viewID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<IssueLayout>> {
-        return m_viewTable.document(viewID)
-            .snapshots()
-            .map { snap ->
-                snap.toObject(ViewLayout::class.java)?.issues ?: emptyList()
-            }
-            .distinctUntilChanged()
-            .flatMapLatest { issues ->
-                if (issues.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
-                val docFlows = issues.map { issue ->
-                    m_issueTable.document(issue)
-                        .snapshots()
-                        .map { snap ->
-                            snap.toObject(IssueLayout::class.java)
-                        }
-                }
-
-                combine (docFlows) { docs ->
-                    val map = docs.filterNotNull().associateBy { it.id }
-                    issues.mapNotNull { map[it] }
-                }
-            }
-            .onCompletion {
-                println("successfully retrieved issues from view: $viewID")
-                onSuccess(viewID)
-            }
-            .catch {
-                println("failed to retrieved issues from view: $viewID")
-                onFailure(viewID)
-            }
-    }
 
     public override fun getIssuesFromProject(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<IssueLayout>> {
         return m_projectTable.document(projID)
@@ -773,6 +741,45 @@ object FirebaseAPI : StorageServerAPI() {
             .catch {
                 println("failed to retrieved views from project: $projID")
                 onFailure(projID)
+            }
+    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    public override fun getIssuesFromView(
+        viewID: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ): Flow<List<IssueLayout>> {
+        return m_viewTable.document(viewID)
+            .snapshots()
+            .map { snap ->
+                snap.toObject(ViewLayout::class.java)?.issues ?: emptyList()
+            }
+            .distinctUntilChanged()
+            .flatMapLatest { issues ->
+                if (issues.isEmpty()) {
+                    return@flatMapLatest flowOf(emptyList())
+                }
+
+                val docFlows = issues.map { issueId ->
+                    m_issueTable.document(issueId)
+                        .snapshots()
+                        .map { snap ->
+                            snap.toObject(IssueLayout::class.java)
+                        }
+                }
+
+                combine(docFlows) { docs ->
+                    val map = docs.filterNotNull().associateBy { it.id }
+                    issues.mapNotNull { map[it] }
+                }
+            }
+            .onCompletion {
+                Log.d(TAG, "Successfully retrieved issues from view: $viewID")
+                onSuccess(viewID)
+            }
+            .catch {
+                Log.e(TAG, "Failed to retrieve issues from view: $viewID", it)
+                onFailure(viewID)
             }
     }
 
