@@ -164,7 +164,16 @@ abstract class AuthServerAPI {
         token: String,
         onComplete: (() -> Unit)? = {}
     )
-
+    /**
+     * Legt das User‑Profil in Firestore an, falls es noch nicht existiert.
+     *
+     * @param onSuccess Wird aufgerufen, wenn das Profil bereits existierte oder erfolgreich angelegt wurde.
+     * @param onError   Wird aufgerufen mit einer Fehlermeldung, wenn etwas schiefgeht.
+     */
+    abstract fun ensureUserProfileExists(
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    )
     /**
      * Retrieve and persist the FCM token for the current device.
      *

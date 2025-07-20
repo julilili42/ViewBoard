@@ -96,7 +96,7 @@ class IssueViewModel : ViewModel() {
         }
             .flatMapLatest { (projId, onlyMine) ->
                 if (onlyMine) {
-                    FirebaseAPI.getIssuesFromUser(myId, projId)
+                    FirebaseAPI.getIssuesFromUser(myId)
                 } else {
                     FirebaseAPI.getIssuesFromProject(projId)
                 }
@@ -185,10 +185,6 @@ class IssueViewModel : ViewModel() {
      */
     // 1) Basiskombination ohne SortOrder: Filterung und SortField
 
-
-
-
-
     /** Setze die aktuelle Project‑ID */
     fun setProject(projectId: String) {
         _projectId.value = projectId
@@ -244,7 +240,7 @@ class IssueViewModel : ViewModel() {
     val items = mutableStateListOf<IssueLayout>()
     val Project = mutableStateListOf<ProjectLayout>()
     val Views = mutableStateListOf<ViewLayout>()
-
+    private val _issues = MutableStateFlow<List<IssueLayout>>(emptyList())
     var isDragging by mutableStateOf(false)
         private set
     // 1) Eingabe‑State für Filter und Zeitspanne
@@ -361,6 +357,8 @@ class IssueViewModel : ViewModel() {
                 items.clear()
                 items .addAll(issueList)
             }
+            FirebaseAPI.getIssuesFromView(viewID)
+                .collectLatest { _issues.value = it }
         }
     }
     fun loadViews() {

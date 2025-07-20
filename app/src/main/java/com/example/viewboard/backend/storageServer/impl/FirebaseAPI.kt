@@ -1,6 +1,8 @@
 package com.example.viewboard.backend.storageServer.impl
 
+import android.util.Log
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import com.example.viewboard.backend.auth.impl.FirebaseProvider
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
@@ -13,6 +15,9 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.firestore.snapshots
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -254,6 +259,25 @@ object FirebaseAPI : StorageServerAPI() {
 
         return snap.toObject(LabelLayout::class.java)
     }
+    override suspend fun getViewsFromUser(userID: String?): List<ViewLayout> {
+        if (userID.isNullOrBlank()) return emptyList()
+        val userSnap = FirebaseProvider.firestore
+            .collection("users")
+            .document(userID)
+            .get().await()
+        val viewIds = userSnap.get("views") as? List<String> ?: emptyList()
+
+        // parallel alle Docs holen
+        return coroutineScope {
+            viewIds.map { id ->
+                async {
+                    m_viewTable.document(id).get().await().toObject(ViewLayout::class.java)
+                }
+            }
+                .awaitAll()
+                .filterNotNull()
+        }
+    }
 
     public override fun getAllLabels() : Flow<List<LabelLayout>> {
         return m_labels
@@ -310,6 +334,63 @@ object FirebaseAPI : StorageServerAPI() {
                 println("failed to add issue")
                 onFailure(issueLayout)
             }
+    }
+
+    public override suspend fun addViewToUser(
+        userID: String,
+        viewID: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        try {
+            // Referenz auf users/{userID}
+            val userRef = Firebase.firestore
+                .collection("users")
+                .document(userID)
+
+            // Update mit arrayUnion und await()
+            userRef
+                .update("views", FieldValue.arrayUnion(viewID))
+                .await()
+
+            // Callback bei Erfolg
+            onSuccess(viewID)
+        } catch (e: Exception) {
+            // Callback bei Fehler
+            onFailure(e.message ?: "Unbekannter Fehler beim Hinzufügen der View")
+        }
+    }
+    /**
+     * Erstellt ein View-Dokument und fügt es direkt dem User hinzu.
+     */
+    override suspend fun createViewForUser(
+        projID: String,
+        viewLayout: ViewLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        val uid = AuthAPI.getUid()
+        if (uid.isNullOrBlank()) {
+            onFailure("Kein eingeloggter User")
+            return
+        }
+
+        try {
+            // 1) View-Dokument erstellen
+            val ref = m_viewTable.add(viewLayout).await()
+            val newViewId = ref.id
+
+            // 2) Verknüpfen mit dem User (suspend call)
+            addViewToUser(uid, newViewId, { /* success callback */ }, { err ->
+                // Falls das Anlegen im User scheitert: wir werfen hier weiter
+                throw RuntimeException("Verknüpfen mit User fehlgeschlagen: $err")
+            })
+
+            // 3) Am Ende Callback
+            onSuccess(newViewId)
+        } catch (e: Exception) {
+            onFailure(e.message ?: "Fehler beim Anlegen des Views")
+        }
     }
 
     public override suspend fun addIssue(projID: String, viewID: String, issueLayout: IssueLayout, onSuccess: (String) -> Unit, onFailure: (IssueLayout) -> Unit) {

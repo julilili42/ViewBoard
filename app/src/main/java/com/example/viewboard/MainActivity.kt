@@ -20,7 +20,10 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         FirebaseAPI.init()
         enableEdgeToEdge()
-
+        AuthAPI.ensureUserProfileExists(
+            onSuccess = {},
+            onError = {}
+        )
         NotificationHelper.createNotificationChannel(this)
 
         lifecycleScope.launch {

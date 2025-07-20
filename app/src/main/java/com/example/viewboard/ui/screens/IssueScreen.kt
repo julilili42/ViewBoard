@@ -98,7 +98,7 @@ fun IssueScreen(
                     .offset(y = 40.dp)
                     .padding(16.dp)
                     .clip(CircleShape),
-                onClick       = { navController.navigate(Screen.IssueCreationScreen.createRoute(projectId)) }
+                onClick       = { navController.navigate(Screen.IssueCreationScreen.createRoute(projectName,projectId)) }
             )
         }
     ) { paddingValues ->

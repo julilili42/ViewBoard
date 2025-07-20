@@ -127,7 +127,7 @@ fun IssueItemCard(
                                 val cleanProj = projectId.trim('{','}')
 
                                 navController.navigate(
-                                    Screen.IssueEditScreen.createRoute(projectId.trim('{','}'), issueId)
+                                    Screen.IssueEditScreen.createRoute(projectId.trim('{','}'),"", issueId)
                                 )
 
                             }

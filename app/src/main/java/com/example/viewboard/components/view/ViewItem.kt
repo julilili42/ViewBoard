@@ -1,5 +1,6 @@
 package com.example.viewboard.components.view
 
+import OptionsMenuButton
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -22,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
@@ -46,9 +49,14 @@ import kotlinx.coroutines.flow.Flow
  * @param onClick is the click event of the ui element
  */
 @Composable
-fun ViewItem(view: ViewLayout, creator: String, color: Color, onClick: () -> Unit) {
+fun ViewItem(
+    view: ViewLayout,
+    creator: String,
+    color: Color,
+    onClick: () -> Unit
+) {
     val viewNameCode = generateProjectCode(view.name, view.creationTS)
-    val viewNamecolor = colorFromCode(viewNameCode)
+    val viewNameColor = colorFromCode(viewNameCode)
 
     Card(
         modifier = Modifier
@@ -59,66 +67,43 @@ fun ViewItem(view: ViewLayout, creator: String, color: Color, onClick: () -> Uni
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box(
-            Modifier
+            modifier = Modifier
                 .background(
-                    brush = Brush.linearGradient(listOf(viewNamecolor, viewNamecolor.copy(alpha = 0.6f))),
+                    brush = Brush.linearGradient(
+                        listOf(
+                            viewNameColor,
+                            viewNameColor.copy(alpha = 0.6f)
+                        )
+                    ),
                     shape = RoundedCornerShape(16.dp)
                 )
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Column(Modifier.fillMaxSize()) {
-                Row(
-                    Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        Modifier
-                            .background(viewNamecolor, RoundedCornerShape(8.dp))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = viewNameCode,
-                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                            color = Color.White
-                        )
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "Details",
-                        tint = Color.White
-                    )
-                }
-                Text(
-                    text = Timestamp(data = view.creationTS).getDate(),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.9f)
-                )
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    text = view.name,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = Color.White
-                )
+            // Options‑Button oben rechts
+            OptionsMenuButton(
+                options = listOf(
+                    "Edit" to { /* TODO: edit action */ },
+                    "Delete" to { /* TODO: delete action */ }
+                ),
+                modifier = Modifier.align(Alignment.TopEnd),
+                icon = Icons.Default.MoreVert
+            )
 
-                Spacer(Modifier.weight(1f))
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(25.dp),
-                    verticalAlignment = Alignment.CenterVertically
+            // Inhalt: Name zentriert
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 8.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box{
-                        Text(
-                            text = creator,
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                            color = Color.White
-                        )
-                    }
-                    Spacer(Modifier.weight(1f))
                     Text(
-                        text = view.issues.size.toString(),
+                        text = view.name,
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         color = Color.White
                     )

@@ -398,7 +398,40 @@ abstract class StorageServerAPI () {
      * @return the views when they have been successfully retrieved
      */
     public abstract fun getViewsFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<ViewLayout>>
-
+    /**
+     * Fügt eine View‐ID in das "views"-Feld des User‑Dokuments ein.
+     *
+     * @param userID    die Firebase‑UID des Users
+     * @param viewID    die View‑ID, die hinzugefügt werden soll
+     * @param onSuccess Callback, aufgerufen mit viewID bei erfolgreichem Update
+     * @param onFailure Callback, aufgerufen mit Fehlermeldung bei Fehler
+     */
+    abstract suspend fun addViewToUser(
+        userID: String,
+        viewID: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    )
+    /**
+     * Lädt alle Views eines Users anhand seiner User‑ID.
+     * @param userID die Firebase‑UID des Users (oder null)
+     * @return Liste aller ViewLayout‑Objekte dieses Users
+     */
+    /**
+     * Erstellt ein neues View‑Dokument und verknüpft es direkt mit dem User.
+     *
+     * @param projID     die ID des Projekts, in dem das View angelegt werden soll
+     * @param viewLayout das ViewLayout, das angelegt werden soll
+     * @param onSuccess  Callback mit der erzeugten viewID bei Erfolg
+     * @param onFailure  Callback mit Fehlermeldung bei Misserfolg
+     */
+    abstract suspend fun createViewForUser(
+        projID: String,
+        viewLayout: ViewLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    )
+    abstract suspend fun getViewsFromUser(userID: String?): List<ViewLayout>
     protected lateinit var m_projects: Flow<List<ProjectLayout>>
     protected lateinit var m_labels: Flow<List<LabelLayout>>
     protected lateinit var m_issues: Flow<List<IssueLayout>>

@@ -235,7 +235,54 @@ object AuthAPI : AuthServerAPI() {
             null
         }
     }
+    override fun ensureUserProfileExists(
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val uid = getUid()
+        val currentUser = FirebaseProvider.auth.currentUser
 
+        if (uid.isNullOrBlank() || currentUser == null) {
+            onError("Kein eingeloggter User")
+            return
+        }
+
+        val userRef = FirebaseProvider.firestore
+            .collection("users")
+            .document(uid)
+
+        // 1) Prüfe, ob’s schon ein Doc gibt
+        userRef.get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    // Profil existiert bereits
+                    onSuccess()
+                } else {
+                    // Profil anlegen
+                    // UserLayout wird hier angenommen so aufgebaut:
+                    // data class UserLayout(
+                    //   val uid: String = "",
+                    //   val name: String = "",
+                    //   val email: String = "",
+                    //   val notificationsEnabled: Boolean = true
+                    // )
+                    val profile = UserLayout(
+                        uid = uid,
+                        name = currentUser.displayName ?: "",
+                        email = currentUser.email ?: "",
+                    )
+
+                    userRef.set(profile)
+                        .addOnSuccessListener { onSuccess() }
+                        .addOnFailureListener { e ->
+                            onError(e.message ?: "Fehler beim Anlegen des Profils")
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                onError(e.message ?: "Fehler bei der Abfrage des Profils")
+            }
+    }
 
     override fun logout(navController: NavController) {
         FirebaseProvider.auth.signOut()

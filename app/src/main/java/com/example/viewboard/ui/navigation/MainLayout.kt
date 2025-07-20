@@ -9,6 +9,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,11 +28,9 @@ sealed class BottomBarScreen(val route: String, @StringRes val title: Int, val i
         R.string.home,
         R.drawable.house_black_silhouette_without_door_svgrepo_com
     )
-
     object Timetable :
         BottomBarScreen("timetable", R.string.timetable, R.drawable.calendar_mark_svgrepo_com)
-
-    object View : BottomBarScreen("View", R.string.views, R.drawable.contacts_svgrepo_com)
+    object View : BottomBarScreen("view", R.string.views, R.drawable.contacts_svgrepo_com)
     object Profile : BottomBarScreen("profile", R.string.profile, R.drawable.user_svgrepo_com)
 }
 
@@ -72,8 +71,16 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
             contentColor = Color.Black,
         ) {
             items.forEach { screen ->
-                val selected = currentRoute == screen.route
+                val selected = currentRoute?.startsWith(screen.route) == true
                 NavigationBarItem(
+                    selected = selected,
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor        = Color(0xFF795548), // z.B. Braun
+                        selectedIconColor     = Color.White,
+                        selectedTextColor     = Color.White,
+                        unselectedIconColor   = Color(0xFF757575),
+                        unselectedTextColor   = Color(0xFF757575)
+                    ),
                     icon = {
                         Icon(
                             painter = painterResource(id = screen.iconRes),
@@ -88,20 +95,24 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
                             color = if (selected) Color(0xFF212121) else Color(0xFF757575)
                         )
                     },
-                    selected = currentRoute == screen.route,
                     onClick = {
+
                         if (currentRoute != screen.route) {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                            navController.navigateTab(screen.route)
                         }
                     }
                 )
             }
         }
+    }
+}
+
+fun NavHostController.navigateTab(route: String) {
+    this.navigate(route) {
+        popUpTo("main") {
+            inclusive = false
+        }
+        launchSingleTop = true
+        restoreState = false
     }
 }

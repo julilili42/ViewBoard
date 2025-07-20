@@ -7,4 +7,5 @@ data class UserLayout (
     var uid: String = "",
     var name: String = "",
     var email: String = "",
+    var views: ArrayList<String> = ArrayList<String>(),
 )

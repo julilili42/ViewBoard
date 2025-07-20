@@ -105,7 +105,7 @@ fun HomeScreen(
                     projects = activeProjects,
                     title = stringResource(R.string.ActiveProjects)
                 ) { projectName ->
-                    navController.navigate(Screen.ProjectDetail.createRoute(projectName))
+                    navController.navigate(Screen.ProjectScreen.createRoute(projectName))
                 }
                 Spacer(Modifier.height(24.dp))
                 val completedTasks = 5
