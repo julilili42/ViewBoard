@@ -46,6 +46,7 @@ import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.components.homeScreen.ProfileHeader
 import com.example.viewboard.ui.issue.IssueItemCard
+import com.example.viewboard.ui.issue.IssueViewModel
 import com.example.viewboard.ui.issue.MainViewModel
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.timetable.CustomIcon
@@ -53,7 +54,7 @@ import com.example.viewboard.ui.timetable.CustomIcon2
 import kotlinx.coroutines.launch
 
 @Composable
-fun ViewIssueScreen(mainViewModel: MainViewModel, navController: NavController, viewID: String, projID: String) {
+fun ViewIssueScreen(mainViewModel: IssueViewModel, navController: NavController, viewID: String, projID: String) {
     var showDialog by remember { mutableStateOf(false) }
 
     val categories = listOf("New", "Ongoing", "Done")

@@ -62,7 +62,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ProjectItem(
     project: ProjectLayout,
-    color: Color,
+    color: Color=Color.White,
     calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },
     avatarUris: List<Uri>,
     onClick: () -> Unit

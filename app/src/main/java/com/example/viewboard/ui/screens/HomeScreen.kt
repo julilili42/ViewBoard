@@ -6,7 +6,9 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -26,6 +28,7 @@ import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.components.homeScreen.CustomDropdownMenu
 import com.example.viewboard.components.homeScreen.ProgressCard
 import com.example.viewboard.components.homeScreen.ProjectGrid
 import com.example.viewboard.ui.navigation.Screen
@@ -48,7 +51,7 @@ val tasks: List<Pair<String, LocalDateTime>> = listOf(
 @Composable
 fun HomeScreen(
     navController: NavController,
-    activeProjects: List<String> = listOf("Created", "Shared", "Archived", "All"),
+    activeProjects: List<String> = listOf("Created", "Shared"),//, "Archived", "All"
     myTasks: List<Pair<String, LocalDateTime>> = tasks,
     viewModel: MainViewModel,
     modifier: Modifier,
@@ -60,7 +63,8 @@ fun HomeScreen(
     val span by viewModel.timeSpan.collectAsState(
         initial = TimeSpanFilter.CURRENT_MONTH
     )
-    val topBlockHeightPx = with(density) { 400.dp.toPx() }
+    val contactheight = 300.dp
+    val topBlockHeightPx = with(density) { contactheight.toPx() }
     Scaffold(
         topBar = {
                     ProfileHeader(
@@ -88,7 +92,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
-                    .height(400.dp)
+                    .height(contactheight )
                     .onSizeChanged { size ->
                         columnHeightPx = size.height
                     }
@@ -194,7 +198,7 @@ fun DraggableMyTasksSection(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    ViewSelectorDropdown(
+                   /* ViewSelectorDropdown(
                         viewNames       = viewNames,
                         selectedView    = selectedName,
                         onViewSelected  = { viewName ->
@@ -203,6 +207,17 @@ fun DraggableMyTasksSection(
                                 viewModel.selectView(view.id)}},
                         modifier        = Modifier
                             .fillMaxWidth(0.4f)
+                    )*/
+                    CustomDropdownMenu(
+                        options = viewNames,
+                        selectedOption = selectedName,
+                        onOptionSelected = {viewName ->
+                            // finde das ViewLayout zur Auswahl und setze es im VM
+                            views.firstOrNull { it.name == viewName }?.let { view ->
+                                viewModel.selectView(view.id)} },
+                        modifier = Modifier
+                            .fillMaxWidth(0.4f)   // nur 80% der Breite
+                            .padding()
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     val onFirstClick = fun(){}

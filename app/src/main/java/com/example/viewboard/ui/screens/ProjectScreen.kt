@@ -45,6 +45,15 @@ import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.project.CustomSearchField
 import kotlinx.coroutines.flow.map
 
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.runtime.collectAsState
+import com.example.viewboard.ui.issue.ProjectViewModel
+import com.example.viewboard.ui.timetable.CustomIconMenu
+import com.example.viewboard.ui.timetable.ProjectSortMenu
+import com.example.viewboard.ui.timetable.ProjectSortMenuSimple
+import com.example.viewboard.ui.timetable.SortOptions
+
+
 /**
  * Beispiel-Liste von Projekten für Preview und Tests.
  */
@@ -89,13 +98,12 @@ object AppColors {
 fun ProjectsScreen(
     navController: NavController,
     projectName: String,
+    @Suppress("UNUSED_PARAMETER")
+    projectViewModel: ProjectViewModel,
     columns: Int = 2,
     onSort: () -> Unit = {},
 ) {
-
-    val projectLayouts = remember { mutableStateListOf<ProjectLayout>() }
-    var error by remember { mutableStateOf<String?>(null) }
-
+    // Bestimme den Filter-Modus anhand des Namens
     val filterMode = when (projectName.lowercase()) {
         "created" -> ProjectFilter.CREATED
         "shared"  -> ProjectFilter.SHARED
@@ -103,49 +111,32 @@ fun ProjectsScreen(
         else      -> ProjectFilter.CREATED
     }
 
-
+    // Sobald filterMode sich ändert: Filter im ViewModel setzen und neu laden
     LaunchedEffect(filterMode) {
-        try {
-            // 3) Baue die richtige Flow‑Quelle
-            val flow = when (filterMode) {
-                ProjectFilter.CREATED ->
-                    FirebaseAPI.getProjectsFromUser(AuthAPI.getUid())
-                ProjectFilter.SHARED ->
-                    FirebaseAPI.getAllProjects().map { list ->
-                        list.filterNot { it.creator == AuthAPI.getUid() }
-                    }
-                ProjectFilter.ALL ->
-                    FirebaseAPI.getAllProjects()
-            }
-
-            // 4) Sammle und fülle deine Liste
-            flow.collect { layouts ->
-                projectLayouts.clear()
-                projectLayouts.addAll(layouts)
-            }
-        } catch (e: Exception) {
-            error = "Ladefehler: ${e.localizedMessage}"
-        }
-    }
-    var query by remember { mutableStateOf("") }
-    val displayed = remember(projectLayouts, query) {
-        if (query.isBlank()) projectLayouts
-        else projectLayouts.filter { it.name.contains(query, ignoreCase = true) }
+        projectViewModel.setFilter(filterMode)
     }
 
+    // Beobachte die gefilterten & gesuchten Projekte aus dem ViewModel
+    val projects by projectViewModel.displayedProjects.collectAsState()
+
+    // Lokaler State für die Such-Query
+    val query by projectViewModel.query.collectAsState()
+    val currentField by projectViewModel.sortField.collectAsState()
+    val currentOrder by projectViewModel.sortOrder.collectAsState()
     Scaffold(
         topBar = {
-                ProfileHeader(
-                    name = AuthAPI.getCurrentDisplayName() ?: "failed to load username",
-                    subtitle = "Welcome back!!",
-                    navController =navController,
-                    showBackButton = true,
-                    onProfileClick = {
-                        navController.navigate(BottomBarScreen.Profile.route)
-                    },
-                    onBackClick = {navController.navigateUp()}
-                )
-
+            ProfileHeader(
+                name = AuthAPI.getCurrentDisplayName() ?: "Unknown User",
+                subtitle = "Welcome back!",
+                navController = navController,
+                showBackButton = true,
+                onProfileClick = {
+                    navController.navigate(BottomBarScreen.Profile.route)
+                },
+                onBackClick = {
+                    navController.navigateUp()
+                }
+            )
         },
         floatingActionButton = {
             CustomIcon(
@@ -159,95 +150,85 @@ fun ProjectsScreen(
                     .offset(y = 40.dp)
                     .padding(16.dp)
                     .clip(CircleShape),
-                onClick = { navController.navigate(Screen.ProjectCreationScreen.route) },
-
+                onClick = {
+                    navController.navigate(Screen.ProjectCreationScreen.route)
+                }
             )
         }
     ) { paddingValues ->
-        Column(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(columns),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())
+                .padding(top = paddingValues.calculateTopPadding()),
+            contentPadding = PaddingValues(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = projectName +" Projects", // z.B. "My Projects"
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val items = listOf("Apple", "Banana", "Cherry").filter {
-                    it.contains(query, ignoreCase = true)    }
-                    CustomSearchField(
-                    query = query,
-                    onQueryChange = { query = it },
+            // Header, Suchfeld und Sort/Filter-Icons
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Text(
+                    text = "$projectName Projects",
+                    style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
-                        .height(40.dp)
-                        .width(200.dp),
-                    suggestionContent = { q ->
-                        Column {
-                            items.forEach { item ->
-                                Text(
-                                    text = item,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            query = item
-                                        }
-                                        .padding(12.dp)
-                                )
-                            }
-                        }
-                    }
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp)
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    CustomIcon(
-                        iconRes = R.drawable.sort_desc_svgrepo_com,
-                        contentDesc = stringResource(R.string.sort_desc_svgrepo_com),
-                        backgroundColor = MaterialTheme.colorScheme.primary,
-                        iconTint = Color.White,
-                        width = 40.dp,
-                        height = 40.dp,
-                        onClick = onSort,
-                        modifier = Modifier
 
-                    )
-                    CustomIcon(
-                        iconRes = R.drawable.filter_svgrepo_com__1,
-                        contentDesc = stringResource(R.string.filter_svgrepo_com__1),
-                        backgroundColor= Color.Gray,
-                        iconTint = Color.White,
-                        width = 40.dp,
-                        height = 40.dp,
-                        onClick = { },
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    CustomSearchField(
+                        query = query,
+                        onQueryChange = { projectViewModel.setQuery(it) },
                         modifier = Modifier
+                            .height(40.dp)
+                            .width(200.dp),
                     )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                      /*  CustomIcon(
+                            iconRes = R.drawable.filter_svgrepo_com__1,
+                            contentDesc = stringResource(R.string.sort_desc_svgrepo_com),
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            iconTint = Color.White,
+                            width = 40.dp,
+                            height = 40.dp,
+                            onClick = onSort,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )*/// Usage example:
+                         val sortOptions = listOf(
+                             SortOptions("Sort by Date", ProjectViewModel.SortField.DATE),
+                            SortOptions("Sort by Name", ProjectViewModel.SortField.NAME),
+
+                         )
+                         ProjectSortMenuSimple(projectViewModel, sortOptions, iconRes = R.drawable.sort_desc_svgrepo_com, contentDesc = "Sort")
+                        ProjectSortMenuSimple(
+                            projectViewModel = projectViewModel,
+                            iconRes          = R.drawable.sort_desc_svgrepo_com,
+                            backgroundColor  = MaterialTheme.colorScheme.primary,
+                            iconTint  = Color.White,
+                            contentDesc      = stringResource(R.string.filter_svgrepo_com__1),
+                            modifier         = Modifier.size(40.dp)
+                        )
+                    }
                 }
             }
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(columns),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth()
-            ) {
-                itemsIndexed(displayed) {index, project ->
-                    ProjectItem(
-                        project = project,
-                        color               = AppColors.StrongPalette[index % AppColors.StrongPalette.size],
-                        avatarUris          = emptyList(),
-                        onClick             = {navController.navigate(Screen.IssueScreen.createRoute(project.name,project.id))}
-                    )
-                }
+
+            // Grid-Items für jedes Projekt
+            itemsIndexed(projects) { index, project ->
+                ProjectItem(
+                    project = project,
+                    avatarUris = emptyList(),
+                    onClick = {
+                        navController.navigate(
+                            Screen.IssueScreen.createRoute(project.name, project.id)
+                        )
+                    }
+                )
             }
         }
     }

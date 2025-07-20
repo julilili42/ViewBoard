@@ -7,9 +7,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -27,16 +30,23 @@ import coil.compose.AsyncImage
 import androidx.compose.ui.res.painterResource
 import com.example.viewboard.R
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import colorFromCode
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.navigation.Screen
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.util.Locale
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -55,25 +65,18 @@ fun IssueItemCard(
     val showCount = avatarUris.size.coerceAtMost(3)
     val avatarSize = 18.dp
     val scope = rememberCoroutineScope()
-    var expanded by remember { mutableStateOf(false) }
-
-    val instant = remember(date) { Instant.parse(date) }
-    val localDt = remember(instant) {
-        instant.atZone(ZoneId.systemDefault())
-    }
-    val fmt = remember {
-        DateTimeFormatter.ofPattern("yyyy‑MM‑dd HH:mm")
-    }
-    val display = remember(localDt) {
-        localDt.format(fmt)
-    }
+    var expandedOptions by remember { mutableStateOf(false) }
+    var expandedUser by remember { mutableStateOf(false) }
+    val issueDate = formatGermanShortDate(date)
+    val issueDueTime = formatRemaining(date)
+    val scrollState = rememberScrollState()
 
     Box(
         modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(
-                Color.Black.copy(alpha = 0.2f),
+                Color.White,
                 shape = RoundedCornerShape(16.dp)
             )
             .border(
@@ -104,7 +107,7 @@ fun IssueItemCard(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
                                 onClick = {
-                                    expanded = true
+                                    expandedOptions  = true
                                     onOptionsClick()
                                 },
                                 onLongClick = {}
@@ -113,14 +116,14 @@ fun IssueItemCard(
                     )
 
                     DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                        expanded = expandedOptions ,
+                        onDismissRequest = { expandedOptions  = false }
                     ) {
                         DropdownMenuItem(
                             text = { Text("Edit") },
                             // z.B. in deinem DropdownMenuItem “Edit”
                             onClick = {
-                                expanded = false
+                                expandedOptions  = false
                                 val cleanProj = projectId.trim('{','}')
 
                                 navController.navigate(
@@ -133,7 +136,7 @@ fun IssueItemCard(
                         DropdownMenuItem(
                             text = { Text("Delete") },
                             onClick = {
-                                expanded = false
+                                expandedOptions  = false
 
                                 scope.launch {
                                     try {
@@ -151,35 +154,52 @@ fun IssueItemCard(
             }
 
 
+            val exampleLabels = listOf(
+                "Bug",
+                "Feature",
+                "High Priority",
+                "Low Priority",
+                "In Review",
+                "Blocked",
+                "UI",
+                "Backend",
+                "Research",
+                "Documentation"
+            )
+            val mails = listOf(
+                "Raoul.dankert@gmail.com", // John Doe
+                "felix.dankert@gmail.com", // Alice Liddell
+                "paul.dankert@gmail.com", // Bob Smith
+                "Jerrry.dankert@gmail.com", // Eve Villanueva
+                "DSad.dankert@gmail.com", // Karl Müller
+                "Twdda.dankert@gmail.com", // Ute Tannhäuser
+                "wadwam.dankert@gmail.com", // Maria García
+                "wadwa.dankert@gmail.com", // Yvonne Thäter
+                "wadwad.dankert@gmail.com", // Xaver Zimmermann
+                "fwad.dankert@gmail.com"   // Quentin (einzelnes Zeichen)
+            )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(
-                    Modifier
-                        .background(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            RoundedCornerShape(8.dp)
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(scrollState),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                exampleLabels.forEach { label ->
+                    val labelColor= colorFromCode(label)
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = labelColor.copy(alpha = 0.1f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
                         )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                   /* Text(
-                        text = priority,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )*/
-                }
-                Box(
-                    Modifier
-                        .background(
-                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
-                            RoundedCornerShape(8.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                   /* Text(
-                        text = status,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.secondary
-                    )*/
+                    }
                 }
             }
             Row(
@@ -197,7 +217,7 @@ fun IssueItemCard(
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
-                        text = display,
+                        text = issueDate,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -207,93 +227,188 @@ fun IssueItemCard(
                         modifier = Modifier.size(15.dp)
                     )
                     Text(
-                        text = attachments.toString() + " days",
+                        text = issueDueTime,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                   /* Icon(
-                        painter = painterResource(id = R.drawable.create_note_svgrepo_com__1_),
-                        contentDescription = "Creator",
-                        modifier = Modifier.size(17.dp)
-                    )
-                    Box (  Modifier
-                        .size(avatarSize +3.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .border(
-                            1.dp,
-                            MaterialTheme.colorScheme.surface,
-                            CircleShape
-                        ),
-                        contentAlignment = Alignment.Center) {
-                        AsyncImage(
-                            model = firstAvatar,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(avatarSize)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary)
-                                .border(
-                                    1.dp,
-                                    MaterialTheme.colorScheme.surface,
-                                    CircleShape
-                                ),
-                        )
-                    }*/
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
+                    val avatarInitials = listOf(
+                        "JD", // John Doe
+                        "AL", // Alice Liddell
+                        "BS", // Bob Smith
+                        "EV", // Eve Villanueva
+                        "KM", // Karl Müller
+                        "UT", // Ute Tannhäuser
+                        "MG", // Maria García
+                        "YT", // Yvonne Thäter
+                        "XZ", // Xaver Zimmermann
+                        "Q"   // Quentin (einzelnes Zeichen)
+                    )
+                    val avatarEmails = listOf(
+                        "john.doe@example.com",        // JD
+                        "alice.liddell@example.com",   // AL
+                        "bob.smith@example.com",       // BS
+                        "eve.villanueva@example.com",  // EV
+                        "karl.mueller@example.com",    // KM
+                        "ute.tannhaeuser@example.com", // UT
+                        "maria.garcia@example.com",    // MG
+                        "yvonne.thaeter@example.com",  // YT
+                        "xaver.zimmermann@example.com",// XZ
+                        "quentin@example.com"          // Q
+                    )
 
-                        avatarUris.take(showCount).forEachIndexed { index, uri ->
-                            Box (  Modifier
-                                .size(avatarSize +3.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary)
-                                .border(
-                                    1.dp,
-                                    MaterialTheme.colorScheme.surface,
-                                    CircleShape
-                                ),
-                                contentAlignment = Alignment.Center) {
-                                AsyncImage(
-                                    model = uri,
-                                    contentDescription = null,
+                    val extraCount = (avatarEmails.size - showCount).coerceAtLeast(0)
+                    Box(modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource()},
+                        indication = null
+                    ) {
+                        expandedUser = true
+                    }) {
+                        Row(horizontalArrangement = Arrangement.spacedBy((-avatarSize/3))
+                            , modifier = modifier.background(Color.White)
+                        ) {
+                            avatarEmails.take(3).forEach { email ->
+                                AvatarInitialBox(email, avatarSize)
+                            }
+                            if (extraCount > 0) {
+                                Box(
                                     modifier = Modifier
-                                        .size(avatarSize)
+                                        .size(avatarSize + 3.dp)
                                         .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.primary)
-                                        .border(
-                                            1.dp,
-                                            MaterialTheme.colorScheme.surface,
-                                            CircleShape
-                                        ),
-                                )
+                                        .background(MaterialTheme.colorScheme.onSurfaceVariant),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "+$extraCount",
+                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
                             }
                         }
-                        val extra = avatarUris.size - showCount
-                        if (extra > 0) {
-                            Box(
-                                contentAlignment = Alignment.Center,
+                        DropdownMenu(
+                            expanded = expandedUser,
+                            onDismissRequest = { expandedUser = false },
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .width(200.dp)
+                                .background(Color.White)
+                        ) {
+                            // Horizontal scrollbare Leiste mit allen Avataren
+                            Row(
                                 modifier = Modifier
-                                    .size(avatarSize +2.dp)
-                                    //.offset(x = (showCount * avatarOverlap)) // nach den sichtbaren Avataren
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primary)
-                                    .border(
-                                        1.dp,
-                                        MaterialTheme.colorScheme.surface,
-                                        CircleShape
-                                    )
+                                    .horizontalScroll(rememberScrollState())
+                                    .padding(top = 4.dp, bottom = 4.dp, end = 8.dp, start = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text(
-                                    text = "+$extra",
-                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                    color = Color.Black
-                                )
-
+                                avatarEmails.forEach { email ->
+                                    AvatarInitialBox(email, avatarSize)
+                                }
+                            }
                         }
                     }
+
                 }
             }
         }
     }
 }
+
+
+
+@Composable
+private fun AvatarInitialBox(email: String, avatarSize: Dp) {
+    val initials = emailToInitials(email)
+    val initialsColor = colorFromCode(email)
+    Box(
+        modifier = Modifier
+            .size(avatarSize + 3.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.onSurfaceVariant)
+            .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(modifier = Modifier
+            .size(avatarSize)
+            .clip(CircleShape)
+            .background(initialsColor)
+            .wrapContentSize(Alignment.Center)) {
+            Text(
+                text = initials,
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium, fontSize = 8.sp),
+                color = MaterialTheme.colorScheme.onPrimary,
+            )
+        }
+    }
+}
+fun formatGermanShortDate(input: String): String {
+    // 1) Nur den Datums‑Teil nehmen (vor 'T' oder Leerzeichen)
+    val datePart = input
+        .substringBefore('T')
+        .substringBefore(' ')
+        .trim()
+
+    // 2) In LocalDate parsen
+    val date = LocalDate.parse(datePart)  // wirft bei ungültigem Format
+
+    // 3) Formatter für "DD. MMM yy" in Deutsch
+    val formatter = DateTimeFormatter.ofPattern("dd. MMM yy", Locale.GERMAN)
+
+    // 4) Formatiertes Ergebnis zurückliefern
+    return date.format(formatter)
+}
+
+fun formatRemaining(isoTimestamp: String): String {
+    // 1) Nur das Datum+Zeit‑Teil vor 'T' oder Leerzeichen
+    val tsPart = isoTimestamp.substringBefore('Z') // entfernt Z, falls vorhanden
+    val instant = Instant.parse(
+        tsPart.substringBefore(' ') // falls ein Leerzeichen im String ist
+            .let { if (it.contains('T')) it else it + "T00:00:00" } + "Z"
+    )
+
+    val now = Instant.now()
+    if (instant.isBefore(now)) {
+        return "0 hours"
+    }
+
+    // 2) Wandeln in LocalDate/LocalDateTime für Datumsermittlung
+    val zone  = ZoneId.systemDefault()
+    val thenDt = instant.atZone(zone).toLocalDateTime()
+    val nowDt  = now.atZone(zone).toLocalDateTime()
+
+    return if (thenDt.toLocalDate() == nowDt.toLocalDate()) {
+        // gleiche Tages‑Datum → Stunden
+        val hours = ChronoUnit.HOURS.between(nowDt, thenDt).toInt()
+        val h     = hours.coerceAtLeast(0)
+        if (h == 1) "1 hour" else "$h hours"
+    } else {
+        // anderes Datum → Tage
+        val days = ChronoUnit.DAYS.between(nowDt.toLocalDate(), thenDt.toLocalDate()).toInt()
+        val d    = days.coerceAtLeast(0)
+        if (d == 1) "1 day" else "$d days"
+    }
+}
+
+fun emailToInitials(email: String): String {
+    // 1) Lokalen Teil vor '@' extrahieren
+    val local = email.substringBefore('@', "").lowercase()
+
+    // 2) Auftrenner definieren und splitten (explizites ignoreCase nötig)
+    val separators = arrayOf(".", "_", "-")
+    val parts = local.split(
+        *separators,
+        ignoreCase = true   // jetzt passt die Signatur vararg String + Boolean
+    ).filter { it.isNotBlank() }
+
+    // 3) Initialen bestimmen wie gehabt
+    val initials = when {
+        parts.size >= 2 -> "${parts[0][0]}${parts[1][0]}"
+        local.length >= 2 -> "${local[0]}${local[1]}"
+        local.length == 1 -> "${local[0]}"
+        else -> "??"
+    }
+
+    return initials.uppercase()
+}
+

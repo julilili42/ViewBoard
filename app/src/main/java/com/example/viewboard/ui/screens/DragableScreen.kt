@@ -13,6 +13,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
+import com.example.viewboard.ui.issue.IssueViewModel
 import com.example.viewboard.ui.issue.MainViewModel
 
 internal val LocalDragTargetInfo = compositionLocalOf { DragTargetInfo() }
@@ -62,7 +63,7 @@ fun DragableScreen(
 fun <T> DragTarget(
     modifier: Modifier = Modifier,
     dataToDrop: T,
-    viewModel: MainViewModel,
+    viewModel: IssueViewModel,
     content: @Composable () -> Unit
 ) {
     val dragInfo = LocalDragTargetInfo.current

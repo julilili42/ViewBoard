@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,12 +26,14 @@ import androidx.navigation.navigation
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.ui.issue.IssueViewModel
 import com.example.viewboard.ui.screens.LoginScreen
 import com.example.viewboard.ui.screens.RegistrationScreen
 import com.example.viewboard.ui.screens.HomeScreen
 import com.example.viewboard.ui.screens.DragableScreen
 import com.example.viewboard.ui.screens.IssueScreen
 import com.example.viewboard.ui.issue.MainViewModel
+import com.example.viewboard.ui.issue.ProjectViewModel
 import com.example.viewboard.ui.screens.ChangeEmailScreen
 import com.example.viewboard.ui.screens.ChangePasswordScreen
 import com.example.viewboard.ui.screens.HelpSupportScreen
@@ -53,7 +56,6 @@ fun Navigation(modifier: Modifier = Modifier) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     val mainViewModel = MainViewModel()
-
     val isLoggedIn = FirebaseProvider.auth.currentUser != null
     val start = if (isLoggedIn) "main" else Screen.LoginScreen.route
 
@@ -144,12 +146,15 @@ fun Navigation(modifier: Modifier = Modifier) {
                 })
             ) { backStackEntry ->
                 val projectName = backStackEntry.arguments!!.getString("projectName")!!
+                val projectViewModel: ProjectViewModel = viewModel(backStackEntry)
                 MainLayout(navController, currentRoute) { padding ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
                         .padding(padding)
                     ) {
-                        ProjectsScreen(navController = navController, projectName = projectName)
+                        ProjectsScreen(navController = navController,
+                            projectName = projectName,
+                            projectViewModel = projectViewModel)
                     }
                 }
             }
@@ -257,6 +262,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                 // beide Argumente auslesen
                 val projectName = backStack.arguments!!.getString("projectName")!!
                 val projectId   = backStack.arguments!!.getString("projectId")!!
+                val issueViewModel: IssueViewModel = viewModel(backStack)
                 MainLayout(navController, currentRoute) { padding ->
                     Box(
                         modifier = Modifier
@@ -269,6 +275,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                             IssueScreen(
                                 mainViewModel,
                                 navController,
+                                issueViewModel=issueViewModel ,
                                 projectName  = projectName,
                                 projectId    = projectId   // jetzt mit übergeben
                             )
@@ -285,6 +292,7 @@ fun Navigation(modifier: Modifier = Modifier) {
             ) { backStack ->
                 val viewID   = backStack.arguments!!.getString("viewID")!!
                 val projID   = backStack.arguments!!.getString("projID")!!
+                val issueViewModel: IssueViewModel = viewModel(backStack)
                 MainLayout(navController, currentRoute) { padding ->
                     Box(
                         modifier = Modifier
@@ -295,7 +303,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                             modifier = Modifier.fillMaxSize()
                         ) {
                             ViewIssueScreen(
-                                mainViewModel = mainViewModel,
+                                mainViewModel = issueViewModel,
                                 navController = navController,
                                 viewID = viewID,
                                 projID = projID

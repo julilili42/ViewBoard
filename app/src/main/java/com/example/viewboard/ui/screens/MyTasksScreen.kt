@@ -1,5 +1,6 @@
 package com.example.viewboard.ui.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -26,6 +27,7 @@ import com.example.viewboard.ui.navigation.Screen
  * @param myTasks List of task name and due date-time pairs
  * @param onSortClick Callback for sort/filter button
  */
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTasksScreen(

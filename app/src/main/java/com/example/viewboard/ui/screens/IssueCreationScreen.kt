@@ -30,8 +30,10 @@ import com.example.viewboard.backend.auth.impl.AuthAPI
 import kotlinx.coroutines.launch
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
+import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 // ---------------------------------------------------
 // Dein CreateIssueScreen
@@ -178,23 +180,69 @@ fun IssueCreationScreen(
                 maxLines = Int.MAX_VALUE
             )
             Spacer(Modifier.height(16.dp))
-/*
-            ChipInputField(
-                entries = assignments,
-                newEntry = newParticipant,
-                inhaltText = "Add Assignee…",
-                onNewEntryChange = { newParticipant = it },
-                onEntryConfirmed = {
-                    if (newParticipant.isNotBlank()) {
-                        assignments = assignments + newParticipant.trim()
-                        newParticipant = ""
-                    }
-                },
-                onEntryRemove = { removed -> assignments = assignments - removed },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(16.dp))
 
+            var project by remember { mutableStateOf<ProjectLayout?>(null) }
+
+            // 2) Zugehöriges Projekt nur einmal beim ersten Compose laden
+            LaunchedEffect(projectId) {
+                val cleanId = projectId.trim('{', '}')
+                try {
+                    project = FirebaseAPI
+                        .getProject(cleanId)   // Flow<ProjectLayout>
+
+                } catch (e: Exception) {
+                    Log.e("ProjectDetailInline", "Fehler beim Laden von $cleanId", e)
+                }
+            }
+
+            val suggestionEmails = project?.users
+            val suggestionTags = project?.labels
+
+            val suggestionList = remember(newParticipant, assignments, suggestionEmails) {
+                if (newParticipant.isBlank()) {
+                    emptyList()
+                } else {
+                    suggestionEmails?.filter { email ->
+                        // enthält eingegebene Zeichen
+                        email.contains(newParticipant, ignoreCase = true)
+                                // und ist noch nicht in assignments
+                                && assignments.none { it.equals(email, ignoreCase = true) }
+                    }
+                }
+            }
+
+            if (suggestionList != null) {
+                ChipInputField(
+                    entries = assignments,
+                    newEntry = newParticipant,
+                    inhaltText = "Add team member…",
+                    suggestions = suggestionList,
+                    onSuggestionClick = { name ->
+                        // wenn Name ausgewählt wird, als Chip hinzufügen
+                        if (name !in assignments) {
+                            assignments = assignments + name
+                        }
+                        newParticipant = ""
+                    },
+                    onNewEntryChange = { newParticipant = it },
+                    onEntryConfirmed = {
+                        // Option: Akzeptiere nur exakte Übereinstimmung
+                        val match =
+                            suggestionEmails?.find { it.equals(newParticipant.trim(), ignoreCase = true) }
+                        if (match != null && match !in assignments) {
+                            assignments = assignments + match
+                        }
+                        newParticipant = ""
+                    },
+                    onEntryRemove = { removed ->
+                        assignments = assignments - removed
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+
+            Spacer(Modifier.height(16.dp))
             ChipInputField(
                 entries = labels,
                 newEntry = newLabelName,
@@ -208,47 +256,39 @@ fun IssueCreationScreen(
                 },
                 onEntryRemove = { removed -> labels = labels - removed },
                 modifier = Modifier.fillMaxWidth()
-            )*/
+            )
             Spacer(Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = dateText,
-                onValueChange = { dateText = it },
-                label = { Text("Datum (YYYY-MM-DD)") },
-                singleLine = true,
-                isError = !isDateValid,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { updateDeadlineFromDateText() }),
-                trailingIcon = {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Datum wählen",
-                        modifier = Modifier.clickable { pickDate() },
-                        tint = uiColor
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = timeText,
-                onValueChange = { timeText = it },
-                label = { Text("Uhrzeit (HH:mm)") },
-                singleLine = true,
-                isError = !isTimeValid,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { updateDeadlineFromTimeText() }),
-                trailingIcon = {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Uhrzeit wählen",
-                        modifier = Modifier.clickable { pickTime() },
-                        tint = uiColor
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = dateText,
+                    onValueChange = { dateText = it },
+                    label = { Text("Date") },
+                    singleLine = true,
+                    trailingIcon = {
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = null,
+                            modifier = Modifier.clickable { pickDate() }
+                        )
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                OutlinedTextField(
+                    value = timeText,
+                    onValueChange = { timeText = it },
+                    label = { Text("Time") },
+                    singleLine = true,
+                    trailingIcon = {
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = null,
+                            modifier = Modifier.clickable { pickTime() }
+                        )
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            }
             Spacer(Modifier.height(8.dp))
 
             if (!isDateValid) {
