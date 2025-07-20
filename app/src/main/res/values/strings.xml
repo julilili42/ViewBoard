@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ComposeLoginScreenInit</string>
+    <string name="app_name">ViewBoard</string>
     <string name="viewBoard">ViewBoard</string>
     <string name="manageIssues">Manages your Issues</string>
     <string name="Login">Login</string>
