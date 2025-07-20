@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+//import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.example.viewboard.backend.NotificationHelper
 import com.example.viewboard.backend.auth.impl.AuthAPI
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        installSplashScreen()
+       // installSplashScreen()
         FirebaseAPI.init()
         enableEdgeToEdge()
         AuthAPI.ensureUserProfileExists(
