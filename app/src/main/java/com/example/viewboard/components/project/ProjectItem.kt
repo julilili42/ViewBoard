@@ -1,6 +1,15 @@
 package com.example.viewboard.components.project
 
 import OptionsMenuButton
+import androidx.compose.runtime.mutableStateOf
+import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import kotlinx.coroutines.launch
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,6 +52,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import androidx.navigation.NavController
+
 
 /**
  * Ein Project-Item mit Gradient-Hintergrund, Pill-Phase, Titel, Zeitraum,
@@ -65,6 +76,7 @@ fun ProjectItem(
     color: Color=Color.White,
     calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },
     avatarUris: List<Uri>,
+    navController: NavController,
     onClick: () -> Unit
 ) {
     val progress by produceState<IssueProgress>(
@@ -87,6 +99,7 @@ fun ProjectItem(
     val showCount     = avatarUris.size.coerceAtMost(3)
     val avatarSize    = 18.dp
     val avatarOverlap = 12.dp
+
 
     Card(
         modifier = Modifier
@@ -122,13 +135,48 @@ fun ProjectItem(
                         )
                     }
                     Spacer(Modifier.weight(1f))
+                    val scope = rememberCoroutineScope()
+                    var showConfirmDialog by remember { mutableStateOf(false) }
+
+                    if (showConfirmDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showConfirmDialog = false },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    scope.launch {
+                                        FirebaseAPI.rmProject(
+                                            id = project.id,
+                                            onSuccess = { /* Optional: Liste refreshen oder zurück navigieren */ },
+                                            onFailure = { /* Fehlerbehandlung */ }
+                                        )
+                                    }
+                                    showConfirmDialog = false
+                                }) {
+                                    Text("Löschen", color = MaterialTheme.colorScheme.error)
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showConfirmDialog = false }) {
+                                    Text("Abbrechen")
+                                }
+                            },
+                            title = { Text("Projekt löschen?") },
+                            text = { Text("Willst du das Projekt wirklich löschen?") }
+                        )
+                    }
+
                     OptionsMenuButton(
                         options = listOf(
-                            "Bearbeiten" to { },
-                            "Löschen"   to {},
+                            "Bearbeiten" to {
+                                navController.navigate("project/edit/${project.id}")
+                            },
+                            "Löschen" to {
+                                showConfirmDialog = true
+                            }
                         ),
                         modifier = Modifier
                     )
+
 
                 }
                 Text(
@@ -183,9 +231,9 @@ fun ProjectItem(
 }
 
 fun labelFromIsoDate(dateStr: String): String {
-    // Nur den Datums‑Teil vorne nehmen (falls mehr hinten dran stünde)
     val iso = dateStr.substringBefore('T').substringBefore(' ')
-    val date = LocalDate.parse(iso)
+    val localDate = LocalDate.parse(iso)
     val formatter = DateTimeFormatter.ofPattern("LLL yy", Locale("de"))
-    return date.format(formatter)
+    return localDate.format(formatter)
 }
+

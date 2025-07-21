@@ -42,12 +42,14 @@ import com.example.viewboard.ui.screens.ChangePasswordScreen
 import com.example.viewboard.ui.screens.HelpSupportScreen
 import com.example.viewboard.ui.screens.IssueCreationScreen
 import com.example.viewboard.ui.screens.IssueEditScreen
+import com.example.viewboard.ui.screens.ProjectEditScreen
 import com.example.viewboard.ui.screens.ProjectsScreen
 import com.example.viewboard.ui.screens.TimetableScreen
 import com.example.viewboard.ui.screens.ProfileScreen
 import com.example.viewboard.ui.screens.ProjectCreationScreen
 import com.example.viewboard.ui.screens.ViewIssueScreen
 import com.example.viewboard.ui.screens.ViewScreen
+import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -225,6 +227,31 @@ fun Navigation(modifier: Modifier = Modifier) {
                     }
                 }
             }
+            composable(
+                route = "project/edit/{projectId}",
+                arguments = listOf(navArgument("projectId") { type = NavType.StringType })
+            ) { backStack ->
+                val id = backStack.arguments?.getString("projectId")!!
+                var project by remember { mutableStateOf<ProjectLayout?>(null) }
+
+                LaunchedEffect(id) {
+                    project = FirebaseAPI.getProject(id)
+                }
+
+                if (project != null) {
+                    ProjectEditScreen(
+                        navController = navController,
+                        projectId     = id,
+                        project       = project!!,
+                        onUpdated     = { /* optional: reload or navigate */ }
+                    )
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+
 
 
 

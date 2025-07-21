@@ -37,10 +37,13 @@ fun ChipInputField(
     onNewEntryChange: (String) -> Unit={},
     onEntryConfirmed: () -> Unit={},
     onEntryRemove: (String) -> Unit={},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true  // <— NEU
+
 ) {
     BasicTextField(
         value = newEntry,
+        enabled = enabled,
         onValueChange = onNewEntryChange,
         singleLine = true,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
@@ -59,8 +62,7 @@ fun ChipInputField(
                 FlowRow(modifier = Modifier.fillMaxWidth()) {
                     entries.forEach { entry ->
                         AssistChip(
-                            onClick = { onEntryRemove(entry) },
-                            label = { Text(entry) },
+                            onClick = { if (enabled) onEntryRemove(entry) },                            label = { Text(entry) },
                             modifier = Modifier
                                 .height(32.dp)
                                 .padding(start = 4.dp, bottom = 2.dp)
@@ -108,7 +110,7 @@ fun ChipInputField(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable { onSuggestionClick(suggestion) }
+                                    .clickable(enabled = enabled) { onSuggestionClick(suggestion) }
                                     .padding(vertical = 8.dp, horizontal = 12.dp)
                             ) {
                                 Text(

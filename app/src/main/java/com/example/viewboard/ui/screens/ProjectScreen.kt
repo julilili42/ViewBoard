@@ -223,6 +223,7 @@ fun ProjectsScreen(
                 ProjectItem(
                     project = project,
                     avatarUris = emptyList(),
+                    navController = navController,
                     onClick = {
                         navController.navigate(
                             Screen.IssueScreen.createRoute(project.name, project.id)
