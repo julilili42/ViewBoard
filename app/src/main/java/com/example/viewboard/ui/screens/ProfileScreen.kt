@@ -189,14 +189,14 @@ private fun NotificationsDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Benachrichtigungen") },
+        title = { Text("Notifications") },
         text = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Aktivieren", style = MaterialTheme.typography.bodyLarge)
+                Text("Activate", style = MaterialTheme.typography.bodyLarge)
                 Switch(
                     checked = enabled,
                     onCheckedChange = onEnabledChange
@@ -205,7 +205,7 @@ private fun NotificationsDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Fertig")
+                Text("Done")
             }
         }
     )

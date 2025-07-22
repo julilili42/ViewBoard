@@ -46,8 +46,10 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -72,23 +74,26 @@ fun IssueItemCard(
     val issueDate = formatGermanShortDate(date)
     val issueDueTime = formatRemaining(date)
     val scrollState = rememberScrollState()
+    // State ganz oben in der Composable (neben expandedOptions etc.)
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
-   /* Box(
-        modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(
-                Color.White,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .border(
-                1.dp,
 
-                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                RoundedCornerShape(12.dp)
-            )
-            .padding(16.dp)
-    )*/   Card(
+    /* Box(
+         modifier
+             .fillMaxWidth()
+             .clip(RoundedCornerShape(12.dp))
+             .background(
+                 Color.White,
+                 shape = RoundedCornerShape(16.dp)
+             )
+             .border(
+                 1.dp,
+
+                 MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                 RoundedCornerShape(12.dp)
+             )
+             .padding(16.dp)
+     )*/   Card(
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = modifier
@@ -147,23 +152,50 @@ fun IssueItemCard(
                         DropdownMenuItem(
                             text = { Text("Delete") },
                             onClick = {
-                                expandedOptions  = false
-
-                                scope.launch {
-                                    try {
-                                        val cleanId = projectId.trim('{', '}')
-                                        FirebaseAPI.rmIssue(projID = cleanId , id = issueId)
-                                    } catch (e: Exception) {
-
-                                    }
-                                }
+                                expandedOptions = false
+                                showConfirmDialog = true
                             }
                         )
                     }
                 }
 
             }
-
+            if (showConfirmDialog) {
+                AlertDialog(
+                    onDismissRequest = { showConfirmDialog = false },
+                    title = { Text("Delete Issue??") },
+                    text = { Text("Do you really want to delete the Issue?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            scope.launch {
+                                try {
+                                    val cleanId = projectId.trim('{', '}')
+                                    FirebaseAPI.rmIssue(
+                                        projID = cleanId,
+                                        id = issueId,
+                                        onSuccess = {
+                                            // optional: z.B. Snack bar zeigen oder ViewModel aktualisieren
+                                        },
+                                        onFailure = {
+                                            // optional: Fehler anzeigen
+                                        }
+                                    )
+                                } catch (_: Exception) {
+                                    // optional: Logging
+                                }
+                            }
+                            showConfirmDialog = false
+                        }) {
+                            Text("Delete", color = MaterialTheme.colorScheme.error)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showConfirmDialog = false }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
 
             val exampleLabels = listOf(
                 "Bug",

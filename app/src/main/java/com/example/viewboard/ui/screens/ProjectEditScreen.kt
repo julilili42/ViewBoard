@@ -178,13 +178,13 @@ fun ProjectEditScreen(
                         .fillMaxWidth()
                         .height(48.dp)
                 ) {
-                    Text("Speichern")
+                    Text("Safe")
                 }
 
                 Spacer(Modifier.height(8.dp))
 
                 Text(
-                    "Projekt löschen",
+                    "Delete Project",
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier
                         .clickable {
@@ -199,7 +199,7 @@ fun ProjectEditScreen(
                         .padding(8.dp)
                 )
             } else {
-                Text("Nur der Ersteller kann dieses Projekt bearbeiten oder löschen.",
+                Text("Only the creator can edit or delete this project.\n",
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.padding(top = 16.dp))
             }
