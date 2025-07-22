@@ -35,7 +35,7 @@ fun ProfileHeader(
         // Profilbild
 
         ProfilePicture(
-            painter = painterResource(id = R.drawable.pb_raoul),
+            painter = painterResource(id = R.drawable.logotest),
             contentDescription = "Profilbild Raoul",
             size = 48.dp,
             borderColor = MaterialTheme.colorScheme.primary,

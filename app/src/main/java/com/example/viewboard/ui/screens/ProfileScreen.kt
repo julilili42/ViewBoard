@@ -85,7 +85,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
                         ProfilePicture(
-                            painter = painterResource(id = R.drawable.pb_raoul),
+                            painter = painterResource(id = R.drawable.logotest),
                             contentDescription = "Profilbild Raoul",
                             size = 120.dp,
                             borderColor = MaterialTheme.colorScheme.primary,
