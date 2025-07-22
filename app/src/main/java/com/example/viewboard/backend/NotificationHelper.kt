@@ -135,8 +135,9 @@ object NotificationHelper {
             val projectId = doc.id
             val data = doc.data ?: continue
             val members = (data["members"] as? List<*>)?.mapNotNull { it as? String } ?: continue
-
+            Log.d("NOTIFY", "Checking project: $projectId - members: $members - uid: $uid")
             if (uid in members && projectId !in notifiedProjectIds) {
+                Log.d("NOTIFY", "Triggering notification for project $projectId")
                 sendNotification(
                     context,
                     title = "New Project!",

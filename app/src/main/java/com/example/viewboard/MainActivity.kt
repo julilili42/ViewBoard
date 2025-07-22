@@ -26,11 +26,16 @@ class MainActivity : ComponentActivity() {
         )
         NotificationHelper.createNotificationChannel(this)
 
-        lifecycleScope.launch {
-            NotificationHelper.checkUpcomingDeadlines(this@MainActivity)
-            NotificationHelper.checkNewIssueAssignments(this@MainActivity)
-            NotificationHelper.checkNewProjectAssignments(this@MainActivity)
-        }
+        AuthAPI.ensureUserProfileExists(
+            onSuccess = {
+                lifecycleScope.launch {
+                    NotificationHelper.checkUpcomingDeadlines(this@MainActivity)
+                    NotificationHelper.checkNewIssueAssignments(this@MainActivity)
+                    NotificationHelper.checkNewProjectAssignments(this@MainActivity)                }
+            },
+            onError = { /* Fehlerbehandlung */ }
+        )
+
         setContent {
             ComposeLoginScreenInitTheme {
                 Navigation()
