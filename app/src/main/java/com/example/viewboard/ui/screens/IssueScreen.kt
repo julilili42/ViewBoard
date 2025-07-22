@@ -7,6 +7,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -43,6 +46,7 @@ import com.example.viewboard.ui.timetable.CustomIcon
 import com.example.viewboard.ui.timetable.IssueSortMenuSimple
 import com.example.viewboard.ui.timetable.SortOptions
 import com.example.viewboard.ui.timetable.SortOptions2
+import generateProjectCodeFromDbId
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +63,10 @@ fun IssueScreen(
     var selectedTab by rememberSaveable { mutableStateOf(0) }
     // Lokaler State für die Such-Query
     val query by issueViewModel.query.collectAsState()
-    issueViewModel.setProject(projectId)
+    val onlyMine by issueViewModel.showOnlyMyIssues.collectAsState()
+    LaunchedEffect(projectId) {
+        issueViewModel.setProject(projectId)
+    }
     val categories = listOf("New", "Ongoing", "Completed")
     var filterMode by remember { mutableStateOf<IssueState?>(null) }
 
@@ -68,7 +75,7 @@ fun IssueScreen(
         issueViewModel.setFilter(state)
         Log.d("IssueScreen", "Tab gewechselt: $selectedTab → setFilter($state)")
     }
-    val baseList = issueViewModel.getItemsForCategory(stateFromIndex(selectedTab))
+    //val displayed = issueViewModel.getItemsForCategory(stateFromIndex(selectedTab))
     val displayed by issueViewModel.displayedIssues.collectAsState()
     LaunchedEffect(displayed) {
         Log.d("IssueListScreen", "Displayed issues (${displayed.size}): ${displayed.map { it.id }}")
@@ -105,21 +112,23 @@ fun IssueScreen(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
             modifier = modifier
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding()),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding     = PaddingValues(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding     = PaddingValues(16.dp),
+
+
         ) {
             // 1) Title
+
             item {
-                Text(
-                    text = projectName,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp)
+
+                EdgeToEdgeRoundedRightItemWithBadge(
+                    viewName = projectName,
+                    projectId = projectId,
                 )
             }
             // 2) Search & filter row
@@ -140,18 +149,28 @@ fun IssueScreen(
                             .height(40.dp)
                             .width(200.dp)
                     )
+                    val iconRes = if (onlyMine)
+                        R.drawable.profile_svgrepo_com__2_
+                           // z. B. ein gefülltes Icon
+                    else
+                        R.drawable.profile_group_svgrepo_com // z. B. ein Outline-Icon
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         CustomIcon(
-                            iconRes       = R.drawable.sort_desc_svgrepo_com,
-                            contentDesc   = stringResource(R.string.sort_desc_svgrepo_com),
+                            iconRes         = iconRes,
+                            contentDesc     = "",
                             backgroundColor = MaterialTheme.colorScheme.primary,
-                            iconTint        = Color.White,
+                            iconTint   = MaterialTheme.colorScheme.onSurface,
                             width           = 40.dp,
                             height          = 40.dp,
-                            onClick         = { /* sort action */ },
-                            modifier = Modifier.padding(end = 8.dp)
+                            onClick         = { issueViewModel.setShowOnlyMine() },
+                            modifier        = Modifier.padding(end = 8.dp)
                         )
-                        IssueSortMenuSimple(issueViewModel, sortOptions, iconRes = R.drawable.sort_desc_svgrepo_com, contentDesc = "Sort")
+                        IssueSortMenuSimple(issueViewModel,
+                            sortOptions,
+                            iconTint = MaterialTheme.colorScheme.onSurface,
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            iconRes = R.drawable.sort_desc_svgrepo_com,
+                            contentDesc = "Sort")
                     }
                 }
             }

@@ -48,7 +48,7 @@ class ProjectViewModel : ViewModel() {
     private val _allProjects = MutableStateFlow<List<ProjectLayout>>(emptyList())
 
     // Filter: CREATED/SHARED/ALL
-    private val _filter = MutableStateFlow(ProjectFilter.CREATED)
+    private val _filter = MutableStateFlow(ProjectFilter.SHARED)
 
     // Such‑Query
     private val _query = MutableStateFlow("")
@@ -86,13 +86,14 @@ class ProjectViewModel : ViewModel() {
     )
 
     // Endgültige Auslieferung mit SortOrder
+
     val displayedProjects: StateFlow<List<ProjectLayout>> = combine(
         _filtered,
         _sortOrder
     ) { (list, sortField), sortOrder ->
         list.sortedWith(compareBy<ProjectLayout> {
             when (sortField) {
-                SortField.DATE -> it.deadlineTS // Long timestamp
+                SortField.DATE -> it.creationTS // Long timestamp
                 SortField.NAME       -> it.name.lowercase()
             }
         }.let { cmp -> if (sortOrder == SortOrder.DESC) cmp.reversed() else cmp })
@@ -126,12 +127,11 @@ class ProjectViewModel : ViewModel() {
     /** Lade Projekte entsprechend dem Filter */
     fun reload() {
         viewModelScope.launch {
-            val flow = when (_filter.value) {
-                ProjectFilter.CREATED -> FirebaseAPI.getProjectsFromUser(myId)
-                ProjectFilter.SHARED  -> FirebaseAPI.getAllProjects().map { it.filterNot { p -> p.creator == myId } }
-                ProjectFilter.ALL     -> FirebaseAPI.getAllProjects()
-            }
-            flow.collectLatest { _allProjects.value = it }
+            FirebaseAPI
+                .getAllProjects()                // immer die gesamte Liste holen
+                .collectLatest { projects ->
+                    _allProjects.value = projects
+                }
         }
     }
     fun toggleSort(field: SortField) {
@@ -145,6 +145,43 @@ class ProjectViewModel : ViewModel() {
             _sortOrder.value = SortOrder.ASC
         }
     }
+
+    private val _filteredView = combine(
+        _allProjects,   // alle Projekte
+        _query,         // Such-String
+        _sortField      // Sortierkriterium
+    ) { list, q, sortField ->
+        // Suche anwenden (kein Creator‑Filter mehr)
+        val filtered = if (q.isBlank()) {
+            list
+        } else {
+            list.filter { it.name.contains(q, ignoreCase = true) }
+        }
+
+        // Rückgabe: gefilterte Liste plus Sortierfeld
+        Pair(filtered, sortField)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        Pair(emptyList<ProjectLayout>(), SortField.DATE)
+    )
+
+    val displayedviewProjects: StateFlow<List<ProjectLayout>> = combine(
+        _filteredView,
+        _sortOrder
+    ) { (list, sortField), sortOrder ->
+        list.sortedWith(compareBy<ProjectLayout> {
+            when (sortField) {
+                SortField.DATE -> it.creationTS // Long timestamp
+                SortField.NAME       -> it.name.lowercase()
+            }
+        }.let { cmp -> if (sortOrder == SortOrder.DESC) cmp.reversed() else cmp })
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        emptyList()
+    )
+
 
     init {
         reload()

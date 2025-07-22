@@ -47,7 +47,7 @@ import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.components.homeScreen.IssueProgress
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
 import com.example.viewboard.components.homeScreen.TimeSpanFilter
-import generateProjectCode
+import generateProjectCodeFromDbId
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -76,6 +76,7 @@ fun ProjectItem(
     color: Color=Color.White,
     calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },
     avatarUris: List<Uri>,
+    editable: Boolean = true,
     navController: NavController,
     onClick: () -> Unit
 ) {
@@ -93,7 +94,7 @@ fun ProjectItem(
     val end   = project.deadlineTS
     val startLabel = labelFromIsoDate(start) // z. B. "Jan 25"
     val endLabel   = labelFromIsoDate(end)   // z. B. "Dez 25"
-    val projectNameCode = generateProjectCode(project.name,project.deadlineTS)
+    val projectNameCode = generateProjectCodeFromDbId(project.id)
     val projectNamecolor = colorFromCode(projectNameCode)
 // Avatare: maximal 3 anzeigen
     val showCount     = avatarUris.size.coerceAtMost(3)
@@ -164,19 +165,19 @@ fun ProjectItem(
                             text = { Text("Willst du das Projekt wirklich löschen?") }
                         )
                     }
-
-                    OptionsMenuButton(
-                        options = listOf(
-                            "Bearbeiten" to {
-                                navController.navigate("project/edit/${project.id}")
-                            },
-                            "Löschen" to {
-                                showConfirmDialog = true
-                            }
-                        ),
-                        modifier = Modifier
-                    )
-
+if(editable) {
+    OptionsMenuButton(
+        options = listOf(
+            "Bearbeiten" to {
+                navController.navigate("project/edit/${project.id}")
+            },
+            "Löschen" to {
+                showConfirmDialog = true
+            }
+        ),
+        modifier = Modifier
+    )
+}
 
                 }
                 Text(
@@ -203,17 +204,17 @@ fun ProjectItem(
 
 
 
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Teilnehmer",
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "$totalParticipants",
-                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Light),
-                            color = Color.White
-                        )
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Teilnehmer",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "$totalParticipants",
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Light),
+                        color = Color.White
+                    )
 
                     Spacer(Modifier.weight(1f))
                     LinearProgressIndicator(

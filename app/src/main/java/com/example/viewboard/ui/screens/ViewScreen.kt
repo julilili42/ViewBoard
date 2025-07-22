@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import com.example.viewboard.R
 import com.example.viewboard.components.homeScreen.ProfileHeader
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
@@ -56,6 +57,9 @@ import com.example.viewboard.ui.issue.IssueViewModel
 import com.example.viewboard.ui.issue.ProjectViewModel
 import com.example.viewboard.ui.issue.ViewsViewModel
 import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.ui.project.CustomSearchField
+import com.example.viewboard.ui.timetable.ProjectSortMenuSimple
+import com.example.viewboard.ui.timetable.ViewSortMenuSimple
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -66,7 +70,7 @@ fun ViewScreen(
     navController: NavController,
     viewsViewModel: ViewsViewModel,
     issueViewModel: IssueViewModel,
-    projectViewModel: ProjectViewModel
+    projectViewModel: ProjectViewModel,
 ) {
 
     val viewLayouts by viewsViewModel.displayedViews.collectAsState()
@@ -75,7 +79,8 @@ fun ViewScreen(
     var newName by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     val uid = AuthAPI.getUid() ?: return
-
+    val query by viewsViewModel.query.collectAsState()
+    val columns = 2
     Scaffold(
         topBar = {
             ProfileHeader(
@@ -108,17 +113,49 @@ fun ViewScreen(
         }
     ) { paddingValues ->
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                top = paddingValues.calculateTopPadding() + 16.dp,
-                end = 16.dp,
-                bottom = paddingValues.calculateBottomPadding() + 16.dp
-            ),
+            columns = GridCells.Fixed(columns),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding()),
+            contentPadding = PaddingValues(16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize()
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                EdgeToEdgeRoundedRightItemWithBadge(
+                    viewName = "Views",
+                )
+            }
+            // Header, Suchfeld und Sort/Filter-Icons
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        ,
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    query?.let {
+                        CustomSearchField(
+                            query = it,
+                            onQueryChange = { viewsViewModel.setQuery(it) },
+                            modifier = Modifier
+                                .height(40.dp)
+                                .width(200.dp),
+                        )
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ViewSortMenuSimple(
+                            viewViewModel = viewsViewModel,
+                            iconRes          = R.drawable.sort_desc_svgrepo_com,
+                            backgroundColor  = MaterialTheme.colorScheme.primary,
+                            iconTint  = Color.White,
+                            contentDesc      = stringResource(R.string.filter_svgrepo_com__1),
+                            modifier         = Modifier.size(40.dp)
+                        )
+                    }
+                }
+            }
             items(viewLayouts) { view ->
                 ViewItem(
                     view = view,
@@ -126,7 +163,7 @@ fun ViewScreen(
                     color = Color.Gray,
                     onClick = {
                         navController.navigate(
-                            Screen.ViewIssueScreen.createRoute(view.id,"")
+                            Screen.ViewIssueScreen.createRoute(view.id,"",view.name)
                         )
                     }
                 )
@@ -157,7 +194,6 @@ fun ViewScreen(
 
                                         it,
                                         ViewLayout(
-                                            id = "", // Firestore assigns ID
                                             name = newName,
                                             creationTS = System.currentTimeMillis().toString(),
                                             creator = uid,

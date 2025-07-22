@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.State
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class IssueViewModel : ViewModel() {
 
@@ -66,7 +67,8 @@ class IssueViewModel : ViewModel() {
 
     private val _sortField = MutableStateFlow(SortField.DATE)
     private val _sortOrder = MutableStateFlow(SortOrder.ASC)
-    private val _showOnlyMyIssues  = MutableStateFlow(true)
+    private val _showOnlyMyIssues  = MutableStateFlow(false)
+    val showOnlyMyIssues: StateFlow<Boolean> = _showOnlyMyIssues.asStateFlow()
     val sortField: StateFlow<SortField> = _sortField.asStateFlow()
     val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
     private val _items = mutableStateListOf<IssueLayout>()
@@ -111,14 +113,21 @@ class IssueViewModel : ViewModel() {
         }
             .flatMapLatest { (projId, onlyMine, stateFilter) ->
                 // 1) Hol die Issues
-                val sourceFlow: Flow<List<IssueLayout>> =
-                    if (onlyMine) FirebaseAPI.getIssuesFromUser(myId)
-                    else             FirebaseAPI.getIssuesFromProject(projId)
+                val sourceFlow: Flow<List<IssueLayout>> = FirebaseAPI.getIssuesFromProject(projId)
 
+                .map { list ->
+                        if (onlyMine) {
+                            list.filter { issue ->
+                                issue.assignments.contains(myId)
+                            }
+                        } else {
+                            list
+                        }
+                    }
                 // 2) Filtere nach IssueState, falls stateFilter != null
                 sourceFlow.map { list ->
                     stateFilter
-                        ?.let { s -> list.filter { it.state == s } }
+                        .let { s -> list.filter { it.state == s } }
                         ?: list
                 }
             }
@@ -135,9 +144,6 @@ class IssueViewModel : ViewModel() {
         val byState = filterState
             ?.let { s -> list.filter { it.state == s } }
             ?: list
-        val byState2 = filterState
-            ?.let { s -> list.filter { it.state == s } }
-            ?: list
 
         // b) Such‑Filter
         val byQuery = if (q.isBlank()) byState
@@ -147,7 +153,7 @@ class IssueViewModel : ViewModel() {
         byQuery.sortedWith(
             compareBy<IssueLayout> {
                 when (sortField) {
-                    SortField.DATE  -> it.deadlineTS
+                    SortField.DATE  -> it.creationTS
                     SortField.NAME -> it.title.lowercase()
                 }
             }.let { cmp ->
@@ -167,7 +173,9 @@ class IssueViewModel : ViewModel() {
         reload()
     }
 
-
+    fun setShowOnlyMine() {
+        _showOnlyMyIssues.value = !_showOnlyMyIssues.value
+    }
     /** Wechsle Sortierung: Feld und Richtung */
     fun toggleSort(field: SortField) {
         if (_sortField.value == field) {
@@ -185,9 +193,23 @@ class IssueViewModel : ViewModel() {
                 .collectLatest { _allIssues.value = it }
         }
     }
+    private fun reloadForProject(id: String) {
+        viewModelScope.launch {
+            FirebaseAPI
+                .getIssuesFromProject(id)
+                .collectLatest { _allIssues.value = it }
+        }
+    }
 
     init {
-        reload()
+        viewModelScope.launch {
+            _projectId
+                .filterNotNull()
+                .distinctUntilChanged()
+                .collectLatest { newProjId ->
+                    reloadForProject(newProjId)
+                }
+        }
     }
 
 
@@ -494,7 +516,6 @@ class IssueViewModel : ViewModel() {
         _selectedProject.value = projectId
     }
     fun loadIssuesForProject() {
-        // nur wenn eine Projekt‑ID ausgewählt ist
         selectedProject.value?.let { projectId ->
             viewModelScope.launch {
                 FirebaseAPI.getIssuesFromProject(projectId)
@@ -504,4 +525,49 @@ class IssueViewModel : ViewModel() {
             }
         }
     }
+
+    private val rawAllIssuesFlow: Flow<List<IssueLayout>> =
+        _state
+            // Jedes Mal, wenn sich der State‑Filter ändert, holen wir den Nutzer‑Flow neu
+            .flatMapLatest { stateFilter ->
+                FirebaseAPI
+                    .getIssuesFromUser(myId)             // ← jetzt user‑bezogen
+                    .map { list ->
+                        // 1) State‑Filter anwenden, falls nicht null
+                        stateFilter
+                            ?.let { s -> list.filter { it.state == s } }
+                            ?: list
+                    }
+            }
+
+    // 4) Finaler Flow: zusätzlich Such‑ und Sortier‑Logik
+    val displayedAllIssues: StateFlow<List<IssueLayout>> =
+        combine(
+            rawAllIssuesFlow,
+            _query,
+            _sortField,
+            _sortOrder
+        ) { list, q, sortField, sortOrder ->
+            // a) Such‑Filter
+            val byQuery = if (q.isBlank()) list
+            else list.filter { it.title.contains(q, ignoreCase = true) }
+
+            // b) Sortierung
+            byQuery.sortedWith(
+                compareBy<IssueLayout> {
+                    when (sortField) {
+                        SortField.DATE -> it.creationTS
+                        SortField.NAME -> it.title.lowercase()
+                    }
+                }.let { cmp ->
+                    if (sortOrder == SortOrder.DESC) cmp.reversed() else cmp
+                }
+            )
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = emptyList()
+            )
+
 }

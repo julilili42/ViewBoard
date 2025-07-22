@@ -1,5 +1,6 @@
 package com.example.viewboard.ui.screens
 
+import android.graphics.drawable.shapes.Shape
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
@@ -54,32 +55,53 @@ import com.example.viewboard.ui.issue.ProjectViewModel
 import com.example.viewboard.ui.issue.ViewsViewModel
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.timetable.CustomIcon
-
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.*
+import android.content.res.Resources
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import colorFromCode
+
+
+import com.example.viewboard.ui.project.CustomSearchField
+import generateProjectCodeFromDbId
+
 
 @Composable
 fun ViewIssueScreen(
-    IssueViewModel: IssueViewModel,
-    ProjectViewModel: ProjectViewModel,
-    ViewsViewModel: ViewsViewModel,
+    issueViewModel: IssueViewModel,
+    projectViewModel: ProjectViewModel,
+    viewsViewModel: ViewsViewModel,
     navController: NavController,
     viewID: String,
-    projID: String
+    projID: String,
+    viewName: String
 ) {
-    val projects by ProjectViewModel.displayedProjects.collectAsState()
+    val projects by projectViewModel.displayedviewProjects.collectAsState()
+    Log.d("ViewIssueScreen", "Issue loaded: id=$projects")
     var showDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    IssueViewModel.setCurrentViewId(viewID)
-    val issues  by IssueViewModel.displayedIssuesFromViews.collectAsState()
+
+    // Observe query and filter state from ViewModel
+    val query by issueViewModel.query.collectAsState(initial = "")
+
+    // Set current view and load issues
     LaunchedEffect(viewID) {
-        IssueViewModel.loadIssuesFromView(viewID)
-        Log.d("ViewIssueScreen", "Composable sees ${issues.size} issues for viewID=$viewID")
+        issueViewModel.setCurrentViewId(viewID)
+        issueViewModel.loadIssuesFromView(viewID)
     }
+    val issues by issueViewModel.displayedIssuesFromViews.collectAsState()
     Scaffold(
         topBar = {
             ProfileHeader(
@@ -103,63 +125,71 @@ fun ViewIssueScreen(
                     .offset(y = 40.dp)
                     .padding(16.dp)
                     .clip(CircleShape),
-                onClick = {
-                    showDialog = true
-                }
+                onClick = { showDialog = true }
             )
         }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
+                .padding(top = paddingValues.calculateTopPadding()),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(16.dp)
         ) {
-            // Optionally delete view dialog
+            // Dialog für neue Issue
             if (showDialog) {
-               /* AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text("Delete View") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showDialog = false
-                            scope.launch {
-                                FirebaseAPI.rmView(projID, viewID)
-                                navController.navigateUp()
-                            }
-                        }) { Text("Delete") }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDialog = false }) { Text("Cancel") }
-                    }
-                )*/
-                ProjectIssueDialog(
-                    viewId = viewID,
-                    projects = projects,
-                    viewViewModel=  ViewsViewModel,
-                    issueViewModel = IssueViewModel,
-                    onDismiss = { showDialog = false }
+                item {
+                    ProjectIssueDialog(
+                        viewId = viewID,
+                        projects = projects,
+                        issueViewModel = issueViewModel,
+                        onDismiss = { showDialog = false }
+                    )
+                }
+            }
+
+
+            // View-Name
+            item {
+                EdgeToEdgeRoundedRightItemWithBadge(
+                    viewName = viewName,
+                    projectId=projID,
                 )
             }
 
-            // Render each issue in a scrollable column
-            issues.forEach { issue: IssueLayout ->
+            // Such- und Sort-Leiste
+            item {
+                Row(
+                    Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    CustomSearchField(
+                        query = query,
+                        onQueryChange = { issueViewModel.setQuery(it) },
+                        modifier = Modifier
+                            .height(40.dp)
+                            .width(200.dp)
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        // hier ggf. dein Toggle-Icon und ViewSortMenuSimple
+                    }
+                }
+            }
+
+            // Die Issues als Lazy Items
+            items(issues) { issue ->
                 IssueItemCard(
-                    title = issue.title,
-                    date = issue.creationTS,
-                    attachments = issue.assignments.size ?: 0,
-                    projectId = projID,
-                    issueId = issue.id,
-                    state = issue.state.name,
-                    navController = navController,
-                    avatarUris = emptyList(),
-                    onOptionsClick = {
-                        // Handle options, e.g. delete issue
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                    title        = issue .title,
+                    state        = stateToString(issue .state),
+                    date         = issue .deadlineTS,
+                    attachments  = 3,
+                    projectId    = projID,
+                    issueId      = issue .id,
+                    avatarUris   = listOf(), // dummy or real
+                    navController= navController,
+                    modifier     = Modifier.clip(RoundedCornerShape(12.dp))
                 )
             }
         }
@@ -168,3 +198,76 @@ fun ViewIssueScreen(
 
 
 
+
+@Composable
+fun EdgeToEdgeRoundedRightItemWithBadge(
+    viewName: String,
+    projectId: String? = null,
+    parentHorizontalPadding: Dp = 16.dp,
+    boxHeight: Dp = 56.dp,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        shape = RoundedCornerShape(
+            topStart = 0.dp,
+            bottomStart = 0.dp,
+            topEnd = 24.dp,
+            bottomEnd = 24.dp
+        ),
+        modifier = modifier
+            // Card selbst füllt die Breite
+            .fillMaxWidth()
+            .offset(x = -parentHorizontalPadding)
+
+            // entferne inneres Card-Padding
+            .padding(horizontal = 0.dp, vertical = 0.dp),
+        colors = CardDefaults.cardColors(), // Standard‑Hintergrund
+        elevation = CardDefaults.cardElevation(defaultElevation = 30.dp) // Standard‑Elevation
+    ) {
+        // Inhalt der Card: deine edge‑to‑edge Box
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(boxHeight)
+                .padding(top = 4.dp, bottom = 4.dp, end = 8.dp, start = 8.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                text = viewName,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                        .align(Alignment.CenterStart)
+            )
+
+            if (!projectId.isNullOrBlank()) {
+                val tagCode= generateProjectCodeFromDbId(projectId)
+                val tagColor = colorFromCode(tagCode)
+                ProjectNameBadge(
+                    text = tagCode,
+                    backgroundColor = tagColor,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ProjectNameBadge(
+    text: String,
+    backgroundColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .background(backgroundColor, RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = Color.White
+        )
+    }
+}

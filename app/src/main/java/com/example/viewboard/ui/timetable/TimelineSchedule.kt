@@ -1,6 +1,7 @@
 package com.example.viewboard.ui.timetable
 
 import android.content.res.Resources
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -13,6 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -21,13 +25,27 @@ import java.time.format.DateTimeFormatter
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.example.viewboard.R
 import com.example.viewboard.backend.Timestamp
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.components.homeScreen.CustomDropdownMenu
 import com.example.viewboard.components.homeScreen.ProjectCardTasks
+import com.example.viewboard.components.homeScreen.TimeSpanFilter
+import com.example.viewboard.ui.issue.IssueViewModel
 import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.ui.screens.DraggableMyTasksSection
+import com.example.viewboard.ui.screens.MyTasksScreen
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.Locale
 
 @Composable
@@ -36,31 +54,29 @@ fun TimelineSchedule(
     month: Int,
     onYearChange: (Int) -> Unit,
     onMonthChange: (Int) -> Unit,
+    onselectDate: (LocalDate) -> Unit,
+    selectedDate: LocalDate?,
     projects: List<ProjectLayout>,
     phases: List<String>,
-    issues: List<IssueLayout>,
+    issueViewModel: IssueViewModel,
     modifier: Modifier = Modifier,
+    height: Dp = 510.dp,
     navController: NavController
 
 ) {
-    var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
 
-    BoxWithConstraints(modifier = modifier) {
+
+    BoxWithConstraints(modifier = modifier.height(height)) {
+        var columnHeightPx    by remember { mutableStateOf(0) }
+        var screenHeightPx by remember { mutableStateOf(0) }
+        val density = LocalDensity.current
+
         val totalPx = constraints.maxWidth.toFloat()
         val monthPx = totalPx / 6f
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yy", Locale.getDefault())
+        val issuesList by issueViewModel.displayedAllIssues.collectAsState()
 
-        val matchingIssues = remember(selectedDate, issues) {
-            issues.filter { issue ->
-                runCatching {
-                    // Aus dem Timestamp erst den Datums-String holen …
-                    val dateString = Timestamp(data = issue.deadlineTS).getDate()
-                    // … und diesen parsen
-                    LocalDate.parse(dateString, formatter)
-                }.getOrNull() == selectedDate
-            }
-        }
-        val dummyIssues = extractIssueDates(issues)
+        val dummyIssues = extractIssueDateTimes(issuesList)
 
         Column(modifier = Modifier.fillMaxSize()) {
             // 1) Monat/Jahr Picker
@@ -71,7 +87,6 @@ fun TimelineSchedule(
                 onYearChange = onYearChange,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp)
             )
 
             // 2) Kalender
@@ -80,86 +95,11 @@ fun TimelineSchedule(
                 month = month,
                 selectedDate = selectedDate,
                 issues = dummyIssues,
-                onDateSelected = { selectedDate = it },
+                onDateSelected = onselectDate,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
             )
-
-            // 3) Timeline-Reihen
-            phases.forEach { phase ->
-                PhaseRow(
-                    projects = projects.filter { it.phase == phase },
-                    monthPx = monthPx.toDp()
-                )
-            }
-
-            // 4) Issues-Bereich
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f) // nimmt den restlichen Platz ein
-                    .padding(start = 8.dp, top = 0.dp, end = 8.dp, bottom = 0.dp)
-            ) {
-                when {
-                    selectedDate == null -> {
-                        Text(
-                            text = "Wähle ein Datum aus dem Kalender.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    matchingIssues.isEmpty() -> {
-                        Text(
-                            text = "Keine Issues an diesem Tag.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    else -> {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            item {
-                                Text(
-                                    text = "Issues für $selectedDate",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    modifier = Modifier.padding(bottom = 4.dp)
-                                )
-                            }
-
-                            items(matchingIssues.size) { index ->
-                                val issue = matchingIssues[index]
-                                val formatter = DateTimeFormatter.ISO_LOCAL_DATE
-                                val dueDateTime = runCatching {
-                                    // erst das Datum als String holen…
-                                    val dateString = Timestamp(data = issue.deadlineTS).getDate()
-                                    // …und dann als LocalDate parsen
-                                    LocalDate.parse(dateString, formatter).atStartOfDay()
-                                }.getOrElse { LocalDateTime.MIN }
-
-                                ProjectCardTasks(
-                                    name = issue.title,
-                                    dueDate = issue.deadlineTS,
-                                    onClick = {
-                                        navController.navigate(Screen.IssueScreen.createRoute(
-                                            issue.title,
-                                            "project.id"
-                                        ))
-                                    },
-                                    onMenuClick = {
-                                        navController.navigate(Screen.IssueScreen.createRoute(
-                                            issue.title,
-                                            "project.id"
-                                        ))
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -172,6 +112,7 @@ fun PhaseRow(
     monthPx: Dp,
     modifier: Modifier = Modifier
 ) {
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -216,5 +157,94 @@ fun extractIssueDates(issues: List<IssueLayout>): List<LocalDate> {
             val datePart = iso.substringBefore('T')
             LocalDate.parse(datePart, isoFormatter)
         }.getOrNull()
+    }
+}
+fun extractIssueDateTimes(issues: List<IssueLayout>): List<OffsetDateTime> {
+    val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+    return issues.mapNotNull { issue ->
+        runCatching {
+            OffsetDateTime.parse(issue.deadlineTS, formatter)
+        }.getOrNull()
+    }
+}
+@Composable
+fun DraggableMyIssuesSection(
+    navController: NavController,
+    onSortClick: () -> Unit,
+    issues: List<IssueLayout>,
+    selectedDate: LocalDate? = null,
+    modifier: Modifier = Modifier,
+    minSheetHeightPx: Float = 0f
+) {
+
+    val density = LocalDensity.current
+    var currentSheetHeightPx by remember { mutableStateOf(0f) }
+    val formatter = DateTimeFormatter.ofPattern("dd.MM.yy", Locale.getDefault())
+    // State, um die Auswahl ggf. weiterzuverwenden
+    val matchingIssues = remember(selectedDate, issues) {
+        val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        issues.filter { issue ->
+            runCatching {
+                // 1) Parse den ISO‑Timestamp zu einem OffsetDateTime
+                val odt = OffsetDateTime.parse(issue.deadlineTS, formatter)
+                // 2) Extrahiere das lokale Datum (ohne Zeit)
+                odt.toLocalDate()
+            }.getOrNull() == selectedDate
+        }
+    }
+
+    BoxWithConstraints(modifier = modifier) {
+        val maxHeightPx = with(density) { maxHeight.toPx() }
+
+        if (currentSheetHeightPx == 0f && maxHeightPx > 0f) {
+            currentSheetHeightPx = minSheetHeightPx.coerceAtMost(maxHeightPx)
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(with(density) { currentSheetHeightPx.toDp() })
+                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                .align(Alignment.BottomCenter)
+                .background(Color.White)
+        ) {
+            // Ziehgriff
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(30.dp)
+                    .pointerInput(Unit) {}
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .draggable(
+                        orientation = Orientation.Vertical,
+                        state = rememberDraggableState { delta ->
+                            val newHeight = currentSheetHeightPx - delta
+                            currentSheetHeightPx = newHeight.coerceIn(minSheetHeightPx, maxHeightPx * 0.8f) // Max 80%
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(4.dp)
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), shape = MaterialTheme.shapes.small)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp, start = 16.dp, end = 16.dp  ),//horizontal = 16.dp, vertical = 8.dp
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    //Spacer(modifier = Modifier.width(15.dp))
+                }
+            }
+            MyTasksScreen(
+                navController = navController,
+                issues = matchingIssues,
+                onSortClick = onSortClick,
+            )
+        }
     }
 }

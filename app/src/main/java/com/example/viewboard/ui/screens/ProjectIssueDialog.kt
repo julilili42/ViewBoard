@@ -37,7 +37,6 @@ import com.example.viewboard.ui.issue.IssueViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.viewboard.ui.issue.ViewsViewModel
 
 import kotlinx.coroutines.launch
 
@@ -51,7 +50,6 @@ fun ProjectIssueDialog(
     viewId: String,
     projects: List<ProjectLayout>,
     loadIssuesForProject: (String) -> Unit = {},
-    viewViewModel: ViewsViewModel = viewModel(),
     issueViewModel: IssueViewModel = viewModel(),
     onDismiss: () -> Unit
 ) {
@@ -60,12 +58,8 @@ fun ProjectIssueDialog(
     val baseColor = MaterialTheme.colorScheme.primary.copy(alpha = 1f)
     var columnWidthPx by remember { mutableStateOf(0f) }
     val issues by issueViewModel.issuesForSelectedProject.collectAsState()
-    val currentIssues  by issueViewModel.displayedIssuesFromViews.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val issueIds: List<String> = currentIssues.map { it.id }
 
-    // 1) Alle geladenen Issues, die noch nicht im View sind
-    val availableIssues = issues.filterNot { it.id in issueIds }
     // Nur Projekte mit mindestens einem Issue anzeigen
     val projectsWithIssues = remember(projects) {
         projects.filter { project -> project.issues.isNotEmpty() }
@@ -114,7 +108,7 @@ fun ProjectIssueDialog(
                         startX = 0f,
                         endX = columnWidthPx
                     )
-                    items(projectsWithIssues) { project ->
+                    items(projects ) { project ->
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -156,7 +150,7 @@ fun ProjectIssueDialog(
                             baseColor.copy(alpha = 0.2f)
                         )
                     )
-                    items(availableIssues) { issue ->
+                    items(issues) { issue ->
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -182,6 +176,10 @@ fun ProjectIssueDialog(
                                         }
                                     },
                                 headlineContent = { Text(issue.title) },
+                                colors = ListItemDefaults.colors(
+
+                                    headlineColor = MaterialTheme.colorScheme.onSurface
+                                )
                             )
                         }
                     }

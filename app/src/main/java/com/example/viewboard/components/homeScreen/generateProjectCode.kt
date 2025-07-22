@@ -14,36 +14,38 @@ import android.graphics.Color as AndroidColor
  * @param creationDate ein ISO‑Datum im Format "YYYY-MM-DD"
  * @return Code wie "#1A2B"
  */
-fun generateProjectCode(
-    projectName: String,
-    creationDate: String
-): String {
-    // 1) Basis-String: Name + "|" + Datum+"T00:00:00Z"
-    val timestamp = creationDate + "T00:00:00Z"
-    val base = projectName.trim() + "|" + timestamp
+/**
+ * Generiert aus einer Datenbank-ID einen kurzen, eindeutigen Projektcode.
+ *
+ * @param dbId Die Datenbank-ID (z. B. Firebase-Document-ID).
+ * @return Ein 4‑stelliges Base36‑Token, immer mit „#“ vorangestellt.
+ */
+fun generateProjectCodeFromDbId(dbId: String): String {
+    // 1) Basis-String: ID (ohne weitere Zusätze)
+    val base = dbId.trim()
 
-    // 2) SHA-256-Hash
+    // 2) SHA-256-Hash über die ID
     val md = MessageDigest.getInstance("SHA-256")
     val hashBytes = md.digest(base.toByteArray(Charsets.UTF_8))
 
-    // 3) Erste 8 Bytes → Long (positiv)
+    // 3) Aus den ersten 8 Bytes einen positiven Long bauen
     var longHash = 0L
     for (i in 0 until 8) {
         longHash = (longHash shl 8) or (hashBytes[i].toLong() and 0xFF)
     }
     if (longHash < 0) longHash = -longHash
 
-    // 4) Base36-String (uppercase)
+    // 4) In Base36 umwandeln und uppercase
     var codePart = longHash.toString(36).uppercase(Locale.getDefault())
 
-    // 5) Auf genau 4 Zeichen bringen
+    // 5) Auf genau 4 Zeichen bringen: pad oder cut
     codePart = when {
         codePart.length < 4 -> codePart.padStart(4, '0')
         codePart.length > 4 -> codePart.take(4)
         else                 -> codePart
     }
 
-    // 6) fertiger Code
+    // 6) Fertigen Code mit Präfix zurückgeben
     return "#$codePart"
 }
 

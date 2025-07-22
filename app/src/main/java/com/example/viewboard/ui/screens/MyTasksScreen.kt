@@ -44,7 +44,7 @@ fun MyTasksScreen(
             columns = GridCells.Fixed(1),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+            contentPadding = PaddingValues( start = 16.dp, end = 16.dp, bottom = 16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
             items(issues) { issue ->
@@ -69,13 +69,15 @@ fun MyTasksScreen(
                             }// suspend call
                         }
 
-                        project?.let {
+                        issue?.let {
+                            val projectName: String = project?.name ?: ""
                             ProjectCardTasks(
-                                name = it.name,
+                                name = it.title,
+                                projectId= it.projectid,
                                 dueDate = it.deadlineTS,
-                                onClick = { navController.navigate(Screen.IssueScreen.createRoute(
-                                    it.name,
-                                    cleanId))
+                                onClick = {navController.navigate(Screen.IssueScreen.createRoute(
+                                    projectName,
+                                    cleanId),)
                                 },
                                 onMenuClick = {
                                 }

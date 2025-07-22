@@ -14,9 +14,9 @@ sealed class Screen(val route: String) {
     /** Screen for the main/home page */
     object HomeScreen : Screen(route = "home")
 
-    object ProjectScreen : Screen("project/{projectName}") {
+    object ProjectScreen : Screen("home/project/{projectName}") {
 
-        fun createRoute(projectName: String) = "project/$projectName"
+        fun createRoute(projectName: String) = "home/project/$projectName"
     }
     /*
         /** Screen for the help/support page, hides bottomBar */
@@ -82,9 +82,9 @@ sealed class Screen(val route: String) {
     }
 
     /** Screen for viewing a specific issue from a shared view */
-    object ViewIssueScreen : Screen("views/viewIssue/{viewID}/{projID}") {
-        fun createRoute(viewID: String, projID: String) =
-            "views/viewIssue/$viewID/$projID"
+    object ViewIssueScreen : Screen("views/viewIssue/{viewID}/{projID}/{viewName}") {
+        fun createRoute(viewID: String, projID: String, viewName: String) =
+            "views/viewIssue/$viewID/$projID/$viewName"
     }
 
     /** Screen for changing password (accessed via profile) */

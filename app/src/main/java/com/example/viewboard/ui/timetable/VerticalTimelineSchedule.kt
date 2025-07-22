@@ -49,7 +49,7 @@ import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.components.homeScreen.IssueProgress
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
 import com.example.viewboard.components.homeScreen.TimeSpanFilter
-import generateProjectCode
+import generateProjectCodeFromDbId
 import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
@@ -140,7 +140,7 @@ fun VerticalTimelineSchedule(
                             val dayDiff = endDateToDays - startDateToDays
                             val startDp  = (startDateToDays  * monthPx).toDp()
                             val heightDp = (dayDiff * monthPx).toDp()
-                            val projectNameCode = generateProjectCode(project.name,project.deadlineTS)
+                            val projectNameCode = generateProjectCodeFromDbId(project.name)
                             val projectNamecolor = colorFromCode(projectNameCode)
 
                             Column(

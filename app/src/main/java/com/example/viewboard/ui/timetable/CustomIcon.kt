@@ -34,6 +34,7 @@ import com.example.viewboard.R
 import com.example.viewboard.ui.issue.IssueViewModel
 import com.example.viewboard.ui.issue.IssueViewModel.SortField
 import com.example.viewboard.ui.issue.IssueViewModel.SortOrder
+import com.example.viewboard.ui.issue.ViewsViewModel
 
 @Composable
 fun CustomIcon(
@@ -562,5 +563,120 @@ public fun IssueSortMenuSimple(
     }
 }
 
+@Composable
+fun ViewSortMenuSimple(
+    viewViewModel: ViewsViewModel,
+    @DrawableRes iconRes: Int,
+    contentDesc: String,
+    modifier: Modifier = Modifier,
+    width: Dp = 40.dp,
+    height: Dp = 40.dp,
+    backgroundColor: Color = Color.Gray,
+    iconTint: Color = Color.White,
+    cornerRadius: Dp = 4.dp,
+    arrowSize: Dp = 20.dp
+) {
+    // 1) Aktueller Sort-Status aus dem ViewModel
+    val currentField by viewViewModel.sortField.collectAsState()
+    val currentOrder by viewViewModel.sortOrder.collectAsState()
+
+    // 2) Optionen mit optionalem Pfeil-Icon je nach aktuellem Feld & Richtung
+    val options = listOf(
+        "Sort by Date" to (
+                if (currentField == ViewsViewModel.SortField.CREATED)
+                    if (currentOrder == ViewsViewModel.SortOrder.ASC)
+                        R.drawable.ic_arrow_upward
+                    else
+                        R.drawable.ic_arrow_downward
+                else null
+                ),
+        "Sort by Name" to (
+                if (currentField == ViewsViewModel.SortField.NAME)
+                    if (currentOrder == ViewsViewModel.SortOrder.ASC)
+                        R.drawable.ic_arrow_upward
+                    else
+                        R.drawable.ic_arrow_downward
+                else null
+                )
+    )
+
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .width(width)
+            .height(height)
+            .clip(RoundedCornerShape(cornerRadius))
+            .background(backgroundColor)
+            .clickable { expanded = true }
+    ) {
+        // 3) Haupt-Icon
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = contentDesc,
+            tint = iconTint,
+            modifier = Modifier
+                .width(width * 0.6f)
+                .height(height * 0.6f)
+        )
+
+        // 4) Dropdown-Menü
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { (label, optIcon) ->
+                DropdownMenuItem(
+                    text = {
+                        Text(label, fontSize = 16.sp)
+                    },
+                    trailingIcon = optIcon?.let { res ->
+                        {
+                            Icon(
+                                painter = painterResource(res),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .width(arrowSize)
+                                    .height(arrowSize)
+                            )
+                        }
+                    },
+                    onClick = {
+                        expanded = false
+                        when (label) {
+                            "Sort by Date" -> {
+                                if (currentField == ViewsViewModel.SortField.CREATED) {
+                                    viewViewModel.setSortOrder(
+                                        if (currentOrder == ViewsViewModel.SortOrder.ASC)
+                                            ViewsViewModel.SortOrder.DESC
+                                        else
+                                            ViewsViewModel.SortOrder.ASC
+                                    )
+                                } else {
+                                    viewViewModel.setSortField(ViewsViewModel.SortField.CREATED)
+                                    viewViewModel.setSortOrder(ViewsViewModel.SortOrder.ASC)
+                                }
+                            }
+                            "Sort by Name" -> {
+                                if (currentField == ViewsViewModel.SortField.NAME) {
+                                    viewViewModel.setSortOrder(
+                                        if (currentOrder == ViewsViewModel.SortOrder.ASC)
+                                            ViewsViewModel.SortOrder.DESC
+                                        else
+                                            ViewsViewModel.SortOrder.ASC
+                                    )
+                                } else {
+                                    viewViewModel.setSortField(ViewsViewModel.SortField.NAME)
+                                    viewViewModel.setSortOrder(ViewsViewModel.SortOrder.ASC)
+                                }
+                            }
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
 
 

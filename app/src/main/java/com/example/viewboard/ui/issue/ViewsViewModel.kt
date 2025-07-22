@@ -9,6 +9,8 @@ import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.ui.issue.ProjectViewModel.SortField
+import com.example.viewboard.ui.issue.ProjectViewModel.SortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +26,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
+
 class ViewsViewModel : ViewModel() {
     // RAW: Flow aller Views aus Firebase
     // RAW: Flow aller Views aus Firebase
@@ -33,11 +36,18 @@ class ViewsViewModel : ViewModel() {
     // StateFlows für Filter, Suche und Sortierung
     private val _filter = MutableStateFlow<String?>(null)
     private val _query = MutableStateFlow("")
+    val query : StateFlow<String?> = _query.asStateFlow()
     enum class SortField { NAME, CREATED }
     enum class SortOrder { ASC, DESC }
-    private val _sortField = MutableStateFlow(SortField.NAME)
-    private val _sortOrder = MutableStateFlow(SortOrder.ASC)
+    private val _sortField = MutableStateFlow(SortField.CREATED)
+    private val _sortOrder = MutableStateFlow(SortOrder.DESC)
+    private val _selectedName = MutableStateFlow<String?>(null)
+    val selectedName : StateFlow<String?> = _selectedName
+    val sortField: StateFlow<SortField> = _sortField.asStateFlow()
+    val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
     // UI-Ausgabe: Views nach Filter, Suche und Sortierung
+
+
     val displayedViews: StateFlow<List<ViewLayout>> = combine(
         viewFlow,
         _filter,
@@ -68,6 +78,7 @@ class ViewsViewModel : ViewModel() {
         initialValue = emptyList()
     )
 
+
     // Aktuell ausgewählte View-ID
     private val _selectedViewId = MutableStateFlow<String?>(null)
     val selectedViewId: StateFlow<String?> = _selectedViewId
@@ -88,6 +99,20 @@ class ViewsViewModel : ViewModel() {
         // Automatische Auswahl der ersten View
 
     }
+    val selectedViewName: StateFlow<String> = kotlinx.coroutines.flow.combine(
+        displayedViews,       // Flow<List<ViewLayout>>
+        _selectedViewId       // Flow<String?>
+    ) { views, selectedId ->
+        selectedId
+            ?.let { id -> views.firstOrNull { it.id == id }?.name }
+            ?: views.firstOrNull()?.name
+                .orEmpty()
+    }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            initialValue = ""
+        )
 
     /** Setze Filter-String */
     fun setFilter(f: String?) { _filter.value = f }
@@ -96,7 +121,8 @@ class ViewsViewModel : ViewModel() {
     fun setQuery(q: String) { _query.value = q }
 
     /** Toggle oder setze Sortierfeld */
-    fun setSortField(field: SortField) { _sortField.value = field }
+    fun setSortField(field: SortField) {
+        _sortField.value = field }
     fun toggleSortOrder() {
         _sortOrder.value = if (_sortOrder.value == SortOrder.ASC) SortOrder.DESC else SortOrder.ASC
     }
@@ -111,6 +137,25 @@ class ViewsViewModel : ViewModel() {
         // viewFlow liefert automatisch Updates
     }
 
-    /** Erneuert die Issues der aktuellen View */
+    /** Setze Sortierreihenfolge */
+    fun setSortOrder(order: SortOrder) {
+        _sortOrder.value = order
+    }
+    fun setSelectedName(name: String?) {
+        _selectedName.value = name
 
+    }
+
+    init {
+        viewModelScope.launch {
+            displayedViews
+                .filter { it.isNotEmpty() }             // warte bis die Liste nicht mehr leer ist
+                .first()                                 // nur das erste nicht‑leere Ergebnis
+                .let { firstList ->
+                    if (_selectedViewId.value == null) {
+                        _selectedViewId.value = firstList.first().id
+                    }
+                }
+        }
+    }
 }

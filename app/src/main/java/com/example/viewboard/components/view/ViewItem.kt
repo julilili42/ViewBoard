@@ -38,7 +38,7 @@ import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueState
 import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.util.filterIssuesByStates
-import generateProjectCode
+import generateProjectCodeFromDbId
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -55,7 +55,7 @@ fun ViewItem(
     color: Color,
     onClick: () -> Unit
 ) {
-    val viewNameCode = generateProjectCode(view.name, view.creationTS)
+    val viewNameCode = generateProjectCodeFromDbId(view.name)
     val viewNameColor = colorFromCode(viewNameCode)
 
     Card(

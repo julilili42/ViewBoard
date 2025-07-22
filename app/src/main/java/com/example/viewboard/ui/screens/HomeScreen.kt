@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
@@ -36,7 +37,10 @@ import java.time.LocalDateTime
 import com.example.viewboard.components.homeScreen.ProfileHeader
 import com.example.viewboard.components.homeScreen.TimeSpanFilter
 import com.example.viewboard.components.homeScreen.ViewSelectorDropdown
+import com.example.viewboard.ui.issue.IssueViewModel
 import com.example.viewboard.ui.issue.MainViewModel
+import com.example.viewboard.ui.issue.ProjectViewModel
+import com.example.viewboard.ui.issue.ViewsViewModel
 import com.example.viewboard.ui.navigation.BottomBarScreen
 
 val tasks: List<Pair<String, LocalDateTime>> = listOf(
@@ -54,6 +58,8 @@ fun HomeScreen(
     activeProjects: List<String> = listOf("Created", "Shared"),//, "Archived", "All"
     myTasks: List<Pair<String, LocalDateTime>> = tasks,
     viewModel: MainViewModel,
+    issueViewModel: IssueViewModel,
+    viewsViewModel: ViewsViewModel,
     modifier: Modifier,
     onSortTasks: () -> Unit = {}
 ) {
@@ -123,7 +129,8 @@ fun HomeScreen(
             DraggableMyTasksSection(
                 navController = navController,
                 onSortClick = onSortTasks,
-                viewModel= viewModel,
+                issueViewModel = issueViewModel,
+                viewsViewModel = viewsViewModel,
                 modifier = Modifier.fillMaxSize(),
                 minSheetHeightPx =  (screenHeightPx - topBlockHeightPx).coerceAtLeast(0f),
             )
@@ -135,24 +142,32 @@ fun HomeScreen(
 fun DraggableMyTasksSection(
     navController: NavController,
     onSortClick: () -> Unit,
-    viewModel: MainViewModel,
+    issueViewModel: IssueViewModel ,
+    viewsViewModel: ViewsViewModel ,
     modifier: Modifier = Modifier,
     minSheetHeightPx: Float = 0f
 ) {
     val density = LocalDensity.current
-    val selectedId by viewModel.selectedViewId.collectAsState()
-    val views by viewModel.views.collectAsState()
-    var viewNames by remember { mutableStateOf<List<String>>(emptyList()) }
-    LaunchedEffect(views) {
-        viewNames = views.map { it.name }
-    }
-    val selectedName = views
-        .firstOrNull { it.id == selectedId }
-        ?.name
-        ?: "No views"
-    val viewIssues by viewModel.issuesForSelectedView.collectAsState()
     var currentSheetHeightPx by remember { mutableStateOf(0f) }
     // State, um die Auswahl ggf. weiterzuverwenden
+    val viewLayouts by viewsViewModel.displayedViews.collectAsState()
+    val selectedViewId by viewsViewModel.selectedViewId.collectAsState()
+    val selectedName by viewsViewModel.selectedViewName.collectAsState()
+
+
+
+    Log.d("selectedId", "selectedName =$selectedViewId")
+
+
+    selectedViewId?.let { issueViewModel.setCurrentViewId(it) }
+    selectedViewId?.let { issueViewModel.loadIssuesFromView(selectedViewId!!) }
+    LaunchedEffect(selectedViewId) {
+        selectedViewId?.let { issueViewModel.setCurrentViewId(it) }
+        selectedViewId?.let { issueViewModel.loadIssuesFromView(it) }
+    }
+    val issues by issueViewModel.displayedIssuesFromViews.collectAsState()
+
+
 
 
     BoxWithConstraints(modifier = modifier) {
@@ -209,12 +224,11 @@ fun DraggableMyTasksSection(
                             .fillMaxWidth(0.4f)
                     )*/
                     CustomDropdownMenu(
-                        options = viewNames,
+                        options = viewLayouts,
                         selectedOption = selectedName,
-                        onOptionSelected = {viewName ->
-                            // finde das ViewLayout zur Auswahl und setze es im VM
-                            views.firstOrNull { it.name == viewName }?.let { view ->
-                                viewModel.selectView(view.id)} },
+                        onOptionSelected = {view ->
+                            Log.d("selectedName", "viewid =$view ")
+                                viewsViewModel.selectView(view)},
                         modifier = Modifier
                             .fillMaxWidth(0.4f)   // nur 80% der Breite
                             .padding()
@@ -261,7 +275,7 @@ fun DraggableMyTasksSection(
             }
             MyTasksScreen(
                 navController = navController,
-                issues = viewIssues,
+                issues = issues,
                 onSortClick = onSortClick,
             )
         }

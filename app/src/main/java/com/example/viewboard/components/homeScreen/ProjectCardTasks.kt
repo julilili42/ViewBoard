@@ -25,15 +25,17 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import generateProjectCode
+import generateProjectCodeFromDbId
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import colorFromCode
+import com.example.viewboard.backend.dataLayout.IssueLayout
 
 @Composable
 fun ProjectCardTasks(
     name: String,
+    projectId: String,
     dueDate: String,
     onClick: () -> Unit,
     onMenuClick: () -> Unit
@@ -87,7 +89,7 @@ fun ProjectCardTasks(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        val projectNameCode = generateProjectCode(name,dueDate)
+                        val projectNameCode = generateProjectCodeFromDbId(projectId)
                         val projectColor = colorFromCode(projectNameCode)
 
                         Box(
@@ -142,4 +144,5 @@ fun ProjectCardTasks(
         }
     }
 }
+
 

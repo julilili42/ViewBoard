@@ -22,22 +22,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
 
-val dummyIssues = listOf(
-    LocalDate.of(2025, 6,  3),
-    LocalDate.of(2025, 6,  3),
-    LocalDate.of(2025, 6, 15),
-    LocalDate.of(2025, 7,  1)
-)
+
 
 @Composable
 fun MonthCalendar(
     year: Int,
     month: Int, // 1..12
-    issues: List<LocalDate> = dummyIssues,
+    issues: List<OffsetDateTime> ,
     modifier: Modifier = Modifier,
     selectedDate: LocalDate? = null,
     onDateSelected: (LocalDate) -> Unit = {}
@@ -95,7 +91,7 @@ fun MonthCalendar(
         // Maximal 35 Tage-Zellen
         items(allDates) { date ->
             val isCurrent = date.monthValue == safeMonth
-            val issueCount = issues.count { it == date }
+            val issueCount = issues.count { it.toLocalDate()  == date }
             val isTodayDate = date == today
             val isSelected = date == selectedDate
 

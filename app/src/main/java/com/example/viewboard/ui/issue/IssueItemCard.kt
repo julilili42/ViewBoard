@@ -46,6 +46,8 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -71,7 +73,7 @@ fun IssueItemCard(
     val issueDueTime = formatRemaining(date)
     val scrollState = rememberScrollState()
 
-    Box(
+   /* Box(
         modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
@@ -86,11 +88,20 @@ fun IssueItemCard(
                 RoundedCornerShape(12.dp)
             )
             .padding(16.dp)
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    )*/   Card(
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            //.padding( 16.dp)
+
+    ){
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding( 16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
+
             ) {
                 Text(
                     text = title,

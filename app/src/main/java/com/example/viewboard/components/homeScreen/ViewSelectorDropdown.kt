@@ -46,6 +46,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.ViewLayout
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,7 +119,7 @@ fun ViewSelectorDropdown(
 
 @Composable
 fun CustomDropdownMenu(
-    options: List<String>,
+    options: List<ViewLayout>,
     selectedOption: String?,
     onOptionSelected: (String) -> Unit,
     modifier: Modifier = Modifier   // einziges Style‑Argument
@@ -171,13 +173,13 @@ fun CustomDropdownMenu(
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = option,
+                            text = option.name,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
                     modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant),
                     onClick = {
-                        onOptionSelected(option)
+                        onOptionSelected(option.id)
                         expanded = false
                     }
                 )

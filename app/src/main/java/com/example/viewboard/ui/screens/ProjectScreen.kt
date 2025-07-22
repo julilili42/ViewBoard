@@ -52,6 +52,7 @@ import com.example.viewboard.ui.timetable.CustomIconMenu
 import com.example.viewboard.ui.timetable.ProjectSortMenu
 import com.example.viewboard.ui.timetable.ProjectSortMenuSimple
 import com.example.viewboard.ui.timetable.SortOptions
+import generateProjectCodeFromDbId
 
 
 /**
@@ -100,14 +101,12 @@ fun ProjectsScreen(
     projectName: String,
     @Suppress("UNUSED_PARAMETER")
     projectViewModel: ProjectViewModel,
-    columns: Int = 2,
     onSort: () -> Unit = {},
 ) {
     // Bestimme den Filter-Modus anhand des Namens
     val filterMode = when (projectName.lowercase()) {
         "created" -> ProjectFilter.CREATED
         "shared"  -> ProjectFilter.SHARED
-        "all"     -> ProjectFilter.ALL
         else      -> ProjectFilter.CREATED
     }
 
@@ -118,11 +117,12 @@ fun ProjectsScreen(
 
     // Beobachte die gefilterten & gesuchten Projekte aus dem ViewModel
     val projects by projectViewModel.displayedProjects.collectAsState()
-
+    val editable = filterMode == ProjectFilter.CREATED
     // Lokaler State für die Such-Query
     val query by projectViewModel.query.collectAsState()
     val currentField by projectViewModel.sortField.collectAsState()
     val currentOrder by projectViewModel.sortOrder.collectAsState()
+    val columns = 2
     Scaffold(
         topBar = {
             ProfileHeader(
@@ -139,21 +139,23 @@ fun ProjectsScreen(
             )
         },
         floatingActionButton = {
-            CustomIcon(
-                iconRes = R.drawable.plus_large_svgrepo_com,
-                contentDesc = stringResource(R.string.plus_large_svgrepo_com),
-                backgroundColor = MaterialTheme.colorScheme.primary,
-                iconTint = Color.White,
-                width = 50.dp,
-                height = 50.dp,
-                modifier = Modifier
-                    .offset(y = 40.dp)
-                    .padding(16.dp)
-                    .clip(CircleShape),
-                onClick = {
-                    navController.navigate(Screen.ProjectCreationScreen.route)
-                }
-            )
+            if(editable) {
+                CustomIcon(
+                    iconRes = R.drawable.plus_large_svgrepo_com,
+                    contentDesc = stringResource(R.string.plus_large_svgrepo_com),
+                    backgroundColor = MaterialTheme.colorScheme.primary,
+                    iconTint = Color.White,
+                    width = 50.dp,
+                    height = 50.dp,
+                    modifier = Modifier
+                        .offset(y = 40.dp)
+                        .padding(16.dp)
+                        .clip(CircleShape),
+                    onClick = {
+                        navController.navigate(Screen.ProjectCreationScreen.route)
+                    }
+                )
+            }
         }
     ) { paddingValues ->
         LazyVerticalGrid(
@@ -165,20 +167,15 @@ fun ProjectsScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                EdgeToEdgeRoundedRightItemWithBadge(viewName = "$projectName Projects")
+            }
             // Header, Suchfeld und Sort/Filter-Icons
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Text(
-                    text = "$projectName Projects",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp)
-                )
-
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .fillMaxWidth(),
+
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -190,22 +187,6 @@ fun ProjectsScreen(
                             .width(200.dp),
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                      /*  CustomIcon(
-                            iconRes = R.drawable.filter_svgrepo_com__1,
-                            contentDesc = stringResource(R.string.sort_desc_svgrepo_com),
-                            backgroundColor = MaterialTheme.colorScheme.primary,
-                            iconTint = Color.White,
-                            width = 40.dp,
-                            height = 40.dp,
-                            onClick = onSort,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )*/// Usage example:
-                         val sortOptions = listOf(
-                             SortOptions("Sort by Date", ProjectViewModel.SortField.DATE),
-                            SortOptions("Sort by Name", ProjectViewModel.SortField.NAME),
-
-                         )
-                         ProjectSortMenuSimple(projectViewModel, sortOptions, iconRes = R.drawable.sort_desc_svgrepo_com, contentDesc = "Sort")
                         ProjectSortMenuSimple(
                             projectViewModel = projectViewModel,
                             iconRes          = R.drawable.sort_desc_svgrepo_com,
@@ -228,7 +209,8 @@ fun ProjectsScreen(
                         navController.navigate(
                             Screen.IssueScreen.createRoute(project.name, project.id)
                         )
-                    }
+                    },
+                    editable = editable
                 )
             }
         }

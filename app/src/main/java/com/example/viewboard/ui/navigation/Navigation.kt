@@ -81,7 +81,9 @@ fun Navigation(modifier: Modifier = Modifier) {
 
             navigation(startDestination = BottomBarScreen.Home.route, route = "main") {
 
-                composable(BottomBarScreen.Home.route) {
+                composable(BottomBarScreen.Home.route) { backStack ->
+                    val issueViewModel: IssueViewModel = viewModel(backStack)
+                    val viewsViewModel: ViewsViewModel = viewModel(backStack)
                     MainLayout(navController, currentRoute) { padding ->
                         Box(modifier = Modifier
                             .fillMaxWidth()
@@ -90,19 +92,27 @@ fun Navigation(modifier: Modifier = Modifier) {
                             HomeScreen(
                                 navController = navController,
                                 viewModel = mainViewModel ,
-                                modifier = Modifier
+                                modifier = Modifier,
+                                issueViewModel = issueViewModel,
+                                viewsViewModel = viewsViewModel,
                             )
                         }
                     }
 
                 }
-                composable(BottomBarScreen.Timetable.route) {
+                composable(BottomBarScreen.Timetable.route) { backStack->
+                    val viewsViewModel: ViewsViewModel = viewModel(backStack)
+                    val issueViewModel: IssueViewModel = viewModel(backStack)
+                    val projectViewModel: ProjectViewModel = viewModel(backStack)
                     MainLayout(navController, currentRoute) { padding ->
                         Box(modifier = Modifier
                             .fillMaxWidth()
                             .padding(padding)
                         ) {
-                            TimetableScreen(navController = navController)
+                            TimetableScreen(navController = navController,
+                                viewsViewModel = viewsViewModel,
+                                issueViewModel = issueViewModel,
+                                projectViewModel = projectViewModel,)
                         }
                     }
                 }
@@ -314,7 +324,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                                 navController,
                                 issueViewModel=issueViewModel ,
                                 projectName  = projectName,
-                                projectId    = projectId   // jetzt mit übergeben
+                                projectId    = projectId,
                             )
                         }
                     }
@@ -329,6 +339,7 @@ fun Navigation(modifier: Modifier = Modifier) {
             ) { backStack ->
                 val viewID   = backStack.arguments!!.getString("viewID")!!
                 val projID   = backStack.arguments!!.getString("projID")!!
+                val viewName = backStack.arguments!!.getString("viewName")!!
                 val issueViewModel: IssueViewModel = viewModel(backStack)
                 val viewsViewModel: ViewsViewModel = viewModel(backStack)
                 val projectViewModel: ProjectViewModel = viewModel(backStack)
@@ -342,12 +353,13 @@ fun Navigation(modifier: Modifier = Modifier) {
                             modifier = Modifier.fillMaxSize()
                         ) {
                             ViewIssueScreen(
-                                IssueViewModel = issueViewModel,
-                                ProjectViewModel = projectViewModel,
-                                ViewsViewModel = viewsViewModel,
+                                issueViewModel = issueViewModel,
+                                projectViewModel = projectViewModel,
+                                viewsViewModel = viewsViewModel,
                                 navController = navController,
                                 viewID = viewID,
-                                projID = projID
+                                projID = projID,
+                                viewName = viewName
                             )
                         }
                     }

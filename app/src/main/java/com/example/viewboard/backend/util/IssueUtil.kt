@@ -21,6 +21,7 @@ fun filterIssuesByLabels(issues: Flow<List<IssueLayout>>, labels: List<String>) 
     }
 }
 
+
 /**
  * Get all issues filtered by a set of assignments
  *
