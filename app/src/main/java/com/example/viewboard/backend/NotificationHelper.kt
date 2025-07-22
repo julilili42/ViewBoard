@@ -109,10 +109,18 @@ object NotificationHelper {
 
         }
     }
+    fun saveSeenIssue(context: Context, issueId: String) {
+        val prefs = context.getSharedPreferences("seen_issues", Context.MODE_PRIVATE)
+        prefs.edit { putBoolean(issueId, true) }
+    }
+
+    fun hasSeenIssue(context: Context, issueId: String): Boolean {
+        val prefs = context.getSharedPreferences("seen_issues", Context.MODE_PRIVATE)
+        return prefs.getBoolean(issueId, false)
+    }
+
 
     suspend fun checkNewIssueAssignments(context: Context) {
-        val notifiedIssueIds = mutableSetOf<String>()
-
         val uid = FirebaseProvider.auth.currentUser?.uid ?: return
 
         val userDoc = Firebase.firestore.collection("users").document(uid).get().await()
@@ -125,16 +133,17 @@ object NotificationHelper {
             val data = doc.data ?: continue
             val assignments = (data["assignments"] as? List<*>)?.mapNotNull { it as? String } ?: continue
 
-            if (uid in assignments && issueId !in notifiedIssueIds) {
+            if (uid in assignments && !hasSeenIssue(context, issueId)) {
                 sendNotification(
                     context,
                     title = "New Issue!",
                     message = "You have been assigned to the issue '${data["title"]}'."
                 )
-                notifiedIssueIds.add(issueId)
+                saveSeenIssue(context, issueId)
             }
         }
     }
+
 
 
     suspend fun checkNewProjectAssignments(context: Context) {
