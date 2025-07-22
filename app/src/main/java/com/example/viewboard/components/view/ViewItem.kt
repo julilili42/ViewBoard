@@ -2,6 +2,7 @@ package com.example.viewboard.components.view
 
 import OptionsMenuButton
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -53,7 +54,9 @@ fun ViewItem(
     view: ViewLayout,
     creator: String,
     color: Color,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDelete: (String) -> Unit // <-- hinzufügen
+
 ) {
     val viewNameCode = generateProjectCodeFromDbId(view.name)
     val viewNameColor = colorFromCode(viewNameCode)
@@ -83,8 +86,8 @@ fun ViewItem(
             // Options‑Button oben rechts
             OptionsMenuButton(
                 options = listOf(
-                    "Edit" to { /* TODO: edit action */ },
-                    "Delete" to { /* TODO: delete action */ }
+                    "Delete" to { Log.d("ViewItem", "Delete clicked for ${view.id}")
+                        onDelete(view.id) }
                 ),
                 modifier = Modifier.align(Alignment.TopEnd),
                 icon = Icons.Default.MoreVert

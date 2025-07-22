@@ -783,6 +783,30 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
+    suspend fun deleteView(
+        viewId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        try {
+            // 1. View-Dokument löschen
+            m_viewTable.document(viewId).delete().await()
+
+            // 2. Aus Benutzer-Referenz entfernen
+            val uid = AuthAPI.getUid() ?: throw Exception("Kein User angemeldet")
+            Firebase.firestore.collection("users")
+                .document(uid)
+                .update("views", FieldValue.arrayRemove(viewId))
+                .await()
+
+            onSuccess()
+        } catch (e: Exception) {
+            onFailure(e)
+        }
+    }
+
+
+
     private lateinit var m_projectTable: CollectionReference
     private lateinit var m_labelTable: CollectionReference
     private lateinit var m_issueTable: CollectionReference

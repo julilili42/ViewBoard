@@ -2,6 +2,7 @@ package com.example.viewboard.ui.issue
 
 
 import android.util.Log
+import kotlinx.coroutines.flow.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
@@ -30,8 +31,8 @@ import kotlinx.coroutines.launch
 class ViewsViewModel : ViewModel() {
     // RAW: Flow aller Views aus Firebase
     // RAW: Flow aller Views aus Firebase
-    val viewFlow: Flow<List<ViewLayout>> =
-        FirebaseAPI.getAllViews()
+    val viewFlow: Flow<List<ViewLayout>> = FirebaseAPI.getAllViews()
+        .map { views -> views.filter { it.creator == myId } }
     private val myId: String = AuthAPI.getUid() ?: ""
     // StateFlows für Filter, Suche und Sortierung
     private val _filter = MutableStateFlow<String?>(null)

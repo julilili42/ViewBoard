@@ -1,5 +1,6 @@
 package com.example.viewboard.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -163,8 +164,17 @@ fun ViewScreen(
                     color = Color.Gray,
                     onClick = {
                         navController.navigate(
-                            Screen.ViewIssueScreen.createRoute(view.id,"",view.name)
+                            Screen.ViewIssueScreen.createRoute(view.id, "", view.name)
                         )
+                    },
+                    onDelete = { viewId ->
+                        coroutineScope.launch {
+                            FirebaseAPI.deleteView(
+                                viewId,
+                                onSuccess = { Log.d("ViewScreen", "Deleted view $viewId") },
+                                onFailure = { error -> Log.e("ViewScreen", "Failed to delete: $error") }
+                            )
+                        }
                     }
                 )
             }
