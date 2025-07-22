@@ -19,6 +19,7 @@ import java.time.ZoneId
 import kotlin.random.Random
 import java.time.Instant
 import java.time.format.DateTimeFormatter
+import androidx.core.content.edit
 
 
 object NotificationHelper {
@@ -33,6 +34,16 @@ object NotificationHelper {
         )
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
+    }
+
+    fun saveSeenProject(context: Context, projectId: String) {
+        val prefs = context.getSharedPreferences("seen_projects", Context.MODE_PRIVATE)
+        prefs.edit() { putBoolean(projectId, true) }
+    }
+
+    fun hasSeenProject(context: Context, projectId: String): Boolean {
+        val prefs = context.getSharedPreferences("seen_projects", Context.MODE_PRIVATE)
+        return prefs.getBoolean(projectId, false)
     }
 
     fun sendNotification(context: Context, title: String, message: String) {
@@ -128,25 +139,27 @@ object NotificationHelper {
 
     suspend fun checkNewProjectAssignments(context: Context) {
         val uid = FirebaseProvider.auth.currentUser?.uid ?: return
-        val notifiedProjectIds = mutableSetOf<String>()
 
         val projectsSnap = Firebase.firestore.collection("Projects").get().await()
         for (doc in projectsSnap.documents) {
             val projectId = doc.id
             val data = doc.data ?: continue
-            val members = (data["members"] as? List<*>)?.mapNotNull { it as? String } ?: continue
+            val members = (data["users"] as? List<*>)?.mapNotNull { it as? String } ?: continue
+
             Log.d("NOTIFY", "Checking project: $projectId - members: $members - uid: $uid")
-            if (uid in members && projectId !in notifiedProjectIds) {
+
+            if (uid in members && !hasSeenProject(context, projectId)) {
                 Log.d("NOTIFY", "Triggering notification for project $projectId")
                 sendNotification(
                     context,
                     title = "New Project!",
                     message = "You have been assigned to a new Project '${data["title"]}'."
                 )
-                notifiedProjectIds.add(projectId)
+                saveSeenProject(context, projectId)
             }
         }
     }
+
 
 
 }
