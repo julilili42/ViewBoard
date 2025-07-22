@@ -179,6 +179,22 @@ abstract class AuthServerAPI {
      *
      * @param onComplete optional callback when the token is fetched and saved
      */
+
+    /**
+     * Liest ein UserLayout für die gegebene userID aus Firestore.
+     * @param userID Die UID des Users
+     * @return Result mit dem UserLayout oder einer Exception im Fehlerfall
+     */
+    abstract suspend fun getUserById(userID: String): Result<UserLayout>
+
+    /**
+     * Liest für jede übergebene User‑ID die zugehörige E‑Mail aus Firestore.
+     * @param userIds Liste von UIDs
+     * @return Result mit Liste der gefundenen E‑Mail‑Strings (in gleicher Reihenfolge wie die IDs;
+     *         an Position i steht null, wenn UID i nicht gefunden wurde)
+     */
+    abstract suspend fun getEmailsByIds(userIds: List<String>): Result<List<String?>>
+
     public abstract fun fetchAndSaveFcmToken(onComplete: (() -> Unit)? = {})
 
     public abstract suspend fun getListOfAllUsers(): Result<List<UserLayout>>

@@ -31,9 +31,15 @@ import kotlinx.coroutines.launch
 class ViewsViewModel : ViewModel() {
     // RAW: Flow aller Views aus Firebase
     // RAW: Flow aller Views aus Firebase
-    val viewFlow: Flow<List<ViewLayout>> = FirebaseAPI.getAllViews()
-        .map { views -> views.filter { it.creator == myId } }
     private val myId: String = AuthAPI.getUid() ?: ""
+    val viewFlowview: Flow<List<ViewLayout>> = FirebaseAPI.getAllViews()
+        .map { views -> views.filter { it.creator == myId } }
+    val viewFlowHome: Flow<List<ViewLayout>> = FirebaseAPI.getAllViews()
+        .map { views ->
+            views.filter { view ->
+                view.creator == myId && view.issues.isNotEmpty()  // nur Views mit mindestens einem Issue
+            }
+        }
     // StateFlows für Filter, Suche und Sortierung
     private val _filter = MutableStateFlow<String?>(null)
     private val _query = MutableStateFlow("")
@@ -50,7 +56,37 @@ class ViewsViewModel : ViewModel() {
 
 
     val displayedViews: StateFlow<List<ViewLayout>> = combine(
-        viewFlow,
+        viewFlowview,
+        _filter,
+        _query,
+        _sortField,
+        _sortOrder
+    ) { list, filter, query, sortField, sortOrder ->
+        // a) Filter nach Name (wenn angegeben)
+        val byFilter = filter?.let { f ->
+            list.filter { it.name.contains(f, ignoreCase = true) }
+        } ?: list
+        // b) Suche nach Query im Namen
+        val byQuery = if (query.isBlank()) byFilter
+        else byFilter.filter { it.name.contains(query, ignoreCase = true) }
+        // c) Sortierung
+        val sorted = byQuery.sortedWith(
+            compareBy<ViewLayout> {
+                when (sortField) {
+                    SortField.NAME      -> it.name.lowercase()
+                    SortField.CREATED   -> it.creationTS
+                }
+            }.let { cmp -> if (sortOrder == SortOrder.DESC) cmp.reversed() else cmp }
+        )
+        sorted
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
+
+    val displayedViewsHome: StateFlow<List<ViewLayout>> = combine(
+        viewFlowHome,
         _filter,
         _query,
         _sortField,
@@ -101,7 +137,7 @@ class ViewsViewModel : ViewModel() {
 
     }
     val selectedViewName: StateFlow<String> = kotlinx.coroutines.flow.combine(
-        displayedViews,       // Flow<List<ViewLayout>>
+        displayedViewsHome,       // Flow<List<ViewLayout>>
         _selectedViewId       // Flow<String?>
     ) { views, selectedId ->
         selectedId
@@ -149,7 +185,7 @@ class ViewsViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            displayedViews
+            displayedViewsHome
                 .filter { it.isNotEmpty() }             // warte bis die Liste nicht mehr leer ist
                 .first()                                 // nur das erste nicht‑leere Ergebnis
                 .let { firstList ->

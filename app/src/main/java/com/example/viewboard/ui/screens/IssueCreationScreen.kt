@@ -49,6 +49,8 @@ fun IssueCreationScreen(
     onCreate: () -> Unit = {}
 ) {
 
+
+
     val uiColor = uiColor()
     val context = LocalContext.current
     val scroll = rememberScrollState()
@@ -83,6 +85,7 @@ fun IssueCreationScreen(
         try { timeFormatter.parse(timeText); true } catch (_: Exception) { false }
     }
     val coroutineScope = rememberCoroutineScope()
+
 
     fun updateDeadlineFromDateText() {
         val d = dateFormatter.parse(dateText) ?: throw IllegalArgumentException("Ungültiges Datum")
@@ -170,17 +173,6 @@ fun IssueCreationScreen(
             )
             Spacer(Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = desc,
-                onValueChange = { desc = it },
-                label = { Text("Description") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = 120.dp),
-                maxLines = Int.MAX_VALUE
-            )
-            Spacer(Modifier.height(16.dp))
-
             var project by remember { mutableStateOf<ProjectLayout?>(null) }
 
             // 2) Zugehöriges Projekt nur einmal beim ersten Compose laden
@@ -195,14 +187,33 @@ fun IssueCreationScreen(
                 }
             }
 
-            val suggestionEmails = project?.users
-            val suggestionTags = project?.labels
+            val emailsState by produceState<List<String?>>(
+                initialValue = emptyList(),
+                key1 = project?.users
+            ) {
+                // Lade die E‑Mails; bei Fehler oder leerem Ergebnis bleibt es bei emptyList
+                val result = runCatching { project?.let { AuthAPI.getEmailsByIds(it.users) } }
+                    .getOrNull()
+                    ?.getOrNull()
+                value = result ?: emptyList()
+            }
+            data class EmailWithId(val userId: String, val mail: String?)
+            val pairedObjects: List<EmailWithId> =
+                (project?.users ?: emptyList()).zip(emailsState) { id, mail ->
+                    EmailWithId(userId = id, mail = mail)
+                }
 
-            val suggestionList = remember(newParticipant, assignments, suggestionEmails) {
+            emailsState
+            val suggestionEmails = project?.users.orEmpty()
+            val suggestionTags = project?.labels
+            val emails = emailsState.orEmpty()
+                .filterNotNull()
+            Log.d("emails", "emails=${emails}")
+            val suggestionList = remember(newParticipant, assignments, emails ) {
                 if (newParticipant.isBlank()) {
                     emptyList()
                 } else {
-                    suggestionEmails?.filter { email ->
+                    emails.filter { email ->
                         // enthält eingegebene Zeichen
                         email.contains(newParticipant, ignoreCase = true)
                                 // und ist noch nicht in assignments
@@ -210,6 +221,8 @@ fun IssueCreationScreen(
                     }
                 }
             }
+
+            val allNames = listOf("Alice", "Bob", "Charlie", "David")
 
             if (suggestionList != null) {
                 ChipInputField(
@@ -227,8 +240,7 @@ fun IssueCreationScreen(
                     onNewEntryChange = { newParticipant = it },
                     onEntryConfirmed = {
                         // Option: Akzeptiere nur exakte Übereinstimmung
-                        val match =
-                            suggestionEmails?.find { it.equals(newParticipant.trim(), ignoreCase = true) }
+                        val match = allNames.find { it.equals(newParticipant.trim(), ignoreCase = true) }
                         if (match != null && match !in assignments) {
                             assignments = assignments + match
                         }
@@ -293,28 +305,36 @@ fun IssueCreationScreen(
 
             if (!isDateValid) {
                 Text(
-                    text = "Ungültiges Datum",
+                    text = "Invalid date",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
             if (!isTimeValid) {
                 Text(
-                    text = "Ungültige Uhrzeit",
+                    text = "Invalid time",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
             Spacer(Modifier.height(16.dp))
             val isFormValid by derivedStateOf {
-                isTitleValid && isDescValid
+                isTitleValid
             }
-
+            val assignmentIds: ArrayList<String> = remember(assignments, pairedObjects) {
+                val ids = assignments.mapNotNull { email ->
+                    pairedObjects
+                        .find { it.mail.equals(email, ignoreCase = true) }
+                        ?.userId
+                }
+                ArrayList(ids)
+            }
             Button(
 
                 enabled = isDateValid && isTimeValid&& isFormValid,
                 onClick = {
                     // Validierung
+
                     if (isDateValid && isTimeValid) {
                         // Datum/Uhrzeit ins Modell übernehmen
                         updateDeadlineFromDateText()
@@ -325,15 +345,16 @@ fun IssueCreationScreen(
                                 creator = currentUserId
                             )
                         })
+
                         // Issue anlegen und speichern
                         val newIssue = IssueLayout(
-                            title       = title,
+                            title       = title.capitalizeWords(),
                             desc        = desc,
                             creator     = currentUserId,
-                            assignments = ArrayList(assignments),
+                            assignments = assignmentIds,
                             projectid = projectId,
 //                            labels      = labelObjects,
-                           // labels      = ArrayList(labels),
+                            labels      = ArrayList(labels),
                             deadlineTS  = deadline.export()
                         )
                         coroutineScope.launch {
@@ -363,3 +384,13 @@ fun IssueCreationScreen(
 }
 
 
+fun String.capitalizeWords(): String =
+    this
+        .split(Regex("\\s+"))                        // nach Leerraum trennen
+        .joinToString(" ") { word ->
+            word
+                .lowercase()                         // zuerst alles klein
+                .replaceFirstChar {                   // dann ersten Buchstaben groß
+                    if (it.isLowerCase()) it.titlecase() else it.toString()
+                }
+        }

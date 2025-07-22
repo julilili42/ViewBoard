@@ -72,3 +72,16 @@ fun colorFromCode(code: String): Color {
     // 6) Wrap in Compose Color
     return Color(colorInt)
 }
+
+fun colorFromEmail(email: String): Color {
+    // Local‑Part extrahieren (alles vor '@'), oder fallback auf die ganze Adresse
+    val localPart = email.substringBefore('@', email)
+    // Hex‑Prefix dran hängen, damit colorFromCode sauber läuft („1A2B“ → „#1A2B“)
+    // Hier nutzen wir einfach die ersten 4 Zeichen als Code, oder padded, falls kürzer
+    val codeFragment = localPart
+        .filter { it.isLetterOrDigit() }
+        .padEnd(4, '0')
+        .take(4)
+        .uppercase()
+    return colorFromCode("#$codeFragment")
+}

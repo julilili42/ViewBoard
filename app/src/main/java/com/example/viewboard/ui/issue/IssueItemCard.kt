@@ -1,6 +1,7 @@
 package com.example.viewboard.ui.issue
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
@@ -46,11 +47,11 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 import androidx.compose.foundation.clickable
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.TextButton
 import androidx.compose.ui.unit.sp
+import colorFromEmail
+import com.example.viewboard.backend.auth.impl.AuthAPI
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -59,6 +60,8 @@ fun IssueItemCard(
     date: String,
     attachments: Int,
     projectId: String,
+    assignments: List<String>,
+    issuelabels: List<String>,
     issueId: String,
     state: String="",
     modifier: Modifier = Modifier,
@@ -74,31 +77,23 @@ fun IssueItemCard(
     val issueDate = formatGermanShortDate(date)
     val issueDueTime = formatRemaining(date)
     val scrollState = rememberScrollState()
-    // State ganz oben in der Composable (neben expandedOptions etc.)
-    var showConfirmDialog by remember { mutableStateOf(false) }
+    val emailsState by produceState<List<String?>>(
+        initialValue = emptyList(),
+        key1 = assignments
+    ) {
+        // Lade die E‑Mails; bei Fehler oder leerem Ergebnis bleibt es bei emptyList
+        val result = runCatching { AuthAPI.getEmailsByIds(assignments) }
+            .getOrNull()
+            ?.getOrNull()
+        value = result ?: emptyList()
+    }
 
-
-    /* Box(
-         modifier
-             .fillMaxWidth()
-             .clip(RoundedCornerShape(12.dp))
-             .background(
-                 Color.White,
-                 shape = RoundedCornerShape(16.dp)
-             )
-             .border(
-                 1.dp,
-
-                 MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                 RoundedCornerShape(12.dp)
-             )
-             .padding(16.dp)
-     )*/   Card(
+    Card(
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = modifier
             .fillMaxWidth()
-            //.padding( 16.dp)
+        //.padding( 16.dp)
 
     ){
         Column(verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -117,7 +112,7 @@ fun IssueItemCard(
                 Column {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More option",
+                        contentDescription = "Mehr Optionen",
                         modifier = Modifier
                             .combinedClickable(
                                 interactionSource = remember { MutableInteractionSource() },
@@ -152,82 +147,33 @@ fun IssueItemCard(
                         DropdownMenuItem(
                             text = { Text("Delete") },
                             onClick = {
-                                expandedOptions = false
-                                showConfirmDialog = true
+                                expandedOptions  = false
+
+                                scope.launch {
+                                    try {
+                                        val cleanId = projectId.trim('{', '}')
+                                        FirebaseAPI.rmIssue(projID = cleanId , id = issueId)
+                                    } catch (e: Exception) {
+
+                                    }
+                                }
                             }
                         )
                     }
                 }
 
             }
-            if (showConfirmDialog) {
-                AlertDialog(
-                    onDismissRequest = { showConfirmDialog = false },
-                    title = { Text("Delete Issue??") },
-                    text = { Text("Do you really want to delete the Issue?") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            scope.launch {
-                                try {
-                                    val cleanId = projectId.trim('{', '}')
-                                    FirebaseAPI.rmIssue(
-                                        projID = cleanId,
-                                        id = issueId,
-                                        onSuccess = {
-                                            // optional: z.B. Snack bar zeigen oder ViewModel aktualisieren
-                                        },
-                                        onFailure = {
-                                            // optional: Fehler anzeigen
-                                        }
-                                    )
-                                } catch (_: Exception) {
-                                    // optional: Logging
-                                }
-                            }
-                            showConfirmDialog = false
-                        }) {
-                            Text("Delete", color = MaterialTheme.colorScheme.error)
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showConfirmDialog = false }) {
-                            Text("Cancel")
-                        }
-                    }
-                )
-            }
 
-            val exampleLabels = listOf(
-                "Bug",
-                "Feature",
-                "High Priority",
-                "Low Priority",
-                "In Review",
-                "Blocked",
-                "UI",
-                "Backend",
-                "Research",
-                "Documentation"
-            )
-            val mails = listOf(
-                "Raoul.dankert@gmail.com", // John Doe
-                "felix.dankert@gmail.com", // Alice Liddell
-                "paul.dankert@gmail.com", // Bob Smith
-                "Jerrry.dankert@gmail.com", // Eve Villanueva
-                "DSad.dankert@gmail.com", // Karl Müller
-                "Twdda.dankert@gmail.com", // Ute Tannhäuser
-                "wadwam.dankert@gmail.com", // Maria García
-                "wadwa.dankert@gmail.com", // Yvonne Thäter
-                "wadwad.dankert@gmail.com", // Xaver Zimmermann
-                "fwad.dankert@gmail.com"   // Quentin (einzelnes Zeichen)
-            )
+
+
+
 
             Row(
                 modifier = Modifier
                     .horizontalScroll(scrollState),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                exampleLabels.forEach { label ->
+                issuelabels.forEach { label ->
                     val labelColor= colorFromCode(label)
                     Box(
                         modifier = Modifier
@@ -276,32 +222,7 @@ fun IssueItemCard(
                     )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
-                    val avatarInitials = listOf(
-                        "JD", // John Doe
-                        "AL", // Alice Liddell
-                        "BS", // Bob Smith
-                        "EV", // Eve Villanueva
-                        "KM", // Karl Müller
-                        "UT", // Ute Tannhäuser
-                        "MG", // Maria García
-                        "YT", // Yvonne Thäter
-                        "XZ", // Xaver Zimmermann
-                        "Q"   // Quentin (einzelnes Zeichen)
-                    )
-                    val avatarEmails = listOf(
-                        "john.doe@example.com",        // JD
-                        "alice.liddell@example.com",   // AL
-                        "bob.smith@example.com",       // BS
-                        "eve.villanueva@example.com",  // EV
-                        "karl.mueller@example.com",    // KM
-                        "ute.tannhaeuser@example.com", // UT
-                        "maria.garcia@example.com",    // MG
-                        "yvonne.thaeter@example.com",  // YT
-                        "xaver.zimmermann@example.com",// XZ
-                        "quentin@example.com"          // Q
-                    )
-
-                    val extraCount = (avatarEmails.size - showCount).coerceAtLeast(0)
+                    val extraCount = (emailsState.size - showCount).coerceAtLeast(0)
                     Box(modifier.clickable(
                         interactionSource = remember { MutableInteractionSource()},
                         indication = null
@@ -309,12 +230,14 @@ fun IssueItemCard(
                         expandedUser = true
                     }) {
                         Row(horizontalArrangement = Arrangement.spacedBy((-avatarSize/3))
-                            , modifier = modifier.background(Color.White)
+                            ,
                         ) {
-                            avatarEmails.take(3).forEach { email ->
-                                AvatarInitialBox(email, avatarSize)
+                            emailsState.take(3).forEach { email ->
+                                if (email != null) {
+                                    AvatarInitialBox(email, avatarSize)
+                                }
                             }
-                            if (extraCount > 0) {
+                            if (extraCount > 3) {
                                 Box(
                                     modifier = Modifier
                                         .size(avatarSize + 3.dp)
@@ -345,8 +268,11 @@ fun IssueItemCard(
                                     .padding(top = 4.dp, bottom = 4.dp, end = 8.dp, start = 8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                avatarEmails.forEach { email ->
-                                    AvatarInitialBox(email, avatarSize)
+                                Log.d("EmailsList", "No emails found for IDs: $emailsState")
+                                emailsState.forEach { email ->
+                                    if (email != null) {
+                                        AvatarInitialBox(email, avatarSize)
+                                    }
                                 }
                             }
                         }
@@ -361,9 +287,9 @@ fun IssueItemCard(
 
 
 @Composable
-private fun AvatarInitialBox(email: String, avatarSize: Dp) {
+fun AvatarInitialBox(email: String, avatarSize: Dp) {
     val initials = emailToInitials(email)
-    val initialsColor = colorFromCode(email)
+    val initialsColor = colorFromEmail(email)
     Box(
         modifier = Modifier
             .size(avatarSize + 3.dp)
@@ -403,35 +329,42 @@ fun formatGermanShortDate(input: String): String {
 }
 
 fun formatRemaining(isoTimestamp: String): String {
-    // 1) Nur das Datum+Zeit‑Teil vor 'T' oder Leerzeichen
-    val tsPart = isoTimestamp.substringBefore('Z') // entfernt Z, falls vorhanden
+    // 1) Nur der Zeit‑Teil bis 'Z'
+    val tsPart = isoTimestamp.substringBefore('Z')
     val instant = Instant.parse(
-        tsPart.substringBefore(' ') // falls ein Leerzeichen im String ist
+        tsPart.substringBefore(' ')
             .let { if (it.contains('T')) it else it + "T00:00:00" } + "Z"
     )
 
     val now = Instant.now()
     if (instant.isBefore(now)) {
-        return "0 hours"
+        return "expired"
     }
 
-    // 2) Wandeln in LocalDate/LocalDateTime für Datumsermittlung
-    val zone  = ZoneId.systemDefault()
+    // 2) In LocalDateTime umwandeln
+    val zone   = ZoneId.systemDefault()
     val thenDt = instant.atZone(zone).toLocalDateTime()
     val nowDt  = now.atZone(zone).toLocalDateTime()
 
     return if (thenDt.toLocalDate() == nowDt.toLocalDate()) {
         // gleiche Tages‑Datum → Stunden
         val hours = ChronoUnit.HOURS.between(nowDt, thenDt).toInt()
-        val h     = hours.coerceAtLeast(0)
-        if (h == 1) "1 hour" else "$h hours"
+        when {
+            hours <= 0 -> "expired"
+            hours == 1 -> "1 hour"
+            else       -> "$hours hours"
+        }
     } else {
         // anderes Datum → Tage
         val days = ChronoUnit.DAYS.between(nowDt.toLocalDate(), thenDt.toLocalDate()).toInt()
-        val d    = days.coerceAtLeast(0)
-        if (d == 1) "1 day" else "$d days"
+        when {
+            days <= 0 -> "expired"
+            days == 1 -> "1 day"
+            else      -> "$days days"
+        }
     }
 }
+
 
 fun emailToInitials(email: String): String {
     // 1) Lokalen Teil vor '@' extrahieren

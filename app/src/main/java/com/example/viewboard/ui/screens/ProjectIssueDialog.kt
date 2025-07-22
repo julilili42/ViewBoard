@@ -50,6 +50,7 @@ fun ProjectIssueDialog(
     viewId: String,
     projects: List<ProjectLayout>,
     loadIssuesForProject: (String) -> Unit = {},
+
     issueViewModel: IssueViewModel = viewModel(),
     onDismiss: () -> Unit
 ) {
@@ -57,13 +58,36 @@ fun ProjectIssueDialog(
     var selectedProject by remember { mutableStateOf<ProjectLayout?>(null) }
     val baseColor = MaterialTheme.colorScheme.primary.copy(alpha = 1f)
     var columnWidthPx by remember { mutableStateOf(0f) }
+    issueViewModel.setCurrentViewId(viewId)
     val issues by issueViewModel.issuesForSelectedProject.collectAsState()
+    val filterIssues by issueViewModel.allIssues.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-
-    // Nur Projekte mit mindestens einem Issue anzeigen
-    val projectsWithIssues = remember(projects) {
-        projects.filter { project -> project.issues.isNotEmpty() }
+    val displayed = remember(issues, filterIssues) {
+        issues.filterNot { issue ->
+            filterIssues.any { it.id == issue.id }
+        }
     }
+    val filterIds = remember(filterIssues) {
+        filterIssues.map { it.id }.toSet()
+    }
+    // Nur Projekte mit mindestens einem Issue anzeigen
+    val projectsWithIssues = remember(projects, filterIds) {
+        projects.filter { project ->
+            // 1) Projekt muss überhaupt Issues haben
+            project.issues.isNotEmpty()
+
+                    && project.issues.any { issue ->
+                issue !in filterIds
+            }
+        }
+    }
+    LaunchedEffect(displayed) {
+        if (displayed.isEmpty()) {
+            showProjectList = true
+            selectedProject = null
+        }
+    }
+
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -108,7 +132,7 @@ fun ProjectIssueDialog(
                         startX = 0f,
                         endX = columnWidthPx
                     )
-                    items(projects ) { project ->
+                    items(projectsWithIssues ) { project ->
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -150,7 +174,7 @@ fun ProjectIssueDialog(
                             baseColor.copy(alpha = 0.2f)
                         )
                     )
-                    items(issues) { issue ->
+                    items(displayed) { issue ->
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()

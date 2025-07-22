@@ -56,12 +56,7 @@ fun IssueEditScreen(
     val timeFmt = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
     var dateText by remember { mutableStateOf(dateFmt.format(calendar.time)) }
     var timeText by remember { mutableStateOf(timeFmt.format(calendar.time)) }
-
-
     var newDeadlineTS by remember { mutableStateOf(issue.deadlineTS) }
-
-
-
     val scope = rememberCoroutineScope()
 
     fun updateDeadline() {
@@ -135,14 +130,6 @@ fun IssueEditScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = desc,
-                onValueChange = { desc = it },
-                label = { Text("Description") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = 100.dp)
-            )
             Spacer(Modifier.height(12.dp))
             ChipInputField(
                 entries = assignments,
@@ -192,7 +179,7 @@ fun IssueEditScreen(
                 onClick = {
                     updateDeadline()
                     val updatedIssue = issue.copy(
-                        title = title,
+                        title = title.capitalizeWords(),
                         desc = desc,
                         assignments = ArrayList(assignments),
                         labels = ArrayList(),

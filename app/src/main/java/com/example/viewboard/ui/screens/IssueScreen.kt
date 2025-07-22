@@ -77,9 +77,7 @@ fun IssueScreen(
     }
     //val displayed = issueViewModel.getItemsForCategory(stateFromIndex(selectedTab))
     val displayed by issueViewModel.displayedIssues.collectAsState()
-    LaunchedEffect(displayed) {
-        Log.d("IssueListScreen", "Displayed issues (${displayed.size}): ${displayed.map { it.id }}")
-    }
+
     /*val displayed = remember(baseList, query) {
         if (query.isBlank()) baseList
         else baseList.filter { it.title.contains(query, ignoreCase = true) }
@@ -241,11 +239,13 @@ fun IssueScreen(
                         title        = item.title,
                         state        = stateToString(item.state),
                         date         = item.deadlineTS,
+                        assignments = item.assignments,
                         attachments  = 3,
                         projectId    = projectId,
                         issueId      = item.id,
                         avatarUris   = listOf(), // dummy or real
                         navController= navController,
+                        issuelabels = item.labels,
                         modifier     = Modifier.clip(RoundedCornerShape(12.dp))
                     )
                 }

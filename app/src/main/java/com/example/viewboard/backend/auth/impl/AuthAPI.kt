@@ -284,6 +284,44 @@ object AuthAPI : AuthServerAPI() {
             }
     }
 
+    override suspend fun getEmailsByIds(userIds: List<String>): Result<List<String?>> = runCatching {
+        val firestore = FirebaseProvider.firestore
+
+        // Wir holen alle Dokumente seriell; Du kannst das bei Bedarf parallelisieren.
+        userIds.map { uid ->
+            val snapshot = firestore
+                .collection("users")
+                .document(uid)
+                .get()
+                .await()
+
+            if (snapshot.exists()) {
+                // lies das E‑Mail‑Feld oder null, wenn es fehlt
+                snapshot.getString("email")
+            } else {
+                null
+            }
+        }
+    }
+
+    override suspend fun getUserById(userID: String): Result<UserLayout> = runCatching {
+        val doc = FirebaseProvider.firestore
+            .collection("users")
+            .document(userID)
+            .get()
+            .await()
+
+        // Dokument existiert nicht?
+        if (!doc.exists()) {
+            throw NoSuchElementException("User with ID $userID not found")
+        }
+
+        // In UserLayout umwandeln und die uid setzen
+        doc.toObject(UserLayout::class.java)
+            ?.copy(uid = doc.id)
+            ?: throw IllegalStateException("Failed to parse UserLayout for ID $userID")
+    }
+
     override fun logout(navController: NavController) {
         FirebaseProvider.auth.signOut()
 
@@ -291,5 +329,7 @@ object AuthAPI : AuthServerAPI() {
             popUpTo(navController.graph.id) { inclusive = true }
         }
     }
+
+
 }
 

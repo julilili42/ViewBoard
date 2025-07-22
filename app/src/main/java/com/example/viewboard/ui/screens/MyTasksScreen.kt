@@ -74,6 +74,7 @@ fun MyTasksScreen(
                             ProjectCardTasks(
                                 name = it.title,
                                 projectId= it.projectid,
+                                assignments = it.assignments,
                                 dueDate = it.deadlineTS,
                                 onClick = {navController.navigate(Screen.IssueScreen.createRoute(
                                     projectName,

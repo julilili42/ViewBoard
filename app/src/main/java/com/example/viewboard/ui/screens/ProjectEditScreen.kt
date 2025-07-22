@@ -18,8 +18,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.backend.Timestamp
+import com.example.viewboard.backend.auth.impl.AuthAPI.getListOfAllUsers
 import com.example.viewboard.backend.auth.impl.FirebaseProvider.auth
 import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 import com.example.viewboard.ui.theme.uiColor
@@ -44,12 +46,26 @@ fun ProjectEditScreen(
     val scope = rememberCoroutineScope()
     val currentUserId = auth.currentUser?.uid
     val isCreator = currentUserId == project.creator
-
+    var users by remember { mutableStateOf<List<UserLayout>>(emptyList()) }
+    LaunchedEffect(users) {
+        try {
+            val result: Result<List<UserLayout>> = getListOfAllUsers()
+            users = result.getOrNull() ?: emptyList()
+        } catch (e: Exception) {
+        }
+    }
     var name by remember { mutableStateOf(project.name) }
     var desc by remember { mutableStateOf(project.desc) }
     var startDate by remember { mutableStateOf(project.startTS) }
     var endDate by remember { mutableStateOf(project.deadlineTS) }
-    var users by remember { mutableStateOf(project.users.toList()) }
+
+    val names = project.users.toList().mapNotNull { email ->
+        users.find { it.uid .equals(email, ignoreCase = true) }?.email
+    }
+    var assignments by remember(names) {
+        mutableStateOf(names)
+    }
+
     val datePattern = Regex("\\d{4}-\\d{2}-\\d{2}")
 
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -136,32 +152,67 @@ fun ProjectEditScreen(
             )
             Spacer(Modifier.height(12.dp))
 
-            var newUser by remember { mutableStateOf("") }
-            ChipInputField(
-                entries = users,
-                newEntry = newUser,
-                inhaltText = "Teilnehmer hinzufügen…",
-                onNewEntryChange = { newUser = it },
-                onEntryConfirmed = {
-                    if (newUser.isNotBlank()) {
-                        users = users + newUser
-                        newUser = ""
+            val allNames = listOf("Alice", "Bob", "Charlie", "David")
+
+            var newParticipant by remember { mutableStateOf("") }
+
+            val filteredUsers = remember(newParticipant, users) {
+                if (newParticipant.isBlank()) emptyList()
+                else users.filter { user ->
+                    user.name.contains(newParticipant, ignoreCase = true) ||
+                            user.email.contains(newParticipant, ignoreCase = true)
+                }
+            }
+            val suggestionNames  = filteredUsers.map { it.name }
+            val suggestionEmails = filteredUsers.map { it.email }
+            val suggestionList = remember(newParticipant, assignments, suggestionEmails) {
+                if (newParticipant.isBlank()) {
+                    emptyList()
+                } else {
+                    suggestionEmails.filter { email ->
+                        // enthält eingegebene Zeichen
+                        email.contains(newParticipant, ignoreCase = true)
+                                // und ist noch nicht in assignments
+                                && assignments.none { it.equals(email, ignoreCase = true) }
                     }
+                }
+            }
+            ChipInputField(
+                entries = assignments,
+                newEntry = newParticipant,
+                inhaltText = "Add team member…",
+                suggestions = suggestionList,
+                onSuggestionClick = { name ->
+                    // wenn Name ausgewählt wird, als Chip hinzufügen
+                    if (name !in assignments) {
+                        assignments = assignments + name
+                    }
+                    newParticipant = ""
                 },
-                onEntryRemove = { entry -> users = users - entry },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = isCreator
+                onNewEntryChange = { newParticipant = it },
+                onEntryConfirmed = {
+                },
+                onEntryRemove = { removed ->
+                    assignments = assignments - removed
+                },
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(24.dp))
 
+            val assignmentIds: ArrayList<String> = remember(assignments, users) {
+                val ids = assignments.mapNotNull { email ->
+                    users.find { it.email.equals(email, ignoreCase = true) }?.uid
+                }
+                ArrayList(ids)
+            }
             if (isCreator) {
                 Button(
                     onClick = {
                         val updated = project.copy(
                             name = name,
                             desc = desc,
-                            users = ArrayList(users),
+                            users = ArrayList(assignmentIds),
                             startTS = startDate,
                             deadlineTS = endDate
                         )

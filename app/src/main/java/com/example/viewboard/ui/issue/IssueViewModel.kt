@@ -49,6 +49,7 @@ class IssueViewModel : ViewModel() {
 
     // Alle geladenen Issues
     private val _allIssues = MutableStateFlow<List<IssueLayout>>(emptyList())
+     val allIssues: StateFlow<List<IssueLayout>> = _allIssues.asStateFlow()
 
     // Filter: spezieller IssueState oder null für alle
     private val _filter = MutableStateFlow<IssueState?>(null)

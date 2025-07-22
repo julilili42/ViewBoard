@@ -125,7 +125,11 @@ fun CustomDropdownMenu(
     modifier: Modifier = Modifier   // einziges Style‑Argument
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val displayText = selectedOption ?: "Bitte wählen"
+    val displayText = if (selectedOption.isNullOrBlank()) {
+        "No Views"
+    } else {
+        selectedOption
+    }
 
     Box(modifier) {
         // 1) Closed Box
@@ -157,6 +161,7 @@ fun CustomDropdownMenu(
             }
         }
         // 2) Dropdown
+        if(!selectedOption.isNullOrBlank()){
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
@@ -183,7 +188,7 @@ fun CustomDropdownMenu(
                         expanded = false
                     }
                 )
-            }
+            } }
         }
     }
 }

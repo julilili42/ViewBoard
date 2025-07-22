@@ -150,7 +150,7 @@ fun DraggableMyTasksSection(
     val density = LocalDensity.current
     var currentSheetHeightPx by remember { mutableStateOf(0f) }
     // State, um die Auswahl ggf. weiterzuverwenden
-    val viewLayouts by viewsViewModel.displayedViews.collectAsState()
+    val viewLayouts by viewsViewModel.displayedViewsHome.collectAsState()
     val selectedViewId by viewsViewModel.selectedViewId.collectAsState()
     val selectedName by viewsViewModel.selectedViewName.collectAsState()
 
@@ -213,16 +213,6 @@ fun DraggableMyTasksSection(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                   /* ViewSelectorDropdown(
-                        viewNames       = viewNames,
-                        selectedView    = selectedName,
-                        onViewSelected  = { viewName ->
-                            // finde das ViewLayout zur Auswahl und setze es im VM
-                            views.firstOrNull { it.name == viewName }?.let { view ->
-                                viewModel.selectView(view.id)}},
-                        modifier        = Modifier
-                            .fillMaxWidth(0.4f)
-                    )*/
                     CustomDropdownMenu(
                         options = viewLayouts,
                         selectedOption = selectedName,
@@ -234,42 +224,7 @@ fun DraggableMyTasksSection(
                             .padding()
                     )
                     Spacer(modifier = Modifier.weight(1f))
-                    val onFirstClick = fun(){}
-                    IconButton(
-                        onClick = onFirstClick,
-                        modifier = Modifier
-                            .size(14.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                MaterialTheme.shapes.small
-                            )
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.sort_desc_svgrepo_com),
-                            contentDescription = stringResource(R.string.sort_desc_svgrepo_com),
-                            modifier = Modifier.fillMaxSize(1f),
-                            tint = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(40.dp))
-                    val onSecondClick = fun(){}
-                    IconButton(
-                        onClick = onSecondClick,
-                        modifier = Modifier
-                            .size(14.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
-                                shape = MaterialTheme.shapes.small
-                            )
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.filter_svgrepo_com__1),
-                            contentDescription = stringResource(R.string.filter_svgrepo_com__1),
-                            modifier = Modifier
-                                .padding(0.dp),
-                            tint = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    }
+
                     Spacer(modifier = Modifier.width(15.dp))
                 }
             }

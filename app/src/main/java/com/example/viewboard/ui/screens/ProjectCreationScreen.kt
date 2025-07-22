@@ -198,12 +198,6 @@ fun ProjectCreationScreen(
                 },
                 onNewEntryChange = { newParticipant = it },
                 onEntryConfirmed = {
-                    // Option: Akzeptiere nur exakte Übereinstimmung
-                    val match = allNames.find { it.equals(newParticipant.trim(), ignoreCase = true) }
-                    if (match != null && match !in assignments) {
-                        assignments = assignments + match
-                    }
-                    newParticipant = ""
                 },
                 onEntryRemove = { removed ->
                     assignments = assignments - removed
@@ -241,7 +235,7 @@ fun ProjectCreationScreen(
                     val startMonth = cal1.get(Calendar.MONTH) + 1
                     val endMonth   = cal2.get(Calendar.MONTH) + 1
                     val p = ProjectLayout(
-                        name = name,
+                        name = name.capitalizeWords(),
                         desc = desc,
                         creator ="",
                         phase = "",
@@ -272,7 +266,7 @@ fun ProjectCreationScreen(
                     disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                 )
             ) {
-                Text("Create", color = MaterialTheme.colorScheme.onSecondary)
+                Text("Create",color = MaterialTheme.colorScheme.onSecondary)
             }
         }
     }

@@ -185,10 +185,12 @@ fun ViewIssueScreen(
                     state        = stateToString(issue .state),
                     date         = issue .deadlineTS,
                     attachments  = 3,
+                    assignments = issue.assignments,
                     projectId    = projID,
                     issueId      = issue .id,
                     avatarUris   = listOf(), // dummy or real
                     navController= navController,
+                    issuelabels = issue.labels,
                     modifier     = Modifier.clip(RoundedCornerShape(12.dp))
                 )
             }

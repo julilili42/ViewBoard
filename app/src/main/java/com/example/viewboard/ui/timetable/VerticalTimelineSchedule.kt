@@ -54,7 +54,7 @@ import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
 import kotlin.random.Random
-
+import kotlin.math.roundToInt
 @Composable
 fun VerticalTimelineSchedule(
     projects: List<ProjectLayout>,
@@ -69,8 +69,11 @@ fun VerticalTimelineSchedule(
 
         // Heute-Linie berechnen
         val today     = LocalDate.now()
+        val todayInDays = dayOfYearFromIso(LocalDate.now().toString())
         val monthFrac = (today.dayOfMonth - 1) / today.lengthOfMonth().toFloat()
         val todayPx   = ((today.monthValue - 1)*30 + monthFrac) * monthPx
+        val todayInDaysPx   = (todayInDays * monthPx) + 60
+        val todayInDaysDP= with(density) { todayInDaysPx .toDp() }
         val todayDp   = with(density) { todayPx.toDp() }
         Box(modifier = Modifier.fillMaxSize()) {
             Row(modifier = Modifier.fillMaxSize()) {
@@ -117,8 +120,8 @@ fun VerticalTimelineSchedule(
                     // gestrichelte Linie nur im scrollbaren Bereich
                     Canvas(modifier = Modifier.matchParentSize()) {
                         val dash = 6.dp.toPx()
-                        val extraOffset = 25.dp.toPx()
-                        val yPos        = todayDp.toPx() + extraOffset
+
+                        val yPos        = todayInDaysDP.toPx()
 
                         drawLine(
                             color       = primaryColor,//Color.Red,
@@ -138,11 +141,12 @@ fun VerticalTimelineSchedule(
                             val startDateToDays = dayOfYearFromIso(project.startTS,)
                             val endDateToDays = dayOfYearFromIso(project.deadlineTS,)
                             val dayDiff = endDateToDays - startDateToDays
-                            val startDp  = (startDateToDays  * monthPx).toDp()
-                            val heightDp = (dayDiff * monthPx).toDp()
+                            val startDp  = (startDateToDays  * monthPx + 60).toDp()
+                            val heightDp = (dayDiff * monthPx -30).toDp()
                             val projectNameCode = generateProjectCodeFromDbId(project.name)
                             val projectNamecolor = colorFromCode(projectNameCode)
-
+                            val total = (dayDiff/15).toInt().coerceAtLeast(1)
+                            Log.d("total", "total: $total")
                             Column(
                                 modifier = Modifier
                                     .width(47.dp)
@@ -180,7 +184,7 @@ fun VerticalTimelineSchedule(
                                     )
                                     VerticalMilestoneBar(
                                         project = project,
-                                        total     = 4,
+                                        total     = total,
                                         colors    = primaryGradient,
                                         timeSpan = TimeSpanFilter.ALL_TIME,
                                         modifier  = Modifier
