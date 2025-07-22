@@ -27,7 +27,7 @@ object NotificationHelper {
     fun createNotificationChannel(context: Context) {
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Benachrichtigungen",
+            "Notifications",
             NotificationManager.IMPORTANCE_DEFAULT
         )
         val manager = context.getSystemService(NotificationManager::class.java)
@@ -111,8 +111,8 @@ object NotificationHelper {
             if (uid in assignments && issueId !in notifiedIssueIds) {
                 sendNotification(
                     context,
-                    title = "Neue Aufgabe!",
-                    message = "Du wurdest dem Issue '${data["title"]}' zugeteilt."
+                    title = "New Issue!",
+                    message = "You have been assigned to the issue '${data["title"]}'."
                 )
                 notifiedIssueIds.add(issueId)
             }
@@ -133,8 +133,8 @@ object NotificationHelper {
             if (uid in members && projectId !in notifiedProjectIds) {
                 sendNotification(
                     context,
-                    title = "Neues Projekt!",
-                    message = "Du wurdest dem Projekt '${data["title"]}' zugewiesen."
+                    title = "New Project!",
+                    message = "You have been assigned to a new Project '${data["title"]}'."
                 )
                 notifiedProjectIds.add(projectId)
             }
