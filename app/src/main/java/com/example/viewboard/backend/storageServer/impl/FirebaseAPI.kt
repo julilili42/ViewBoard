@@ -44,6 +44,8 @@ object FirebaseAPI : StorageServerAPI() {
 
         m_viewTable = db.collection("Views")
         m_views = m_viewTable.snapshots().map { it.toObjects<ViewLayout>() }
+        m_userTable = db.collection("users")
+        m_users = m_userTable.snapshots().map { it.toObjects<ViewLayout>() }
     }
 
     public override fun addProject(projectLayout: ProjectLayout, onSuccess: (String) -> Unit, onFailure: (ProjectLayout) -> Unit) {
@@ -811,4 +813,5 @@ object FirebaseAPI : StorageServerAPI() {
     private lateinit var m_labelTable: CollectionReference
     private lateinit var m_issueTable: CollectionReference
     private lateinit var m_viewTable: CollectionReference
+    private lateinit var m_userTable: CollectionReference
 }

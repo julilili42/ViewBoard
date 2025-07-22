@@ -436,4 +436,5 @@ abstract class StorageServerAPI () {
     protected lateinit var m_labels: Flow<List<LabelLayout>>
     protected lateinit var m_issues: Flow<List<IssueLayout>>
     protected lateinit var m_views: Flow<List<ViewLayout>>
+    protected lateinit var m_users: Flow<List<ViewLayout>>
 }

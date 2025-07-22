@@ -52,6 +52,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.unit.sp
 import colorFromEmail
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZonedDateTime
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -329,42 +333,33 @@ fun formatGermanShortDate(input: String): String {
 }
 
 fun formatRemaining(isoTimestamp: String): String {
-    // 1) Nur der Zeit‑Teil bis 'Z'
-    val tsPart = isoTimestamp.substringBefore('Z')
-    val instant = Instant.parse(
-        tsPart.substringBefore(' ')
-            .let { if (it.contains('T')) it else it + "T00:00:00" } + "Z"
-    )
+    // 1) Parse das Instant in UTC und addiere 2 Stunden
+    val instantUtc = Instant.parse(isoTimestamp).plus(2, ChronoUnit.HOURS)
 
     val now = Instant.now()
-    if (instant.isBefore(now)) {
+    if (instantUtc.isBefore(now)) {
         return "expired"
     }
 
-    // 2) In LocalDateTime umwandeln
-    val zone   = ZoneId.systemDefault()
-    val thenDt = instant.atZone(zone).toLocalDateTime()
-    val nowDt  = now.atZone(zone).toLocalDateTime()
+    // 2) Berechne die Dauer zwischen jetzt und dem korrigierten Zeitpunkt
+    val duration = Duration.between(now, instantUtc)
 
-    return if (thenDt.toLocalDate() == nowDt.toLocalDate()) {
-        // gleiche Tages‑Datum → Stunden
-        val hours = ChronoUnit.HOURS.between(nowDt, thenDt).toInt()
-        when {
-            hours <= 0 -> "expired"
-            hours == 1 -> "1 hour"
-            else       -> "$hours hours"
+    return if (duration.toHours() < 24) {
+        val hours = duration.toHours().toInt().coerceAtLeast(0)
+        when (hours) {
+            0    -> "expired"
+            1    -> "1 hour"
+            else -> "$hours hours"
         }
     } else {
-        // anderes Datum → Tage
-        val days = ChronoUnit.DAYS.between(nowDt.toLocalDate(), thenDt.toLocalDate()).toInt()
-        when {
-            days <= 0 -> "expired"
-            days == 1 -> "1 day"
-            else      -> "$days days"
+        val days = duration.toDays().toInt()
+        when (days) {
+            0    -> "expired"
+            1    -> "1 day"
+            else -> "$days days"
         }
     }
 }
-
 
 fun emailToInitials(email: String): String {
     // 1) Lokalen Teil vor '@' extrahieren

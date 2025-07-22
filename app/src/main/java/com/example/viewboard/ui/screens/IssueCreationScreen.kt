@@ -34,6 +34,8 @@ import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 // ---------------------------------------------------
 // Dein CreateIssueScreen
@@ -94,8 +96,36 @@ fun IssueCreationScreen(
         ts.import(d.toInstant())
         deadline = ts
     }
+    val isoFormatter: DateTimeFormatter =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ")
+            .withZone(ZoneOffset.UTC)
+    fun updateDeadlineFromDateTimeText(dateText: String, timeText: String) {
+        // 1) Datum parsen
+        val d = dateFormatter.parse(dateText)
+            ?: throw IllegalArgumentException("Ungültiges Datum")
+        // 2) Zeit parsen
+        val t = timeFormatter.parse(timeText)
+            ?: throw IllegalArgumentException("Ungültige Uhrzeit")
 
+        // 3) Kalender initialisieren mit Datum
+        val cal = Calendar.getInstance().apply { time = d }
+        // 4) Stunden und Minuten setzen
+        val calTime = Calendar.getInstance().apply { time = t }
+        cal.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY))
+        cal.set(Calendar.MINUTE,    calTime.get(Calendar.MINUTE))
+        cal.set(Calendar.SECOND,    calTime.get(Calendar.SECOND))
+        cal.set(Calendar.MILLISECOND, calTime.get(Calendar.MILLISECOND))
 
+        // 5) Instant erzeugen und ins Timestamp‑Objekt schieben
+        val instant = cal.toInstant()
+        val ts = Timestamp().apply { import(instant) }
+        deadline = ts
+
+        // 6) Optional: ISO‑String
+        val isoString = isoFormatter.format(instant)
+        Log.d("Deadline", "Neue Deadline: $isoString")
+        // isoString enthält z.B. "2025-07-21T18:11:34.902588Z"
+    }
     fun updateDeadlineFromTimeText() {
         val t = timeFormatter.parse(timeText) ?: throw IllegalArgumentException("Ungültige Uhrzeit")
         val cal2 = Calendar.getInstance().apply { time = t }
@@ -339,13 +369,6 @@ fun IssueCreationScreen(
                         // Datum/Uhrzeit ins Modell übernehmen
                         updateDeadlineFromDateText()
                         updateDeadlineFromTimeText()
-                        val labelObjects = ArrayList(labels.map { labelName ->
-                            LabelLayout(
-                                name    = labelName,
-                                creator = currentUserId
-                            )
-                        })
-
                         // Issue anlegen und speichern
                         val newIssue = IssueLayout(
                             title       = title.capitalizeWords(),
