@@ -153,25 +153,25 @@ fun ProjectItem(
                                     }
                                     showConfirmDialog = false
                                 }) {
-                                    Text("Löschen", color = MaterialTheme.colorScheme.error)
+                                    Text("Delete", color = MaterialTheme.colorScheme.error)
                                 }
                             },
                             dismissButton = {
                                 TextButton(onClick = { showConfirmDialog = false }) {
-                                    Text("Abbrechen")
+                                    Text("Cancel")
                                 }
                             },
-                            title = { Text("Projekt löschen?") },
-                            text = { Text("Willst du das Projekt wirklich löschen?") }
+                            title = { Text("Delete Project?") },
+                            text = { Text("Do you really want to delete the project?") }
                         )
                     }
 if(editable) {
     OptionsMenuButton(
         options = listOf(
-            "Bearbeiten" to {
+            "Edit" to {
                 navController.navigate("project/edit/${project.id}")
             },
-            "Löschen" to {
+            "Delete" to {
                 showConfirmDialog = true
             }
         ),
@@ -206,7 +206,7 @@ if(editable) {
 
                     Icon(
                         imageVector = Icons.Default.Person,
-                        contentDescription = "Teilnehmer",
+                        contentDescription = "Participants",
                         tint = Color.White
                     )
                     Spacer(modifier = Modifier.width(4.dp))
