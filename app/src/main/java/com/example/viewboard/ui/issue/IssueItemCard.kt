@@ -117,7 +117,7 @@ fun IssueItemCard(
                 Column {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Mehr Optionen",
+                        contentDescription = "More option",
                         modifier = Modifier
                             .combinedClickable(
                                 interactionSource = remember { MutableInteractionSource() },

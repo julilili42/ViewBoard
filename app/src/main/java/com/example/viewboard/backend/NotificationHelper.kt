@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -66,7 +67,8 @@ object NotificationHelper {
         if (!notificationsEnabled) return
 
         val now = LocalDate.now()
-        val tomorrow = now.plusDays(1)
+        val tomorrow = LocalDate.now().plusDays(1)
+        Log.d("NOTIFY", "Now: ${LocalDate.now()} → Tomorrow: $tomorrow")
         val inTwoDays = now.plusDays(2)
 
         val issuesSnap = Firebase.firestore.collection("Issues").get().await()
@@ -82,14 +84,18 @@ object NotificationHelper {
             val deadlineStr = issue["deadlineTS"] as? String ?: continue
             val deadline = Instant.parse(deadlineStr).atZone(ZoneId.systemDefault()).toLocalDate()
             val deadlineFormatted = deadline.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+            Log.d("NOTIFY", "Parsed deadlineTS: $deadlineStr → $deadline (local)")
 
-            if (deadline == inTwoDays || deadline == tomorrow ) {
+            if (deadline == inTwoDays || deadline == tomorrow) {
+                Log.d("NOTIFY", "sendNotification called: Deadline incoming! - The Issue '${issue["title"]}' deadline is due $deadlineFormatted.")
+
                 sendNotification(
                     context,
                     title = "Deadline incoming!",
                     message = "The Issue '${issue["title"]}' deadline is due $deadlineFormatted."
                 )
             }
+
         }
     }
 
