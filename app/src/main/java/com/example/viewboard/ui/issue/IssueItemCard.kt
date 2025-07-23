@@ -66,6 +66,7 @@ fun IssueItemCard(
     projectId: String,
     assignments: List<String>,
     issuelabels: List<String>,
+    emailsState:List<String?>,
     issueId: String,
     state: String="",
     modifier: Modifier = Modifier,
@@ -81,16 +82,7 @@ fun IssueItemCard(
     val issueDate = formatGermanShortDate(date)
     val issueDueTime = formatRemaining(date)
     val scrollState = rememberScrollState()
-    val emailsState by produceState<List<String?>>(
-        initialValue = emptyList(),
-        key1 = assignments
-    ) {
-        // Lade die E‑Mails; bei Fehler oder leerem Ergebnis bleibt es bei emptyList
-        val result = runCatching { AuthAPI.getEmailsByIds(assignments) }
-            .getOrNull()
-            ?.getOrNull()
-        value = result ?: emptyList()
-    }
+
 
     Card(
         shape = MaterialTheme.shapes.medium,
@@ -174,24 +166,29 @@ fun IssueItemCard(
 
             Row(
                 modifier = Modifier
-                    .horizontalScroll(scrollState),
+                    .horizontalScroll(scrollState)
+                    .defaultMinSize(minHeight = 32.dp),  // <-- hier Mindesthöhe festlegen
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                issuelabels.forEach { label ->
-                    val labelColor= colorFromCode(label)
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = labelColor.copy(alpha = 0.1f),
-                                shape = RoundedCornerShape(8.dp)
+                if (issuelabels.isEmpty()) {
+                    Spacer(modifier = Modifier.height(0.dp))  // oder zeige einen leeren Platzhalter
+                } else {
+                    issuelabels.forEach { label ->
+                        val labelColor = colorFromCode(label)
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = labelColor.copy(alpha = 0.1f),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = label,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary
                             )
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = label,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        }
                     }
                 }
             }
@@ -227,10 +224,11 @@ fun IssueItemCard(
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
                     val extraCount = (emailsState.size - showCount).coerceAtLeast(0)
-                    Box(modifier.clickable(
+                    Box(modifier.height(avatarSize).clickable(
                         interactionSource = remember { MutableInteractionSource()},
                         indication = null
-                    ) {
+                    )
+                    {
                         expandedUser = true
                     }) {
                         Row(horizontalArrangement = Arrangement.spacedBy((-avatarSize/3))

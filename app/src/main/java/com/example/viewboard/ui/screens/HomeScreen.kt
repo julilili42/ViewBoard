@@ -166,6 +166,7 @@ fun DraggableMyTasksSection(
         selectedViewId?.let { issueViewModel.loadIssuesFromView(it) }
     }
     val issues by issueViewModel.displayedIssuesFromViews.collectAsState()
+    val emails by issueViewModel.emailsByIssue.collectAsState()
 
 
 
@@ -231,7 +232,10 @@ fun DraggableMyTasksSection(
             MyTasksScreen(
                 navController = navController,
                 issues = issues,
+                mails= emails,
+
                 onSortClick = onSortClick,
+
             )
         }
     }

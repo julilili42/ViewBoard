@@ -81,7 +81,7 @@ fun TimetableScreen(navController: NavHostController,
     var year by remember { mutableStateOf(today.year) }
     var month by remember { mutableStateOf(today.monthValue) } // 1..12
     var selectedDate by remember { mutableStateOf<LocalDate?>(today) }
-
+    val emails by issueViewModel.emailsByIssue.collectAsState()
 
     //val displayed = issueViewModel.getItemsForCategory(stateFromIndex(selectedTab))
 
@@ -175,8 +175,10 @@ fun TimetableScreen(navController: NavHostController,
                 navController = navController,
                 onSortClick = { },
                 issues = issues,
+                emails =emails,
                 selectedDate = selectedDate,
                 modifier = Modifier.fillMaxSize(),
+
                 minSheetHeightPx = (screenHeightPx - topBlockHeightPx).coerceAtLeast(0f),
             )
         }

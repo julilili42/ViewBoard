@@ -59,6 +59,7 @@ fun IssueScreen(
     projectId: String,
     modifier: Modifier = Modifier
 ) {
+
     var showOnlyMyIssues by rememberSaveable { mutableStateOf(true) }
     var selectedTab by rememberSaveable { mutableStateOf(0) }
     // Lokaler State für die Such-Query
@@ -77,6 +78,7 @@ fun IssueScreen(
     }
     //val displayed = issueViewModel.getItemsForCategory(stateFromIndex(selectedTab))
     val displayed by issueViewModel.displayedIssues.collectAsState()
+    val email by issueViewModel.emailsByIssue.collectAsState()
 
     /*val displayed = remember(baseList, query) {
         if (query.isBlank()) baseList
@@ -231,6 +233,7 @@ fun IssueScreen(
             }
             // 4) Issue list
             items(displayed, key = { it.id }) { item ->
+                val mails: List<String?> = email[item.id].orEmpty()
                 DragTarget(
                     dataToDrop = item,
                     viewModel  = issueViewModel
@@ -239,6 +242,7 @@ fun IssueScreen(
                         title        = item.title,
                         state        = stateToString(item.state),
                         date         = item.deadlineTS,
+                        emailsState = mails,
                         assignments = item.assignments,
                         attachments  = 3,
                         projectId    = projectId,

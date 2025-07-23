@@ -76,6 +76,7 @@ fun TimelineSchedule(
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yy", Locale.getDefault())
         val issuesList by issueViewModel.displayedAllIssues.collectAsState()
 
+
         val dummyIssues = extractIssueDateTimes(issuesList)
 
         Column(modifier = Modifier.fillMaxSize()) {
@@ -172,6 +173,7 @@ fun DraggableMyIssuesSection(
     navController: NavController,
     onSortClick: () -> Unit,
     issues: List<IssueLayout>,
+    emails: Map<String, List<String?>>,
     selectedDate: LocalDate? = null,
     modifier: Modifier = Modifier,
     minSheetHeightPx: Float = 0f
@@ -243,6 +245,7 @@ fun DraggableMyIssuesSection(
             MyTasksScreen(
                 navController = navController,
                 issues = matchingIssues,
+                mails =emails,
                 onSortClick = onSortClick,
             )
         }

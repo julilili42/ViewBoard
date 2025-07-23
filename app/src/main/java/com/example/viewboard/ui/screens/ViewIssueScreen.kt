@@ -180,11 +180,22 @@ fun ViewIssueScreen(
 
             // Die Issues als Lazy Items
             items(issues) { issue ->
+                val emailsState by produceState<List<String?>>(
+                    initialValue = emptyList(),
+                    key1 = issue .assignments
+                ) {
+                    // Lade die E‑Mails; bei Fehler oder leerem Ergebnis bleibt es bei emptyList
+                    val result = runCatching { AuthAPI.getEmailsByIds(issue .assignments) }
+                        .getOrNull()
+                        ?.getOrNull()
+                    value = result ?: emptyList()
+                }
                 IssueItemCard(
                     title        = issue .title,
                     state        = stateToString(issue .state),
                     date         = issue .deadlineTS,
                     attachments  = 3,
+                    emailsState =emailsState,
                     assignments = issue.assignments,
                     projectId    = projID,
                     issueId      = issue .id,

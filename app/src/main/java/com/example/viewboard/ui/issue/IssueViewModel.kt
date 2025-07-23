@@ -37,6 +37,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.State
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 class IssueViewModel : ViewModel() {
@@ -65,6 +68,8 @@ class IssueViewModel : ViewModel() {
     private val _projectId = MutableStateFlow<String?>(null)
     private val _viewId = MutableStateFlow<String?>(null)
     private val projectId: StateFlow<String?> = _projectId
+    private val _emails = MutableStateFlow<String?>(null)
+     val emails: StateFlow<String?> = _emails
 
     private val _sortField = MutableStateFlow(SortField.DATE)
     private val _sortOrder = MutableStateFlow(SortOrder.ASC)
@@ -168,6 +173,29 @@ class IssueViewModel : ViewModel() {
             emptyList()
         )
 
+    private val _emailsByIssue = MutableStateFlow<Map<String, List<String?>>>(emptyMap())
+
+    // 2) Öffentliches, unveränderbares StateFlow
+    val emailsByIssue: StateFlow<Map<String, List<String?>>> = _emailsByIssue
+
+    // 3) Funktion, die du aufrufst, sobald sich die Liste der Issues ändert
+    fun loadEmailsForIssues(issues: List<IssueLayout>) {
+        viewModelScope.launch {
+            // Parallel alle E‑Mail‑Listen holen
+            val pairs = coroutineScope {
+                issues.map { issue ->
+                    async {
+                        val mails = runCatching {
+                            AuthAPI.getEmailsByIds(issue.assignments)
+                        }.getOrNull()?.getOrNull() ?: emptyList()
+                        issue.id to mails
+                    }
+                }.awaitAll()
+            }
+            // Ergebnis als Map speichern
+            _emailsByIssue.value = pairs.toMap()
+        }
+    }
     /** Setze den Issue‑Filter */
     fun setFilter(state: IssueState?) {
         _filter.value = state
@@ -209,6 +237,24 @@ class IssueViewModel : ViewModel() {
                 .distinctUntilChanged()
                 .collectLatest { newProjId ->
                     reloadForProject(newProjId)
+                }
+        }
+        viewModelScope.launch {
+            displayedIssues
+                .collectLatest { issues ->
+                    // Lade parallel alle Emails:
+                    val pairs = coroutineScope {
+                        issues.map { issue ->
+                            async {
+                                val mails = runCatching {
+                                    AuthAPI.getEmailsByIds(issue.assignments)
+                                }.getOrNull()?.getOrNull() ?: emptyList()
+                                issue.id to mails
+                            }
+                        }.awaitAll()
+                    }
+                    // 3) Ergebnis in den StateFlow schreiben
+                    _emailsByIssue.value = pairs.toMap()
                 }
         }
     }

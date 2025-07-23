@@ -53,6 +53,7 @@ fun ProjectCardTasks(
     name: String,
     projectId: String,
     assignments: List<String>,
+    emailsState:List<String?>,
     dueDate: String,
     onClick: () -> Unit,
     onMenuClick: () -> Unit
@@ -64,13 +65,6 @@ fun ProjectCardTasks(
     var expandedUser by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
-    // Lade E‑Mails asynchron
-    val emailsState by produceState<List<String?>>(initialValue = emptyList(), key1 = assignments) {
-        val result = runCatching { AuthAPI.getEmailsByIds(assignments) }
-            .getOrNull()
-            ?.getOrNull()
-        value = result ?: emptyList()
-    }
 
     Card(
         shape = MaterialTheme.shapes.medium,

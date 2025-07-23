@@ -8,6 +8,7 @@ import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.ui.navigation.Screen
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FieldPath
 import kotlinx.coroutines.tasks.await
 
 
@@ -286,21 +287,17 @@ object AuthAPI : AuthServerAPI() {
 
     override suspend fun getEmailsByIds(userIds: List<String>): Result<List<String?>> = runCatching {
         val firestore = FirebaseProvider.firestore
-
-        // Wir holen alle Dokumente seriell; Du kannst das bei Bedarf parallelisieren.
-        userIds.map { uid ->
+        // 1) In Batches zu je max. 10 IDs aufteilen
+        userIds.chunked(10).flatMap { chunk ->
+            // 2) Einmal-Query statt einzelne get()
             val snapshot = firestore
                 .collection("users")
-                .document(uid)
+                .whereIn(FieldPath.documentId(), chunk)
                 .get()
                 .await()
 
-            if (snapshot.exists()) {
-                // lies das E‑Mail‑Feld oder null, wenn es fehlt
-                snapshot.getString("email")
-            } else {
-                null
-            }
+            // 3) Emails extrahieren
+            snapshot.documents.map { it.getString("email") }
         }
     }
 
