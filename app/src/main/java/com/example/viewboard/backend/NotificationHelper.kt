@@ -162,7 +162,7 @@ object NotificationHelper {
                 sendNotification(
                     context,
                     title = "New Project!",
-                    message = "You have been assigned to a new Project '${data["title"]}'."
+                    message = "You have been assigned to a new Project '${data["name"]}'."
                 )
                 saveSeenProject(context, projectId)
             }
