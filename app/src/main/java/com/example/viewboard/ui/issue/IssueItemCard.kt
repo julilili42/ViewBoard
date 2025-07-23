@@ -334,7 +334,7 @@ fun formatGermanShortDate(input: String): String {
 
 fun formatRemaining(isoTimestamp: String): String {
     // 1) Parse das Instant in UTC und addiere 2 Stunden
-    val instantUtc = Instant.parse(isoTimestamp).plus(2, ChronoUnit.HOURS)
+    val instantUtc = Instant.parse(isoTimestamp).plus(1, ChronoUnit.HOURS)
 
     val now = Instant.now()
     if (instantUtc.isBefore(now)) {
