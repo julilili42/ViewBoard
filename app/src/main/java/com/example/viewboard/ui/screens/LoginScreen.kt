@@ -43,7 +43,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
 
-
+/**
+ * Top section of the login screen displaying the background shape, logo, and headings.
+ *
+ * @param modifier optional [Modifier] for layout adjustments
+ */
 @Composable
 fun LoginTopSection(modifier: Modifier = Modifier) {
     Column(

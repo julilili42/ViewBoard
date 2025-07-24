@@ -50,19 +50,15 @@ import com.example.viewboard.ui.utils.formatRemaining
 fun IssueItemCard(
     title: String,
     date: String,
-    attachments: Int,
     projectId: String,
-    assignments: List<String>,
     issuelabels: List<String>,
     emailsState:List<String?>,
     issueId: String,
-    state: String="",
     modifier: Modifier = Modifier,
     navController: NavController,
-    avatarUris: List<Uri>,
     onOptionsClick: () -> Unit = {}
 ) {
-    val showCount = avatarUris.size.coerceAtMost(3)
+    val showCount = emailsState.size.coerceAtMost(3)
     val avatarSize = 18.dp
     val scope = rememberCoroutineScope()
     var expandedOptions by remember { mutableStateOf(false) }
@@ -116,11 +112,8 @@ fun IssueItemCard(
                     ) {
                         DropdownMenuItem(
                             text = { Text("Edit") },
-                            // z.B. in deinem DropdownMenuItem “Edit”
                             onClick = {
                                 expandedOptions  = false
-                                val cleanProj = projectId.trim('{','}')
-
                                 navController.navigate(
                                     Screen.IssueEditScreen.createRoute(projectId.trim('{','}'),"", issueId)
                                 )
@@ -138,7 +131,7 @@ fun IssueItemCard(
                                         val cleanId = projectId.trim('{', '}')
                                         FirebaseAPI.rmIssue(projID = cleanId , id = issueId)
                                     } catch (e: Exception) {
-
+                                        Log.e("IssueItemCard", "Error deleting issue", e)
                                     }
                                 }
                             }

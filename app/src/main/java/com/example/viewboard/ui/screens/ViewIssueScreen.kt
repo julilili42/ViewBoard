@@ -142,14 +142,10 @@ fun ViewIssueScreen(
                 }
                 IssueItemCard(
                     title        = issue .title,
-                    state        = stateToString(issue .state),
                     date         = issue .deadlineTS,
-                    attachments  = 3,
                     emailsState =emailsState,
-                    assignments = issue.assignments,
                     projectId    = projectId,
                     issueId      = issue .id,
-                    avatarUris   = listOf(),
                     navController= navController,
                     issuelabels = issue.labels,
                     modifier     = Modifier.clip(RoundedCornerShape(12.dp))

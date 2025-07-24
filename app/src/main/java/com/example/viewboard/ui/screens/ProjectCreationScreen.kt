@@ -44,7 +44,7 @@ fun ProjectCreationScreen(
     val uiColor = uiColor()
     val scroll = rememberScrollState()
     var name by remember { mutableStateOf("") }
-    var desc by remember { mutableStateOf("") }
+    val desc by remember { mutableStateOf("") }
     var startDate by remember { mutableStateOf("") }
     var endDate   by remember { mutableStateOf("") }
     var assignments by remember { mutableStateOf(listOf<String>()) }
@@ -128,6 +128,7 @@ fun ProjectCreationScreen(
                     val result: Result<List<UserLayout>> = getListOfAllUsers()
                     users = result.getOrNull() ?: emptyList()
                 } catch (e: Exception) {
+                    users = emptyList()
                 }
             }
             // Zeitraum

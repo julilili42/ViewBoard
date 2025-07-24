@@ -40,8 +40,8 @@ fun IssueEditScreen(
     val context = LocalContext.current
     val scroll = rememberScrollState()
     var title by remember { mutableStateOf(issue.title) }
-    var desc by remember { mutableStateOf(issue.desc) }
-    var assignments by remember { mutableStateOf(issue.assignments.toList()) }
+    val desc by remember { mutableStateOf(issue.desc) }
+    val assignments by remember { mutableStateOf(issue.assignments.toList()) }
 
     val calendar = remember {
         Calendar.getInstance().apply {

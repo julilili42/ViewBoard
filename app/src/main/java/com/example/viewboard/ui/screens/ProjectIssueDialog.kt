@@ -33,8 +33,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun ProjectIssueDialog(
     viewId: String,
     projects: List<ProjectLayout>,
-    loadIssuesForProject: (String) -> Unit = {},
-
     issueViewModel: IssueViewModel = viewModel(),
     onDismiss: () -> Unit
 ) {
@@ -54,10 +52,8 @@ fun ProjectIssueDialog(
     val filterIds = remember(filterIssues) {
         filterIssues.map { it.id }.toSet()
     }
-    // Nur Projekte mit mindestens einem Issue anzeigen
     val projectsWithIssues = remember(projects, filterIds) {
         projects.filter { project ->
-            // 1) Projekt muss überhaupt Issues haben
             project.issues.isNotEmpty()
 
                     && project.issues.any { issue ->
@@ -71,8 +67,6 @@ fun ProjectIssueDialog(
             selectedProject = null
         }
     }
-
-
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier.heightIn(max = 400.dp),

@@ -59,7 +59,6 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
-            // Nur Logging oder UI Feedback, falls du willst
         }
     )
 
@@ -114,7 +113,6 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
             }
 
             item {
-                // other
                 SectionCard(title = "More") {
                     MenuItem(
                         text = "Notifications",
@@ -126,7 +124,6 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                 Spacer(modifier = Modifier.size(170.dp))
             }
             item {
-                // Logout
                 Text(
                     modifier = Modifier
                         .clickable { AuthAPI.logout(navController) }

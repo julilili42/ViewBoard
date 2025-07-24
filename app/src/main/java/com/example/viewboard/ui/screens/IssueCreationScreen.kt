@@ -38,8 +38,6 @@ fun IssueCreationScreen(
     navController: NavController,
     projectId: String,
     currentUserId: String = AuthAPI.getUid() ?: "",
-
-    onCreate: () -> Unit = {}
 ) {
     val uiColor = uiColor()
     val context = LocalContext.current
@@ -166,6 +164,7 @@ fun IssueCreationScreen(
                         .getProject(cleanId)
 
                 } catch (e: Exception) {
+                    Log.e("IssueCreationScreen", "Error fetching project: ${e.message}")
                 }
             }
 

@@ -22,10 +22,11 @@ import generateProjectCodeFromDbId
 @Composable
 fun EdgeToEdgeRoundedRightItemWithBadge(
     viewName: String,
+    modifier: Modifier = Modifier,
     projectId: String? = null,
     parentHorizontalPadding: Dp = 16.dp,
     boxHeight: Dp = 56.dp,
-    modifier: Modifier = Modifier
+
 ) {
     Card(
         shape = RoundedCornerShape(
