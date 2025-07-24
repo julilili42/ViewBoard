@@ -6,12 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.data.IssueDeadlineFilter
+import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
-import com.example.viewboard.backend.data.IssueLayout
-import com.example.viewboard.backend.data.IssueProgress
-import com.example.viewboard.backend.data.IssueState
-import com.example.viewboard.backend.data.ViewLayout
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.IssueProgress
+import com.example.viewboard.backend.dataLayout.IssueState
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,15 +69,6 @@ class IssueViewModel : ViewModel() {
     private val _state = MutableStateFlow<IssueState>(IssueState.NEW)
     val state: StateFlow<IssueState> = _state
     var isDragging by mutableStateOf(false)
-    private val _viewsFlow: StateFlow<List<ViewLayout>> =
-        FirebaseAPI
-            .getAllViews()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList()
-            )
-    val views: StateFlow<List<ViewLayout>> = _viewsFlow
 
     
 
@@ -240,7 +230,7 @@ class IssueViewModel : ViewModel() {
                     .map { list ->
                         if (onlyMine) {
                             list.filter { issue ->
-                                issue.assignments.contains(userId)
+                                issue.users.contains(userId)
                             }
                         } else {
                             list
@@ -346,7 +336,7 @@ class IssueViewModel : ViewModel() {
                         issues.map { issue ->
                             async {
                                 val mails = runCatching {
-                                    AuthAPI.getEmailsByIds(issue.assignments)
+                                    AuthAPI.getEmailsByIds(issue.users)
                                 }.getOrNull()?.getOrNull() ?: emptyList()
                                 issue.id to mails
                             }

@@ -1,9 +1,9 @@
 package com.example.viewboard.backend.storage.abstraction
 
-import com.example.viewboard.backend.data.IssueLayout
-import com.example.viewboard.backend.data.LabelLayout
-import com.example.viewboard.backend.data.ProjectLayout
-import com.example.viewboard.backend.data.ViewLayout
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.dataLayout.UserLayout
+import com.example.viewboard.backend.dataLayout.ViewLayout
 import kotlinx.coroutines.flow.Flow
 
 abstract class StorageServerAPI () {
@@ -75,94 +75,6 @@ abstract class StorageServerAPI () {
      * @return the projects when they have been successfully retrieved
      */
     public abstract fun getProjectsFromUser(userID: String?) : Flow<List<ProjectLayout>>
-
-    /**
-     * Add a label
-     *
-     * @param projID the id of the project
-     * @param labelLayout the label in an initial state
-     * @param onSuccess success callback, when the label has been successfully added
-     * @param onFailure failure callback, if the label has not been added
-     */
-    public abstract suspend fun addLabel(projID: String, labelLayout: LabelLayout, onSuccess: (String) -> Unit = {}, onFailure: (LabelLayout) -> Unit = {})
-
-    /**
-     * Remove a label
-     *
-     * @param projID the id of the project
-     * @param id the id of the label
-     * @param onSuccess success callback, when the label has been successfully removed
-     * @param onFailure failure callback, if the label has not been removed
-     */
-    public abstract suspend fun rmLabel(projID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
-
-    /**
-     * Add a label to a issue
-     *
-     * @param issueID the id of an issue
-     * @param id the id of the label
-     * @param onSuccess success callback, when the label has been successfully added
-     * @param onFailure failure callback, if the label has not been added
-     */
-    public abstract suspend fun addLabelToIssue(issueID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
-
-    /**
-     * Remove a label from issue
-     *
-     * @param issueID the id of an issue
-     * @param id the id of the label
-     * @param onSuccess success callback, when the label has been successfully removed
-     * @param onFailure failure callback, if the label has not been removed
-     */
-    public abstract suspend fun rmLabelFromIssue(issueID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
-
-    /**
-     * Update a label
-     *
-     * @param labelLayout the updated label state
-     * @param onSuccess success callback, when the label has been successfully updated
-     * @param onFailure failure callback, if the label has not been updated
-     */
-    public abstract fun updLabel(labelLayout: LabelLayout, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
-
-    /**
-     * Update a label
-     *
-     * @param id the id of the label
-     * @param labelLayout the new label state
-     * @param onSuccess success callback, when the label has been successfully updated
-     * @param onFailure failure callback, if the label has not been updated
-     */
-    public abstract fun updLabel(id: String, labelLayout: LabelLayout, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
-
-    /**
-     * Get a label
-     *
-     * @param id the id of the label
-     * @param onSuccess success callback, when the label has been successfully retrieved
-     * @param onFailure failure callback, if the label has not been retrieved
-     *
-     * @return the label if it has been successfully retrieved, otherwise null
-     */
-    public abstract suspend fun getLabel(id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : LabelLayout?
-
-    /**
-     * Get all labels
-     *
-     * @return the labels
-     */
-    public abstract fun getAllLabels() : Flow<List<LabelLayout>>
-
-    /**
-     * Get all labels
-     *
-     * @param projID the id of the project
-     * @param onSuccess success callback, when the labels have been successfully retrieved
-     * @param onFailure failure callback, if the labels have not been retrieved
-     *
-     * @return the labels when they have been successfully retrieved
-     */
-    public abstract fun getLabelsFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<LabelLayout>>
 
     /**
      * Add a issue
@@ -334,22 +246,22 @@ abstract class StorageServerAPI () {
     /**
      * Add a view
      *
-     * @param projID the id of the project
+     * @param userID the id of the user
      * @param viewLayout a view in an initial state
      * @param onSuccess success callback, when the view has been successfully added
      * @param onFailure failure callback, if the view has not been added
      */
-    public abstract suspend fun addView(projID: String, viewLayout: ViewLayout, onSuccess: (String) -> Unit = {}, onFailure: (ViewLayout) -> Unit = {})
+    public abstract suspend fun addView(userID: String?, viewLayout: ViewLayout, onSuccess: (String) -> Unit = {}, onFailure: (ViewLayout) -> Unit = {})
 
     /**
      * Remove a view
      *
-     * @param projID the id of the project
+     * @param userID the id of the user
      * @param id the id of the view
      * @param onSuccess success callback, when the view has been successfully removed
      * @param onFailure failure callback, if the view has not been removed
      */
-    public abstract suspend fun rmView(projID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    public abstract suspend fun rmView(userID: String?, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
 
     /**
      * Update a view
@@ -371,15 +283,15 @@ abstract class StorageServerAPI () {
     public abstract fun updView(id: String, viewLayout: ViewLayout, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
 
     /**
-     * Get a view
+     * Get all views from a user
      *
-     * @param id the id of the view
-     * @param onSuccess success callback, when the view has been successfully retrieved
-     * @param onFailure failure callback, if the view has not been retrieved
+     * @param userID the id of the user
+     * @param onSuccess success callback, when the views have been successfully retrieved
+     * @param onFailure failure callback, if the views have not been retrieved
      *
-     * @return the view if it has been successfully retrieved, otherwise null
+     * @return the views if they have been successfully retrieved, otherwise null
      */
-    public abstract suspend fun getView(id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : ViewLayout?
+    public abstract suspend fun getViews(userID: String?, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : List<ViewLayout>
 
     /**
      * Get all views
@@ -388,59 +300,9 @@ abstract class StorageServerAPI () {
      */
     public abstract fun getAllViews() : Flow<List<ViewLayout>>
 
-    /**
-     * Get all views from
-     *
-     * @param projID the id of the project
-     * @param onSuccess success callback, when the views have been successfully retrieved
-     * @param onFailure failure callback, if the views have not been retrieved
-     *
-     * @return the views when they have been successfully retrieved
-     */
-    public abstract fun getViewsFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<ViewLayout>>
-
-    /**
-     * Adds a view ID to the "views" field of the user's document.
-     *
-     * @param userID    The Firebase UID of the user
-     * @param viewID    The view ID to add
-     * @param onSuccess Callback invoked with the viewID upon successful update
-     * @param onFailure Callback invoked with an error message if the update fails
-     */
-    abstract suspend fun addViewToUser(
-        userID: String,
-        viewID: String,
-        onSuccess: (String) -> Unit,
-        onFailure: (String) -> Unit
-    )
-
-    /**
-     * Loads all views belonging to a user by their user ID.
-     *
-     * @param userID The Firebase UID of the user (or null)
-     * @return A list of all ViewLayout objects for this user
-     */
-    abstract suspend fun getViewsFromUser(userID: String?): List<ViewLayout>
-
-    /**
-     * Creates a new view document and immediately associates it with the user.
-     *
-     * @param projID     The ID of the project under which the view should be created
-     * @param viewLayout The ViewLayout object to create
-     * @param onSuccess  Callback invoked with the newly created viewID on success
-     * @param onFailure  Callback invoked with an error message on failure
-     */
-    abstract suspend fun createViewForUser(
-        projID: String,
-        viewLayout: ViewLayout,
-        onSuccess: (String) -> Unit,
-        onFailure: (String) -> Unit
-    )
-
-    /** Local flow references to Firestore collections */
-    protected lateinit var m_projects: Flow<List<ProjectLayout>>
-    protected lateinit var m_labels: Flow<List<LabelLayout>>
-    protected lateinit var m_issues: Flow<List<IssueLayout>>
-    protected lateinit var m_views: Flow<List<ViewLayout>>
-    protected lateinit var m_users: Flow<List<ViewLayout>>
+    // abstract flow Lists //
+    protected lateinit var projects: Flow<List<ProjectLayout>>
+    protected lateinit var issues: Flow<List<IssueLayout>>
+    protected lateinit var views: Flow<List<ViewLayout>>
+    protected lateinit var users: Flow<List<UserLayout>>
 }

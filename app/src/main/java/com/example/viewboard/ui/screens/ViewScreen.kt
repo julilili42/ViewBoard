@@ -1,6 +1,5 @@
 package com.example.viewboard.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,7 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.data.ViewLayout
+import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.components.view.ViewItem
 import androidx.compose.foundation.lazy.grid.items
@@ -154,11 +153,7 @@ fun ViewScreen(
                     },
                     onDelete = { viewId ->
                         coroutineScope.launch {
-                            FirebaseAPI.deleteView(
-                                viewId,
-                                onSuccess = { Log.d("ViewScreen", "Deleted view $viewId") },
-                                onFailure = { error -> Log.e("ViewScreen", "Failed to delete: $error") }
-                            )
+                            FirebaseAPI.rmView(AuthAPI.getUid(), viewId)
                         }
                     }
                 )
@@ -185,9 +180,8 @@ fun ViewScreen(
                         if (newName.isNotBlank()) {
                             coroutineScope.launch {
                                 AuthAPI.getUid()?.let {
-                                    FirebaseAPI.createViewForUser(
-
-                                        it,
+                                    FirebaseAPI.addView(
+                                        AuthAPI.getUid(),
                                         ViewLayout(
                                             name = newName,
                                             creationTS = System.currentTimeMillis().toString(),

@@ -133,9 +133,9 @@ fun ViewIssueScreen(
             items(issues) { issue ->
                 val emailsState by produceState<List<String?>>(
                     initialValue = emptyList(),
-                    key1 = issue .assignments
+                    key1 = issue .users
                 ) {
-                    val result = runCatching { AuthAPI.getEmailsByIds(issue .assignments) }
+                    val result = runCatching { AuthAPI.getEmailsByIds(issue .users) }
                         .getOrNull()
                         ?.getOrNull()
                     value = result ?: emptyList()
@@ -147,7 +147,7 @@ fun ViewIssueScreen(
                     projectId    = projectId,
                     issueId      = issue .id,
                     navController= navController,
-                    issuelabels = issue.labels,
+                    issuelabels = emptyList(), // TODO remove
                     modifier     = Modifier.clip(RoundedCornerShape(12.dp))
                 )
             }

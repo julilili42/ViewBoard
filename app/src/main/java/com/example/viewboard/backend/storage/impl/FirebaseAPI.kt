@@ -1,12 +1,11 @@
 package com.example.viewboard.backend.storage.impl
 
-import android.util.Log
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
-import com.example.viewboard.backend.data.IssueLayout
-import com.example.viewboard.backend.data.LabelLayout
-import com.example.viewboard.backend.data.ProjectLayout
-import com.example.viewboard.backend.data.ViewLayout
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.dataLayout.UserLayout
+import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.storage.abstraction.StorageServerAPI
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
@@ -15,7 +14,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.firestore.snapshots
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -31,19 +29,17 @@ object FirebaseAPI : StorageServerAPI() {
     public override fun init() {
         val db = Firebase.firestore
 
-        m_projectTable = db.collection("Projects")
-        m_projects = m_projectTable.snapshots().map { it.toObjects<ProjectLayout>() }
+        projectTable = db.collection("Projects")
+        projects = projectTable.snapshots().map { it.toObjects<ProjectLayout>() }
 
-        m_labelTable = db.collection("Labels")
-        m_labels = m_labelTable.snapshots().map { it.toObjects<LabelLayout>() }
+        issueTable = db.collection("Issues")
+        issues = issueTable.snapshots().map { it.toObjects<IssueLayout>() }
 
-        m_issueTable = db.collection("Issues")
-        m_issues = m_issueTable.snapshots().map { it.toObjects<IssueLayout>() }
+        viewTable = db.collection("Views")
+        views = viewTable.snapshots().map { it.toObjects<ViewLayout>() }
 
-        m_viewTable = db.collection("Views")
-        m_views = m_viewTable.snapshots().map { it.toObjects<ViewLayout>() }
-        m_userTable = db.collection("users")
-        m_users = m_userTable.snapshots().map { it.toObjects<ViewLayout>() }
+        userTable = db.collection("users")
+        users = userTable.snapshots().map { it.toObjects<UserLayout>() }
     }
 
     public override fun addProject(projectLayout: ProjectLayout, onSuccess: (String) -> Unit, onFailure: (ProjectLayout) -> Unit) {
@@ -58,7 +54,7 @@ object FirebaseAPI : StorageServerAPI() {
             creator = uid,
             users = updatedUsers
         )
-        m_projectTable.add(projectWithUser)
+        projectTable.add(projectWithUser)
 
             .addOnSuccessListener { ref ->
                 println("successfully added project: " + ref.id)
@@ -71,7 +67,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun rmProject(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        m_projectTable.document(id)
+        projectTable.document(id)
             .delete()
             .addOnSuccessListener {
                 println("successfully removed project: $id")
@@ -84,7 +80,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun updProject(projectLayout: ProjectLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        m_projectTable.document(projectLayout.id)
+        projectTable.document(projectLayout.id)
             .set(projectLayout)
             .addOnSuccessListener {
                 println("successfully updated project: " + projectLayout.id)
@@ -97,7 +93,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun updProject(id: String, projectLayout: ProjectLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        m_projectTable.document(id)
+        projectTable.document(id)
             .set(projectLayout)
             .addOnSuccessListener {
                 println("successfully updated project: $id")
@@ -110,14 +106,14 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override suspend fun getProject(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : ProjectLayout? {
-        val snap = m_projectTable.document(id)
+        val snap = projectTable.document(id)
             .get()
             .addOnSuccessListener {
                 println("successfully retrieved project: $id")
                 onSuccess(id)
             }
             .addOnFailureListener {
-                println("failed to retrieved project: $id")
+                println("failed to retrieve project: $id")
                 onFailure(id)
             }
             .await()
@@ -126,12 +122,12 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun getAllProjects() : Flow<List<ProjectLayout>> {
-        return m_projects
+        return projects
     }
 
     public override fun getProjectsFromUser(userID: String?) : Flow<List<ProjectLayout>> {
         return if (userID != null) {
-            m_projects.map { projects ->
+            projects.map { projects ->
                 projects.filter { it.users.contains(userID) }
             }
         } else {
@@ -139,185 +135,10 @@ object FirebaseAPI : StorageServerAPI() {
         }
     }
 
-    public override suspend fun addLabel(projID: String, labelLayout: LabelLayout, onSuccess: (String) -> Unit, onFailure: (LabelLayout) -> Unit) {
-        val batch = Firebase.firestore.batch()
-        val projREF = m_projectTable.document(projID)
-        val labelREF = m_labelTable.document()
-
-        batch.set(labelREF, labelLayout)
-
-        batch.update(projREF, "labels", FieldValue.arrayUnion(labelREF.id))
-
-        batch.commit()
-            .addOnSuccessListener {
-                println("successfully added label: " + labelREF.id)
-                onSuccess(labelREF.id)
-            }
-            .addOnFailureListener {
-                println("failed to add label")
-                onFailure(labelLayout)
-            }
-    }
-
-    public override suspend fun rmLabel(projID: String, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        // TODO: print warning or inform the user, if ref counter > 0
-
-        val projREF = m_projectTable.document(projID)
-        val labelREF = m_labelTable.document(id)
-
-        Firebase.firestore.runTransaction { transaction ->
-            val projSnap = transaction.get(projREF)
-            val issues = projSnap.get("issues") as? List<String> ?: emptyList()
-
-            transaction.delete(labelREF)
-
-            transaction.update(projREF, "labels", FieldValue.arrayRemove(id))
-
-            for (issue in issues) {
-                val issueREF = m_issueTable.document(issue)
-                transaction.update(issueREF, "labels", FieldValue.arrayRemove(id))
-            }
-
-        }
-            .addOnSuccessListener {
-                println("successfully removed label: $id")
-                onSuccess(id)
-            }
-            .addOnFailureListener {
-                println("failed to remove label: $id")
-                onFailure(id)
-            }
-    }
-
-    public override suspend fun addLabelToIssue(issueID: String, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        val batch = Firebase.firestore.batch()
-
-        m_issueTable.document(issueID)
-            .update("labels", FieldValue.arrayUnion(id))
-            .addOnSuccessListener {
-                println("successfully added label to issue: $issueID")
-                onSuccess(issueID)
-            }
-            .addOnFailureListener {
-                println("failed to add label to issue: $issueID")
-                onFailure(issueID)
-            }
-    }
-
-    public override suspend fun rmLabelFromIssue(issueID: String, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        val batch = Firebase.firestore.batch()
-
-        m_issueTable.document(issueID)
-            .update("labels", FieldValue.arrayRemove(id))
-            .addOnSuccessListener {
-                println("successfully removed label from issue: $issueID")
-                onSuccess(issueID)
-            }
-            .addOnFailureListener {
-                println("failed to remove label from issue: $issueID")
-                onFailure(issueID)
-            }
-    }
-
-    public override fun updLabel(labelLayout: LabelLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        m_labelTable.document(labelLayout.id)
-            .set(labelLayout)
-            .addOnSuccessListener {
-                println("successfully updated label: " + labelLayout.id)
-                onSuccess(labelLayout.id)
-            }
-            .addOnFailureListener {
-                println("failed to update label: " + labelLayout.id)
-                onFailure(labelLayout.id)
-            }
-    }
-
-    public override fun updLabel(id: String, labelLayout: LabelLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        m_labelTable.document(id)
-            .set(labelLayout)
-            .addOnSuccessListener {
-                println("successfully updated label: $id")
-                onSuccess(id)
-            }
-            .addOnFailureListener {
-                println("failed to update label: $id")
-                onFailure(id)
-            }
-    }
-
-    public override suspend fun getLabel(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : LabelLayout? {
-        val snap = m_labelTable.document(id)
-            .get()
-            .addOnSuccessListener {
-                println("successfully retrieved label: $id")
-                onSuccess(id)
-            }
-            .addOnFailureListener {
-                println("failed to retrieved label: $id")
-                onFailure(id)
-            }
-            .await()
-
-        return snap.toObject(LabelLayout::class.java)
-    }
-    override suspend fun getViewsFromUser(userID: String?): List<ViewLayout> {
-        if (userID.isNullOrBlank()) return emptyList()
-        val userSnap = FirebaseProvider.firestore
-            .collection("users")
-            .document(userID)
-            .get().await()
-        val viewIds = userSnap.get("views") as? List<String> ?: emptyList()
-
-        // parallel alle Docs holen
-        return coroutineScope {
-            viewIds.map { id ->
-                    m_viewTable.document(id).get().await().toObject(ViewLayout::class.java)
-            }
-                .filterNotNull()
-        }
-    }
-
-    public override fun getAllLabels() : Flow<List<LabelLayout>> {
-        return m_labels
-    }
-
-    public override fun getLabelsFromProject(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<LabelLayout>> {
-        return m_projectTable.document(projID)
-            .snapshots()
-            .map { snap ->
-                snap.toObject(ProjectLayout::class.java)?.labels ?: emptyList()
-            }
-            .distinctUntilChanged()
-            .flatMapLatest { labels ->
-                if (labels.isEmpty()) return@flatMapLatest flowOf(emptyList())
-
-                val docFlows = labels.map { label ->
-                    m_labelTable.document(label)
-                        .snapshots()
-                        .map { snap ->
-                            snap.toObject(LabelLayout::class.java)
-                        }
-                }
-
-                combine (docFlows) { docs ->
-                    val map = docs.filterNotNull().associateBy { it.id }
-                    labels.mapNotNull { map[it] }
-                }
-            }
-            .onCompletion {
-                println("successfully retrieved issues from project: $projID")
-                onSuccess(projID)
-            }
-            .catch {
-                println("failed to retrieved issues from project: $projID")
-                onFailure(projID)
-            }
-    }
-
     public override suspend fun addIssue(projID: String, issueLayout: IssueLayout, onSuccess: (String) -> Unit, onFailure: (IssueLayout) -> Unit) {
         val batch = Firebase.firestore.batch()
-        val projREF = m_projectTable.document(projID)
-        val issueREF = m_issueTable.document()
+        val projREF = projectTable.document(projID)
+        val issueREF = issueTable.document()
 
         batch.set(issueREF, issueLayout)
 
@@ -334,59 +155,10 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun addViewToUser(
-        userID: String,
-        viewID: String,
-        onSuccess: (String) -> Unit,
-        onFailure: (String) -> Unit
-    ) {
-        try {
-            // Reference users/{userID}
-            val userRef = Firebase.firestore
-                .collection("users")
-                .document(userID)
-
-            userRef
-                .update("views", FieldValue.arrayUnion(viewID))
-                .await()
-
-            onSuccess(viewID)
-        } catch (e: Exception) {
-            onFailure(e.message ?: "Unknown error while adding view to user")
-        }
-    }
-
-    override suspend fun createViewForUser(
-        projID: String,
-        viewLayout: ViewLayout,
-        onSuccess: (String) -> Unit,
-        onFailure: (String) -> Unit
-    ) {
-        val uid = AuthAPI.getUid()
-        if (uid.isNullOrBlank()) {
-            onFailure("No logged-in user")
-            return
-        }
-
-        try {
-            val ref = m_viewTable.add(viewLayout).await()
-            val newViewId = ref.id
-
-            // view added to current user
-            addViewToUser(uid, newViewId, { /* TODO: success callback */ }, { err ->
-                throw RuntimeException("Linking user failed: $err")
-            })
-
-            onSuccess(newViewId)
-        } catch (e: Exception) {
-            onFailure(e.message ?: "Error while creating view")
-        }
-    }
-
     public override suspend fun addIssue(projID: String, viewID: String, issueLayout: IssueLayout, onSuccess: (String) -> Unit, onFailure: (IssueLayout) -> Unit) {
-        val projREF = m_projectTable.document(projID)
-        val viewREF = m_viewTable.document(viewID)
-        val issueREF = m_issueTable.document()
+        val projREF = projectTable.document(projID)
+        val viewREF = viewTable.document(viewID)
+        val issueREF = issueTable.document()
 
         Firebase.firestore.runTransaction { transaction ->
             val projSnap = transaction.get(projREF)
@@ -401,19 +173,19 @@ object FirebaseAPI : StorageServerAPI() {
             transaction.update(projREF, "issues", FieldValue.arrayUnion(issueREF.id))
             transaction.update(viewREF, "issues", FieldValue.arrayUnion(issueREF.id))
         }
-        .addOnSuccessListener {
-            println("successfully added issue: " + issueREF.id)
-            onSuccess(issueREF.id)
-        }
-        .addOnFailureListener {
-            println("failed to add issue")
-            onFailure(issueLayout)
-        }
+            .addOnSuccessListener {
+                println("successfully added issue: " + issueREF.id)
+                onSuccess(issueREF.id)
+            }
+            .addOnFailureListener {
+                println("failed to add issue")
+                onFailure(issueLayout)
+            }
     }
 
     public override suspend fun rmIssue(projID: String, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        val projREF = m_projectTable.document(projID)
-        val issueREF = m_issueTable.document(id)
+        val projREF = projectTable.document(projID)
+        val issueREF = issueTable.document(id)
 
         Firebase.firestore.runTransaction { transaction ->
             val projSnap = transaction.get(projREF)
@@ -424,7 +196,7 @@ object FirebaseAPI : StorageServerAPI() {
             transaction.update(projREF, "issues", FieldValue.arrayRemove(id))
 
             for (view in views) {
-                val viewREF = m_viewTable.document(view)
+                val viewREF = viewTable.document(view)
                 transaction.update(viewREF, "issues", FieldValue.arrayRemove(id))
             }
 
@@ -442,7 +214,7 @@ object FirebaseAPI : StorageServerAPI() {
     public override suspend fun addIssueToView(viewID: String, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
         val batch = Firebase.firestore.batch()
 
-        m_viewTable.document(viewID)
+        viewTable.document(viewID)
             .update("issues", FieldValue.arrayUnion(id))
             .addOnSuccessListener {
                 println("successfully added issue to view: $viewID")
@@ -457,7 +229,7 @@ object FirebaseAPI : StorageServerAPI() {
     public override suspend fun rmIssueFromView(viewID: String, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
         val batch = Firebase.firestore.batch()
 
-        m_viewTable.document(viewID)
+        viewTable.document(viewID)
             .update("issues", FieldValue.arrayRemove(id))
             .addOnSuccessListener {
                 println("successfully removed issue from view: $viewID")
@@ -470,7 +242,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun updIssue(issueLayout: IssueLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        m_issueTable.document(issueLayout.id)
+        issueTable.document(issueLayout.id)
             .set(issueLayout)
             .addOnSuccessListener {
                 println("successfully updated issue: " + issueLayout.id)
@@ -483,7 +255,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun updIssue(id: String, issueLayout: IssueLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        m_issueTable.document(id)
+        issueTable.document(id)
             .set(issueLayout)
             .addOnSuccessListener {
                 println("successfully updated issue: $id")
@@ -496,14 +268,14 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override suspend fun getIssue(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : IssueLayout? {
-        val snap = m_issueTable.document(id)
+        val snap = issueTable.document(id)
             .get()
             .addOnSuccessListener {
                 println("successfully retrieved issue: $id")
                 onSuccess(id)
             }
             .addOnFailureListener {
-                println("failed to retrieved issue: $id")
+                println("failed to retrieve issue: $id")
                 onFailure(id)
             }
             .await()
@@ -512,14 +284,44 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun getAllIssues() : Flow<List<IssueLayout>> {
-        return m_issues
+        return issues
     }
-    private const val TAG = "FirebaseAPI"
 
+    public override fun getIssuesFromView(viewID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<IssueLayout>> {
+        return viewTable.document(viewID)
+            .snapshots()
+            .map { snap ->
+                snap.toObject(ViewLayout::class.java)?.issues ?: emptyList()
+            }
+            .distinctUntilChanged()
+            .flatMapLatest { issues ->
+                if (issues.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
+                val docFlows = issues.map { issue ->
+                    issueTable.document(issue)
+                        .snapshots()
+                        .map { snap ->
+                            snap.toObject(IssueLayout::class.java)
+                        }
+                }
+
+                combine (docFlows) { docs ->
+                    val map = docs.filterNotNull().associateBy { it.id }
+                    issues.mapNotNull { map[it] }
+                }
+            }
+            .onCompletion {
+                println("successfully retrieved issues from view: $viewID")
+                onSuccess(viewID)
+            }
+            .catch {
+                println("failed to retrieve issues from view: $viewID")
+                onFailure(viewID)
+            }
+    }
 
     public override fun getIssuesFromProject(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<IssueLayout>> {
-        return m_projectTable.document(projID)
+        return projectTable.document(projID)
             .snapshots()
             .map { snap ->
                 snap.toObject(ProjectLayout::class.java)?.issues ?: emptyList()
@@ -529,7 +331,7 @@ object FirebaseAPI : StorageServerAPI() {
                 if (issues.isEmpty()) return@flatMapLatest flowOf(emptyList())
 
                 val docFlows = issues.map { issue ->
-                    m_issueTable.document(issue)
+                    issueTable.document(issue)
                         .snapshots()
                         .map { snap ->
                             snap.toObject(IssueLayout::class.java)
@@ -546,15 +348,15 @@ object FirebaseAPI : StorageServerAPI() {
                 onSuccess(projID)
             }
             .catch {
-                println("failed to retrieved issues from project: $projID")
+                println("failed to retrieve issues from project: $projID")
                 onFailure(projID)
             }
     }
 
     public override fun getIssuesFromAssignment(userID: String?) : Flow<List<IssueLayout>> {
-        return m_issues.map { issues ->
+        return issues.map { issues ->
             if (userID != null) {
-                issues.filter { it.assignments.contains(userID) }
+                issues.filter { it.users.contains(userID) }
             }
             else {
                 emptyList()
@@ -565,7 +367,7 @@ object FirebaseAPI : StorageServerAPI() {
     public override fun getIssuesFromAssignment(userID: String?, projID: String) : Flow<List<IssueLayout>> {
         return getIssuesFromProject(projID).map { issues ->
             if (userID != null) {
-                issues.filter { it.assignments.contains(userID) }
+                issues.filter { it.users.contains(userID) }
             }
             else {
                 emptyList()
@@ -574,7 +376,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun getIssuesFromCreator(userID: String?) : Flow<List<IssueLayout>> {
-        return m_issues.map { issues ->
+        return issues.map { issues ->
             if (userID != null) {
                 issues.filter { it.creator == userID }
             }
@@ -596,9 +398,9 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun getIssuesFromUser(userID: String?) : Flow<List<IssueLayout>> {
-        return m_issues.map { issues ->
+        return issues.map { issues ->
             if (userID != null) {
-                issues.filter { it.assignments.contains(userID) || it.creator == userID }
+                issues.filter { it.users.contains(userID) || it.creator == userID }
             }
             else {
                 emptyList()
@@ -609,7 +411,7 @@ object FirebaseAPI : StorageServerAPI() {
     public override fun getIssuesFromUser(userID: String?, projID: String) : Flow<List<IssueLayout>> {
         return getIssuesFromProject(projID).map { issues ->
             if (userID != null) {
-                issues.filter { it.assignments.contains(userID) || it.creator == userID }
+                issues.filter { it.users.contains(userID) || it.creator == userID }
             }
             else {
                 emptyList()
@@ -617,14 +419,21 @@ object FirebaseAPI : StorageServerAPI() {
         }
     }
 
-    public override suspend fun addView(projID: String, viewLayout: ViewLayout, onSuccess: (String) -> Unit, onFailure: (ViewLayout) -> Unit) {
+    public override suspend fun addView(userID: String?, viewLayout: ViewLayout, onSuccess: (String) -> Unit, onFailure: (ViewLayout) -> Unit) {
+        if (userID == null) {
+            println("failed to remove view, invalid user id: $userID")
+            onFailure(viewLayout)
+
+            return
+        }
+
         val batch = Firebase.firestore.batch()
-        val projREF = m_projectTable.document(projID)
-        val viewREF = m_viewTable.document()
+        val userREF = userTable.document(userID)
+        val viewREF = viewTable.document()
 
         batch.set(viewREF, viewLayout)
 
-        batch.update(projREF, "views", FieldValue.arrayUnion(viewREF.id))
+        batch.update(userREF, "views", FieldValue.arrayUnion(viewREF.id))
 
         batch.commit()
             .addOnSuccessListener {
@@ -637,14 +446,21 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun rmView(projID: String, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    public override suspend fun rmView(userID: String?, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+        if (userID == null) {
+            println("failed to remove view, invalid user id: $userID")
+            onFailure(id)
+
+            return
+        }
+
         val batch = Firebase.firestore.batch()
-        val projREF = m_projectTable.document(projID)
-        val viewREF = m_viewTable.document(id)
+        val userREF = userTable.document(userID)
+        val viewREF = viewTable.document(id)
 
         batch.delete(viewREF)
 
-        batch.update(projREF, "views", FieldValue.arrayRemove(id))
+        batch.update(userREF, "views", FieldValue.arrayRemove(id))
 
         batch.commit()
             .addOnSuccessListener {
@@ -658,7 +474,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun updView(viewLayout: ViewLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        m_viewTable.document(viewLayout.id)
+        viewTable.document(viewLayout.id)
             .set(viewLayout)
             .addOnSuccessListener {
                 println("successfully updated view: " + viewLayout.id)
@@ -671,7 +487,7 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     public override fun updView(id: String, viewLayout: ViewLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        m_viewTable.document(id)
+        viewTable.document(id)
             .set(viewLayout)
             .addOnSuccessListener {
                 println("successfully updated view: $id")
@@ -683,125 +499,29 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun getView(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : ViewLayout? {
-        val snap = m_viewTable.document(id)
-            .get()
-            .addOnSuccessListener {
-                println("successfully retrieved view: $id")
-                onSuccess(id)
+    public override suspend fun getViews(userID: String?, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : List<ViewLayout> {
+        if (userID.isNullOrBlank()) return emptyList()
+        val userSnap = FirebaseProvider.firestore
+            .collection("users")
+            .document(userID)
+            .get().await()
+        val viewIds = userSnap.get("views") as? List<String> ?: emptyList()
+
+        return coroutineScope {
+            viewIds.map { id ->
+                viewTable.document(id).get().await().toObject(ViewLayout::class.java)
             }
-            .addOnFailureListener {
-                println("failed to retrieved view: $id")
-                onFailure(id)
-            }
-            .await()
-
-        return snap.toObject(ViewLayout::class.java)
-    }
-
-    public override fun getAllViews() : Flow<List<ViewLayout>> {
-        return m_views
-    }
-
-    public override fun getViewsFromProject(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<ViewLayout>> {
-        return m_projectTable.document(projID)
-            .snapshots()
-            .map { snap ->
-                snap.toObject(ProjectLayout::class.java)?.views ?: emptyList()
-            }
-            .distinctUntilChanged()
-            .flatMapLatest { views ->
-                if (views.isEmpty()) return@flatMapLatest flowOf(emptyList())
-
-                val docFlows = views.map { view ->
-                    m_viewTable.document(view)
-                        .snapshots()
-                        .map { snap ->
-                            snap.toObject(ViewLayout::class.java)
-                        }
-                }
-
-                combine (docFlows) { docs ->
-                    val map = docs.filterNotNull().associateBy { it.id }
-                    views.mapNotNull { map[it] }
-                }
-            }
-            .onCompletion {
-                println("successfully retrieved views from project: $projID")
-                onSuccess(projID)
-            }
-            .catch {
-                println("failed to retrieved views from project: $projID")
-                onFailure(projID)
-            }
-    }
-    @OptIn(ExperimentalCoroutinesApi::class)
-    public override fun getIssuesFromView(
-        viewID: String,
-        onSuccess: (String) -> Unit,
-        onFailure: (String) -> Unit
-    ): Flow<List<IssueLayout>> {
-        return m_viewTable.document(viewID)
-            .snapshots()
-            .map { snap ->
-                snap.toObject(ViewLayout::class.java)?.issues ?: emptyList()
-            }
-            .distinctUntilChanged()
-            .flatMapLatest { issues ->
-                if (issues.isEmpty()) {
-                    return@flatMapLatest flowOf(emptyList())
-                }
-
-                val docFlows = issues.map { issueId ->
-                    m_issueTable.document(issueId)
-                        .snapshots()
-                        .map { snap ->
-                            snap.toObject(IssueLayout::class.java)
-                        }
-                }
-
-                combine(docFlows) { docs ->
-                    val map = docs.filterNotNull().associateBy { it.id }
-                    issues.mapNotNull { map[it] }
-                }
-            }
-            .onCompletion {
-                Log.d(TAG, "Successfully retrieved issues from view: $viewID")
-                onSuccess(viewID)
-            }
-            .catch {
-                Log.e(TAG, "Failed to retrieve issues from view: $viewID", it)
-                onFailure(viewID)
-            }
-    }
-
-    suspend fun deleteView(
-        viewId: String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        try {
-            m_viewTable.document(viewId).delete().await()
-
-            val uid = AuthAPI.getUid() ?: throw Exception("No User logged in")
-
-            // remove view from user
-            Firebase.firestore.collection("users")
-                .document(uid)
-                .update("views", FieldValue.arrayRemove(viewId))
-                .await()
-
-            onSuccess()
-        } catch (e: Exception) {
-            onFailure(e)
+                .filterNotNull()
         }
     }
 
+    public override fun getAllViews() : Flow<List<ViewLayout>> {
+        return views
+    }
 
-
-    private lateinit var m_projectTable: CollectionReference
-    private lateinit var m_labelTable: CollectionReference
-    private lateinit var m_issueTable: CollectionReference
-    private lateinit var m_viewTable: CollectionReference
-    private lateinit var m_userTable: CollectionReference
+    // firestore collection references //
+    private lateinit var projectTable: CollectionReference
+    private lateinit var issueTable: CollectionReference
+    private lateinit var viewTable: CollectionReference
+    private lateinit var userTable: CollectionReference
 }

@@ -3,11 +3,11 @@ package com.example.viewboard.stateholder
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.viewboard.backend.data.IssueDeadlineFilter
+import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
-import com.example.viewboard.backend.data.IssueLayout
-import com.example.viewboard.backend.data.IssueProgress
-import com.example.viewboard.backend.data.ViewLayout
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.IssueProgress
+import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
 import com.example.viewboard.components.homeScreen.next
 import kotlinx.coroutines.ExperimentalCoroutinesApi

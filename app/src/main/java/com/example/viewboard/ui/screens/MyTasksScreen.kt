@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
-import com.example.viewboard.backend.data.IssueLayout
-import com.example.viewboard.backend.data.ProjectLayout
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.components.homeScreen.ProjectCardTasks
 import com.example.viewboard.ui.navigation.Screen
@@ -56,14 +56,14 @@ fun MyTasksScreen(
                                 }
                             }
                     ) {
-                        val cleanId = issue.projectid.trim('{', '}')
+                        val cleanId = issue.projID.trim('{', '}')
                         var project by remember { mutableStateOf<ProjectLayout?>(null) }
-                        LaunchedEffect(issue.projectid) {
+                        LaunchedEffect(issue.projID) {
                             try {
                             project = FirebaseAPI.getProject(cleanId)
-                                Log.d("IssueWithProject", "Loaded project for issue ${issue.projectid}: $project")
+                                Log.d("IssueWithProject", "Loaded project for issue ${issue.projID}: $project")
                             } catch (e: Exception) {
-                                Log.e("IssueWithProject", "Failed to load project ${issue.projectid}", e)
+                                Log.e("IssueWithProject", "Failed to load project ${issue.projID}", e)
                             }
                         // suspend call
                         }
@@ -72,7 +72,7 @@ fun MyTasksScreen(
                             val projectName: String = project?.name ?: ""
                             ProjectCardTasks(
                                 issueName = it.title,
-                                projectId= it.projectid,
+                                projectId= it.projID,
                                 dueDate = it.deadlineTS,
                                 onClick = {navController.navigate(Screen.IssueScreen.createRoute(
                                     projectName,

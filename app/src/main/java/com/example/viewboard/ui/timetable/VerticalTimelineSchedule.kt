@@ -33,8 +33,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalDensity
 import colorFromCode
-import com.example.viewboard.backend.data.IssueDeadlineFilter
-import com.example.viewboard.backend.data.ProjectLayout
+import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
+import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.ui.utils.dayOfYearFromIso
 import com.example.viewboard.ui.utils.toDp
 import generateProjectCodeFromDbId

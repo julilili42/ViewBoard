@@ -19,8 +19,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.backend.util.Timestamp
-import com.example.viewboard.backend.data.IssueLayout
-import com.example.viewboard.backend.data.UserLayout
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.ui.navigation.ChipInputField
@@ -44,7 +44,7 @@ fun IssueEditScreen(
 
     var title by remember { mutableStateOf(issue.title) }
     val desc by remember { mutableStateOf(issue.desc) }
-    var assignmentIds by remember { mutableStateOf(issue.assignments.toMutableList()) }
+    var assignmentIds by remember { mutableStateOf(issue.users.toMutableList()) }
     var newEmail by remember { mutableStateOf("") }
 
     // load all users
@@ -57,7 +57,7 @@ fun IssueEditScreen(
     // pair uid email
     data class EmailWithId(val userId: String, val mail: String?)
     val pairedList = remember(allUsers) {
-        allUsers.map { EmailWithId(it.uid, it.email) }
+        allUsers.map { EmailWithId(it.id, it.email) }
     }
 
     // display email for uid
@@ -161,8 +161,7 @@ fun IssueEditScreen(
                         val updatedIssue = issue.copy(
                             title = title.capitalizeWords(),
                             desc = desc,
-                            assignments = ArrayList(assignmentIds),
-                            labels = ArrayList(),
+                            users = ArrayList(assignmentIds),
                             deadlineTS = newDeadlineTS
                         )
                         FirebaseAPI.updIssue(

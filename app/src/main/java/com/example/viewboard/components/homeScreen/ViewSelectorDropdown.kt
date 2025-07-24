@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.draw.clip
 
-import com.example.viewboard.backend.data.ViewLayout
+import com.example.viewboard.backend.dataLayout.ViewLayout
 
 
 @Composable
