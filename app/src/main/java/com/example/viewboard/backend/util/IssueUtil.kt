@@ -1,38 +1,21 @@
 package com.example.viewboard.backend.util
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.IssueState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
- * Get all issues filtered by a set of labels
+ * Get all issues filtered by a set of users
  *
  * @param issues the issues to be filtered
- * @param labels the set of labels to be used for filtering
+ * @param users a set of users to be used for filtering
  *
  * @return the issues when they have been successfully filtered
  */
-fun filterIssuesByLabels(issues: Flow<List<IssueLayout>>, labels: List<String>) : Flow<List<IssueLayout>> {
+fun filterIssuesByUsers(issues: Flow<List<IssueLayout>>, users: List<String>) : Flow<List<IssueLayout>> {
     return issues.map { issue ->
-        issue.filter { it.labels.containsAll(labels) }
-            .ifEmpty { emptyList() }
-    }
-}
-
-
-/**
- * Get all issues filtered by a set of assignments
- *
- * @param issues the issues to be filtered
- * @param assignments the set of assignments to be used for filtering
- *
- * @return the issues when they have been successfully filtered
- */
-fun filterIssuesByAssignments(issues: Flow<List<IssueLayout>>, assignments: List<String>) : Flow<List<IssueLayout>> {
-    return issues.map { issue ->
-        issue.filter { it.assignments.containsAll(assignments) }
+        issue.filter { it.users.containsAll(users) }
             .ifEmpty { emptyList() }
     }
 }
