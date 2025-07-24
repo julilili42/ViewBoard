@@ -102,15 +102,13 @@ fun IssueScreen(
 
 
         ) {
-            // 1) Title
-
             item {
                 EdgeToEdgeRoundedRightItemWithBadge(
                     viewName = projectName,
                     projectId = projectId,
                 )
             }
-            // 2) Search & filter row
+            // search & filter row
             val sortOptions = listOf(
                 SortOptionsIssues("Sort by Date", IssueViewModel.SortField.DATE),
                 SortOptionsIssues("Sort by Name", IssueViewModel.SortField.NAME),
@@ -130,9 +128,8 @@ fun IssueScreen(
                     )
                     val iconRes = if (onlyMine)
                         R.drawable.profile_svgrepo_com__2_
-                           // z. B. ein gefülltes Icon
                     else
-                        R.drawable.profile_group_svgrepo_com // z. B. ein Outline-Icon
+                        R.drawable.profile_group_svgrepo_com
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         CustomIcon(
                             iconRes         = iconRes,
@@ -153,7 +150,7 @@ fun IssueScreen(
                     }
                 }
             }
-            // 3) Tabs row
+            // tabs row
             item {
                 Row(
                     Modifier
@@ -210,7 +207,7 @@ fun IssueScreen(
                     }
                 }
             }
-            // 4) Issue list
+            // issue list
             items(issues) { item ->
                 val mails: List<String?> = email[item.id].orEmpty()
                 DragTarget(
@@ -237,13 +234,7 @@ fun stateFromIndex(idx: Int): IssueState = when (idx) {
     0    -> IssueState.NEW
     1    -> IssueState.ONGOING
     2    -> IssueState.DONE
-    else -> throw IllegalArgumentException("Ungültiger Index für IssueState: $idx")
-}
-
-fun stateToString(state: IssueState): String = when (state) {
-    IssueState.NEW     -> "New"
-    IssueState.ONGOING -> "Ongoing"
-    IssueState.DONE    -> "Done"
+    else -> throw IllegalArgumentException("Invalid Index for IssueState: $idx")
 }
 
 

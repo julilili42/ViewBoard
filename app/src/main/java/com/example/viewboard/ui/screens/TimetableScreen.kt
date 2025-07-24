@@ -26,6 +26,7 @@ import com.example.viewboard.components.timetable.SegmentedSwitch
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -50,12 +51,12 @@ fun TimetableScreen(navController: NavHostController,
     val density = LocalDensity.current
     val projects by projectViewModel.displayedViewProjects.collectAsState()
     val topBlockHeightPx = with(density) { contactHeight.toPx() }
-    var screenHeightPx by remember { mutableStateOf(0) }
+    var screenHeightPx by remember { mutableIntStateOf(0) }
     val issues by issueViewModel.displayedAllIssues.collectAsState()
     var showProjects by remember { mutableStateOf(true) }
     val today = LocalDate.now()
-    var year by remember { mutableStateOf(today.year) }
-    var month by remember { mutableStateOf(today.monthValue) } // 1..12
+    var year by remember { mutableIntStateOf(today.year) }
+    var month by remember { mutableIntStateOf(today.monthValue) } // 1..12
     var selectedDate by remember { mutableStateOf<LocalDate?>(today) }
     Scaffold(
         topBar = {

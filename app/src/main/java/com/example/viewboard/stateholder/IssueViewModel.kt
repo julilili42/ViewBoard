@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.IssueState
 import com.example.viewboard.backend.dataLayout.ViewLayout

@@ -1,6 +1,5 @@
 package com.example.viewboard.ui.issue
 
-import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.Icon
@@ -33,7 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
 import colorFromCode
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.Screen
 import kotlinx.coroutines.launch
 import androidx.compose.material3.Card
@@ -73,8 +72,6 @@ fun IssueItemCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = modifier
             .fillMaxWidth()
-        //.padding( 16.dp)
-
     ){
         Column(verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding( 16.dp)) {
@@ -148,11 +145,11 @@ fun IssueItemCard(
             Row(
                 modifier = Modifier
                     .horizontalScroll(scrollState)
-                    .defaultMinSize(minHeight = 32.dp),  // <-- hier Mindesthöhe festlegen
+                    .defaultMinSize(minHeight = 32.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 if (issuelabels.isEmpty()) {
-                    Spacer(modifier = Modifier.height(0.dp))  // oder zeige einen leeren Platzhalter
+                    Spacer(modifier = Modifier.height(0.dp))
                 } else {
                     issuelabels.forEach { label ->
                         val labelColor = colorFromCode(label)

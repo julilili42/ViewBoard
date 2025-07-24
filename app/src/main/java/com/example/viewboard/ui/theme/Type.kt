@@ -28,7 +28,7 @@ val Roboto = FontFamily(
     )
 )
 
-// Set of Material typography styles to start with
+// Set of Material typography styles
 val Typography = Typography(
     headlineLarge = TextStyle(
         fontFamily = Roboto,

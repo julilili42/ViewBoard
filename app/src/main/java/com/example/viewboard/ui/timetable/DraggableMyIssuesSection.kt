@@ -69,7 +69,7 @@ fun DraggableMyIssuesSection(
                 .align(Alignment.BottomCenter)
                 .background(Color.White)
         ) {
-            // Ziehgriff
+            // Drag and Drop
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -94,7 +94,7 @@ fun DraggableMyIssuesSection(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp, start = 16.dp, end = 16.dp  ),//horizontal = 16.dp, vertical = 8.dp
+                        .padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {

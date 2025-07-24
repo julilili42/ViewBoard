@@ -15,7 +15,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.components.homeScreen.ProjectCardTasks
 import com.example.viewboard.ui.navigation.Screen
 
@@ -64,7 +64,8 @@ fun MyTasksScreen(
                                 Log.d("IssueWithProject", "Loaded project for issue ${issue.projectid}: $project")
                             } catch (e: Exception) {
                                 Log.e("IssueWithProject", "Failed to load project ${issue.projectid}", e)
-                            }// suspend call
+                            }
+                        // suspend call
                         }
 
                         issue?.let {

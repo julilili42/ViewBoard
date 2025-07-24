@@ -25,12 +25,12 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
 import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.stateholder.IssueViewModel
 import com.example.viewboard.ui.screens.LoginScreen
 import com.example.viewboard.ui.screens.RegistrationScreen
 import com.example.viewboard.ui.screens.HomeScreen
-import com.example.viewboard.ui.screens.DragableScreen
+import com.example.viewboard.ui.screens.DraggableScreen
 import com.example.viewboard.ui.screens.IssueScreen
 import com.example.viewboard.stateholder.MainViewModel
 import com.example.viewboard.stateholder.ProjectViewModel
@@ -49,6 +49,10 @@ import com.example.viewboard.ui.screens.ViewIssueScreen
 import com.example.viewboard.ui.screens.ViewScreen
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 
+/**
+ * Root of the app's navigation graph, deciding start destination based on auth state
+ * and defining all navigation routes between composable screens.
+ */
 @SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun Navigation(modifier: Modifier = Modifier) {
@@ -303,7 +307,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                             .fillMaxWidth()
                             .padding(padding)
                     ) {
-                        DragableScreen(
+                        DraggableScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             IssueScreen(
@@ -335,7 +339,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                             .fillMaxWidth()
                             .padding(padding)
                     ) {
-                        DragableScreen(
+                        DraggableScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             ViewIssueScreen(

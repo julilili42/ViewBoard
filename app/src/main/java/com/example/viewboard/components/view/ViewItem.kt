@@ -34,7 +34,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 import coil.compose.AsyncImage
 import colorFromCode
-import com.example.viewboard.backend.Timestamp
+import com.example.viewboard.backend.util.Timestamp
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueState
 import com.example.viewboard.backend.dataLayout.ViewLayout

@@ -93,7 +93,7 @@ fun ViewIssueScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(16.dp)
         ) {
-            // Dialog für neue Issue
+            // Dialog new issues
             if (showDialog) {
                 item {
                     ProjectIssueDialog(

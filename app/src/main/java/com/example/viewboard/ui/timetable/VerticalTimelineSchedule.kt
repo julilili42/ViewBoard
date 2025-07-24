@@ -120,7 +120,6 @@ fun VerticalTimelineSchedule(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         projects.forEach { project ->
-                            // Berechne hier pro Projekt direkt deine Offsets
                             val startDateToDays = dayOfYearFromIso(project.startTS,)
                             val endDateToDays = dayOfYearFromIso(project.deadlineTS,)
                             val dayDiff = endDateToDays - startDateToDays

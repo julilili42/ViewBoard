@@ -27,7 +27,7 @@ import com.example.viewboard.backend.auth.impl.AuthAPI.getListOfAllUsers
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.UserLayout
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -131,7 +131,7 @@ fun ProjectCreationScreen(
                     users = emptyList()
                 }
             }
-            // Zeitraum
+            // Timeframe
             OutlinedTextField(
                 value = if (startDate.isNotBlank() && endDate.isNotBlank())
                     "$startDate – $endDate" else "",
@@ -180,7 +180,7 @@ fun ProjectCreationScreen(
             ChipInputField(
                 entries = assignments,
                 newEntry = newParticipant,
-                inhaltText = "Add team member…",
+                contentText = "Add team member…",
                 suggestions = suggestionList,
                 onSuggestionClick = { name ->
 

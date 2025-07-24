@@ -85,7 +85,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
 
                         ProfilePicture(
                             painter = painterResource(id = R.drawable.logotest),
-                            contentDescription = "Profilbild Raoul",
+                            contentDescription = "pb Raoul",
                             size = 120.dp,
                             borderColor = MaterialTheme.colorScheme.primary,
                             borderWidth = 3.dp

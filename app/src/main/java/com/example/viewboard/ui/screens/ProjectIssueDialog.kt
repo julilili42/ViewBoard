@@ -23,7 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.onGloballyPositioned
 import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.stateholder.IssueViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 

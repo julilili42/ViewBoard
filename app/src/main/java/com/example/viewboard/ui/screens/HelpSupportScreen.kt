@@ -32,7 +32,6 @@ import com.example.viewboard.ui.navigation.BackButton
 
 @Composable
 fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavController) {
-    // State für das Ein-/Ausklappen
     var faqExpanded by remember { mutableStateOf(false) }
     var passwordExpanded by remember { mutableStateOf(false) }
 
@@ -43,7 +42,7 @@ fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavControlle
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // --- Header mit Back-Button und Titel ---
+        // Header back button and title
         Box(modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp)
@@ -62,9 +61,8 @@ fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavControlle
 
         Spacer(Modifier.size(24.dp))
 
-        // --- FAQ-Section mit ausklappbarem Inhalt ---
+        // faq section
         SectionCard(title = "FAQ") {
-            // Klickbares Haupt-Item
             Row (
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,11 +80,11 @@ fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavControlle
                     contentDescription = if (faqExpanded) "Collapse" else "Expand",
                     modifier = Modifier
                         .size(24.dp)
-                        // Icon drehen je nachdem ob ausgeklappt
+                        // rotate icon if clicked
                         .rotate(if (faqExpanded) 90f else 180f)
                 )
             }
-            // Animiertes Ein-/Ausblenden der Anleitung
+
             AnimatedVisibility(
                 visible = faqExpanded,
                 enter = expandVertically() + fadeIn(),
@@ -127,11 +125,10 @@ fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavControlle
                     contentDescription = if (passwordExpanded) "Collapse" else "Expand",
                     modifier = Modifier
                         .size(24.dp)
-                        // Icon drehen je nachdem ob ausgeklappt
+                        // rotate icon if clicked
                         .rotate(if (passwordExpanded) 90f else 180f)
                 )
             }
-            // Animiertes Ein-/Ausblenden der Anleitung
             AnimatedVisibility(
                 visible = passwordExpanded,
                 enter = expandVertically() + fadeIn(),

@@ -119,7 +119,7 @@ private fun PasswordField(
             IconButton(onClick = { onVisibilityChange(!visible) }) {
                 Icon(
                     imageVector = if (visible) Icons.Filled.Edit else Icons.Filled.Edit,
-                    contentDescription = if (visible) "Verbergen" else "Anzeigen"
+                    contentDescription = if (visible) "Hide" else "Show"
                 )
             }
         },

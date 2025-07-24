@@ -42,7 +42,6 @@ fun ChangeEmailScreen(
                     }
                 },
                 actions = {
-                    val enabled = newEmail.isNotBlank() && newEmail == confirmEmail
                     TextButton(
                         onClick = {
                             scope.launch {
@@ -83,7 +82,7 @@ fun ChangeEmailScreen(
                 verticalArrangement = Arrangement.Top
             ) {
                 Spacer(Modifier.height(24.dp))
-                // Neue E-Mail
+                // New E-Mail
                 OutlinedTextField(
                     value = newEmail,
                     onValueChange = { newEmail = it },
@@ -121,7 +120,7 @@ fun ChangeEmailScreen(
                 )
                 Spacer(Modifier.height(16.dp))
 
-                // Aktuelles Passwort
+                // Current password
                 OutlinedTextField(
                     value = currentPassword,
                     onValueChange = { currentPassword = it },

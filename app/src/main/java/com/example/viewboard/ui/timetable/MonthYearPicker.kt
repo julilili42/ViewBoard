@@ -43,7 +43,7 @@ fun MonthYearPicker(
                     onMonthChange(month - 1)
                 }
             }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Vorheriger Monat")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Previous month")
             }
             Text(
                 text = Month.of(month)
@@ -59,13 +59,13 @@ fun MonthYearPicker(
                     onMonthChange(month + 1)
                 }
             }) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Nächster Monat")
+                Icon(Icons.Default.ArrowForward, contentDescription = "Next month")
             }
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { onYearChange(year - 1) }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Vorheriges Jahr")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Previous year")
             }
             Text(
                 text = year.toString(),
@@ -73,7 +73,7 @@ fun MonthYearPicker(
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
             IconButton(onClick = { onYearChange(year + 1) }) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Nächstes Jahr")
+                Icon(Icons.Default.ArrowForward, contentDescription = "Next year")
             }
         }
     }

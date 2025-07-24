@@ -18,15 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.viewboard.backend.Timestamp
+import com.example.viewboard.backend.util.Timestamp
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.UserLayout
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 import com.example.viewboard.ui.theme.uiColor
 import com.example.viewboard.ui.utils.capitalizeWords
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
@@ -48,20 +47,20 @@ fun IssueEditScreen(
     var assignmentIds by remember { mutableStateOf(issue.assignments.toMutableList()) }
     var newEmail by remember { mutableStateOf("") }
 
-    // 1) Lade alle Benutzer (UID + E-Mail)
+    // load all users
     val allUsers by produceState(initialValue = emptyList<UserLayout>(), key1 = projectId) {
         value = AuthAPI.getListOfAllUsers()
             .getOrNull()
             .orEmpty()
     }
 
-    // 2) Paare UID ↔ E-Mail
+    // pair uid email
     data class EmailWithId(val userId: String, val mail: String?)
     val pairedList = remember(allUsers) {
         allUsers.map { EmailWithId(it.uid, it.email) }
     }
 
-    // 3) Zeige für die aktuell zugewiesenen IDs die korrekten E-Mails
+    // display email for uid
     val displayedAssignments by remember(assignmentIds, pairedList) {
         derivedStateOf {
             assignmentIds.mapNotNull { id ->
@@ -70,7 +69,7 @@ fun IssueEditScreen(
         }
     }
 
-    // 4) Vorschläge basierend auf Eingabe (ohne Duplikate)
+    // suggestions for input
     val suggestions by remember(newEmail, pairedList, displayedAssignments) {
         derivedStateOf {
             if (newEmail.isBlank()) emptyList()
@@ -84,7 +83,6 @@ fun IssueEditScreen(
         }
     }
 
-    // Datum/Zeit wie gehabt
     val calendar = remember {
         Calendar.getInstance().apply {
             val instant = Instant.parse(issue.deadlineTS)
@@ -96,7 +94,6 @@ fun IssueEditScreen(
     var dateText by remember { mutableStateOf(dateFmt.format(calendar.time)) }
     var timeText by remember { mutableStateOf(timeFmt.format(calendar.time)) }
     var newDeadlineTS by remember { mutableStateOf(issue.deadlineTS) }
-    val scope = rememberCoroutineScope()
 
     fun updateDeadline() {
         val d = dateFmt.parse(dateText) ?: return
@@ -201,11 +198,10 @@ fun IssueEditScreen(
             )
             Spacer(Modifier.height(24.dp))
 
-            // ChipInputField für E-Mails
             ChipInputField(
                 entries = displayedAssignments,
                 newEntry = newEmail,
-                inhaltText = "Add Assignee…",
+                contentText = "Add Assignee…",
                 suggestions = suggestions,
                 onSuggestionClick = { mail ->
                     pairedList.find { it.mail == mail }?.userId

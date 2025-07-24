@@ -1,7 +1,7 @@
 package com.example.viewboard.backend.dataLayout
 
 import com.google.firebase.firestore.DocumentId
-import com.example.viewboard.backend.Timestamp
+import com.example.viewboard.backend.util.Timestamp
 
 data class LabelLayout (
     @DocumentId

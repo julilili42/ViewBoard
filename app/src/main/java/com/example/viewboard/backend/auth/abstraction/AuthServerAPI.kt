@@ -5,7 +5,6 @@ import androidx.navigation.NavController
 import com.example.viewboard.backend.dataLayout.UserLayout
 
 abstract class AuthServerAPI {
-
     /**
      * Send a password reset email to the given address.
      *
@@ -164,11 +163,12 @@ abstract class AuthServerAPI {
         token: String,
         onComplete: (() -> Unit)? = {}
     )
+
     /**
-     * Legt das User‑Profil in Firestore an, falls es noch nicht existiert.
+     * Creates the user profile in Firestore if it does not already exist.
      *
-     * @param onSuccess Wird aufgerufen, wenn das Profil bereits existierte oder erfolgreich angelegt wurde.
-     * @param onError   Wird aufgerufen mit einer Fehlermeldung, wenn etwas schiefgeht.
+     * @param onSuccess Called when the profile already existed or was successfully created
+     * @param onError   Called with an error message if something goes wrong
      */
     abstract fun ensureUserProfileExists(
         onSuccess: () -> Unit,
@@ -179,23 +179,30 @@ abstract class AuthServerAPI {
      *
      * @param onComplete optional callback when the token is fetched and saved
      */
+    public abstract fun fetchAndSaveFcmToken(onComplete: (() -> Unit)? = {})
 
     /**
-     * Liest ein UserLayout für die gegebene userID aus Firestore.
-     * @param userID Die UID des Users
-     * @return Result mit dem UserLayout oder einer Exception im Fehlerfall
+     * Reads a UserLayout for the given userID from Firestore.
+     *
+     * @param userID The user’s UID
+     * @return Result containing the UserLayout, or an Exception on failure
      */
     abstract suspend fun getUserById(userID: String): Result<UserLayout>
 
     /**
-     * Liest für jede übergebene User‑ID die zugehörige E‑Mail aus Firestore.
-     * @param userIds Liste von UIDs
-     * @return Result mit Liste der gefundenen E‑Mail‑Strings (in gleicher Reihenfolge wie die IDs;
-     *         an Position i steht null, wenn UID i nicht gefunden wurde)
+     * Reads the email address for each provided user ID from Firestore.
+     *
+     * @param userIds List of UIDs
+     * @return Result containing a list of email strings in the same order as the IDs;
+     *         a null entry at position i if UID i was not found
      */
     abstract suspend fun getEmailsByIds(userIds: List<String>): Result<List<String?>>
 
-    public abstract fun fetchAndSaveFcmToken(onComplete: (() -> Unit)? = {})
 
+    /**
+     * Retrieves all user profiles from Firestore.
+     *
+     * @return Result containing a list of UserLayout objects, or an Exception on failure
+     */
     public abstract suspend fun getListOfAllUsers(): Result<List<UserLayout>>
 }

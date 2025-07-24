@@ -62,7 +62,7 @@ fun VerticalMilestoneBar(
                     .background(Color.LightGray.copy(alpha = 0.3f))
             ) {
                 if (fillFrac > 0f) {
-                    // Wähle die Basis-Farben für diesen Index
+                    // Color for index
                     val baseColor = brush[idx]
                     val nextColor = brush[idx+1]
 
@@ -74,8 +74,8 @@ fun VerticalMilestoneBar(
                             .background(
                                 brush = Brush.verticalGradient(
                                     colors = listOf(
-                                        baseColor.copy(alpha = 1f),    // oben etwas kräftiger
-                                        nextColor.copy(alpha = 1f)     // unten etwas transparenter
+                                        baseColor.copy(alpha = 1f),
+                                        nextColor.copy(alpha = 1f)
                                     ),
                                     startY = 0.0f,
                                     endY   = Float.POSITIVE_INFINITY,

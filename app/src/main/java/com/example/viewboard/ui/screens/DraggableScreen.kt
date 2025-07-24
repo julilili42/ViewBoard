@@ -18,7 +18,7 @@ import com.example.viewboard.stateholder.IssueViewModel
 internal val LocalDragTargetInfo = compositionLocalOf { DragTargetInfo() }
 
 @Composable
-fun DragableScreen(
+fun DraggableScreen(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
@@ -30,8 +30,8 @@ fun DragableScreen(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .onGloballyPositioned { coords ->
-                    rootOffset = coords.localToWindow(Offset.Zero)
+                .onGloballyPositioned { cords ->
+                    rootOffset = cords.localToWindow(Offset.Zero)
                 }
         ) {
             content()
@@ -139,13 +139,4 @@ fun <T> DropItem(
     var dragOffset by mutableStateOf(Offset.Zero)
     var draggableComposable by mutableStateOf<(@Composable () -> Unit)?>(null)
     var dataToDrop by mutableStateOf<Any?>(null)
-    var isOverDropTarget: Boolean by mutableStateOf(false)
-    fun reset() {
-        isDragging          = false
-        dataToDrop          = null
-        dragOffset          = Offset.Zero
-        draggableComposable = null
-        dragPosition        = Offset.Zero
-        isOverDropTarget = false
-    }
 }

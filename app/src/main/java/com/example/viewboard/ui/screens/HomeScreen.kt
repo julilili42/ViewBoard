@@ -77,8 +77,8 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
                 .background(MaterialTheme.colorScheme.background)
-                .onGloballyPositioned { coords ->
-                    screenHeightPx = coords.size.height
+                .onGloballyPositioned { cords ->
+                    screenHeightPx = cords.size.height
                 }
         ) {
             Column(
@@ -89,8 +89,8 @@ fun HomeScreen(
                     .onSizeChanged { size ->
                         columnHeightPx = size.height
                     }
-                    .onGloballyPositioned { coords ->
-                        columnHeightPx = coords.size.height
+                    .onGloballyPositioned { cords ->
+                        columnHeightPx = cords.size.height
                     }
             ) {
                 Spacer(modifier = Modifier.height(24.dp))

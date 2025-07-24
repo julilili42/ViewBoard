@@ -1,4 +1,4 @@
-package com.example.viewboard.backend.storageServer.impl
+package com.example.viewboard.backend.storage.impl
 
 import android.util.Log
 import com.example.viewboard.backend.auth.impl.AuthAPI
@@ -7,7 +7,7 @@ import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.ViewLayout
-import com.example.viewboard.backend.storageServer.abstraction.StorageServerAPI
+import com.example.viewboard.backend.storage.abstraction.StorageServerAPI
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
@@ -16,8 +16,6 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -343,26 +341,21 @@ object FirebaseAPI : StorageServerAPI() {
         onFailure: (String) -> Unit
     ) {
         try {
-            // Referenz auf users/{userID}
+            // Reference users/{userID}
             val userRef = Firebase.firestore
                 .collection("users")
                 .document(userID)
 
-            // Update mit arrayUnion und await()
             userRef
                 .update("views", FieldValue.arrayUnion(viewID))
                 .await()
 
-            // Callback bei Erfolg
             onSuccess(viewID)
         } catch (e: Exception) {
-            // Callback bei Fehler
-            onFailure(e.message ?: "Unbekannter Fehler beim Hinzufügen der View")
+            onFailure(e.message ?: "Unknown error while adding view to user")
         }
     }
-    /**
-     * Erstellt ein View-Dokument und fügt es direkt dem User hinzu.
-     */
+
     override suspend fun createViewForUser(
         projID: String,
         viewLayout: ViewLayout,
@@ -371,25 +364,22 @@ object FirebaseAPI : StorageServerAPI() {
     ) {
         val uid = AuthAPI.getUid()
         if (uid.isNullOrBlank()) {
-            onFailure("Kein eingeloggter User")
+            onFailure("No logged-in user")
             return
         }
 
         try {
-            // 1) View-Dokument erstellen
             val ref = m_viewTable.add(viewLayout).await()
             val newViewId = ref.id
 
-            // 2) Verknüpfen mit dem User (suspend call)
-            addViewToUser(uid, newViewId, { /* success callback */ }, { err ->
-                // Falls das Anlegen im User scheitert: wir werfen hier weiter
-                throw RuntimeException("Verknüpfen mit User fehlgeschlagen: $err")
+            // view added to current user
+            addViewToUser(uid, newViewId, { /* TODO: success callback */ }, { err ->
+                throw RuntimeException("Linking user failed: $err")
             })
 
-            // 3) Am Ende Callback
             onSuccess(newViewId)
         } catch (e: Exception) {
-            onFailure(e.message ?: "Fehler beim Anlegen des Views")
+            onFailure(e.message ?: "Error while creating view")
         }
     }
 
@@ -791,11 +781,11 @@ object FirebaseAPI : StorageServerAPI() {
         onFailure: (Exception) -> Unit
     ) {
         try {
-            // 1. View-Dokument löschen
             m_viewTable.document(viewId).delete().await()
 
-            // 2. Aus Benutzer-Referenz entfernen
-            val uid = AuthAPI.getUid() ?: throw Exception("Kein User angemeldet")
+            val uid = AuthAPI.getUid() ?: throw Exception("No User logged in")
+
+            // remove view from user
             Firebase.firestore.collection("users")
                 .document(uid)
                 .update("views", FieldValue.arrayRemove(viewId))

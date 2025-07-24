@@ -38,7 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.ViewLayout
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.components.view.ViewItem
 import androidx.compose.foundation.lazy.grid.items
 import com.example.viewboard.stateholder.IssueViewModel
@@ -61,7 +61,6 @@ fun ViewScreen(
 ) {
 
     val viewLayouts by viewsViewModel.displayedViews.collectAsState()
-    val selectedViewId by viewsViewModel.selectedViewId.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var newName by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
@@ -113,7 +112,7 @@ fun ViewScreen(
                     viewName = "Views",
                 )
             }
-            // Header, Suchfeld und Sort/Filter-Icons
+            // Header, Search, Filter
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Row(
                     modifier = Modifier
@@ -196,7 +195,7 @@ fun ViewScreen(
                                             issues = ArrayList()
                                         ),
                                         onSuccess = { _ ->  },
-                                        onFailure = { err -> /* handle error, e.g. Toast */ }
+                                        onFailure = { err -> /* TODO handle error*/ }
                                     )
                                 }
                             }

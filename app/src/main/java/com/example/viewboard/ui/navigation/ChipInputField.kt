@@ -31,15 +31,14 @@ import androidx.compose.ui.unit.dp
 fun ChipInputField(
     entries: List<String>,
     newEntry: String,
-    inhaltText: String,
-    suggestions: List<String> = emptyList(),                       // jetzt String-Liste
-    onSuggestionClick: (String) -> Unit={},             // Callback mit String
+    contentText: String,
+    suggestions: List<String> = emptyList(),
+    onSuggestionClick: (String) -> Unit={},             // Callback with String
     onNewEntryChange: (String) -> Unit={},
     onEntryConfirmed: () -> Unit={},
     onEntryRemove: (String) -> Unit={},
     modifier: Modifier = Modifier,
-    enabled: Boolean = true  // <— NEU
-
+    enabled: Boolean = true
 ) {
     BasicTextField(
         value = newEntry,
@@ -58,7 +57,7 @@ fun ChipInputField(
             .padding(4.dp),
         decorationBox = { innerTextField ->
             Column(modifier = Modifier.fillMaxWidth()) {
-                // 1) Chips für bestehende Einträge
+                // chips for existing entries
                 FlowRow(modifier = Modifier.fillMaxWidth()) {
                     entries.forEach { entry ->
                         AssistChip(
@@ -72,7 +71,7 @@ fun ChipInputField(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // 2) Eingabefeld mit Placeholder
+                // input field with placeholder
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -82,7 +81,7 @@ fun ChipInputField(
                 ) {
                     if (newEntry.isEmpty()) {
                         Text(
-                            text = inhaltText,
+                            text = contentText,
                             modifier = Modifier.padding(horizontal = 8.dp),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -98,7 +97,7 @@ fun ChipInputField(
                     }
                 }
 
-                // 3) Suggestion‑Liste als String-Array
+                // suggestion list
                 if (suggestions.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Column(

@@ -1,11 +1,9 @@
 package com.example.viewboard.ui.screens
 
 import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -17,19 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.viewboard.backend.Timestamp
 import com.example.viewboard.backend.auth.impl.AuthAPI.getListOfAllUsers
 import com.example.viewboard.backend.auth.impl.FirebaseProvider.auth
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.UserLayout
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 import com.example.viewboard.ui.theme.uiColor
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,8 +60,6 @@ fun ProjectEditScreen(
         mutableStateOf(names)
     }
 
-    val datePattern = Regex("\\d{4}-\\d{2}-\\d{2}")
-
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     fun pickDateRange() {
@@ -97,10 +89,10 @@ fun ProjectEditScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Projekt bearbeiten", color = uiColor) },
+                title = { Text("Edit project", color = uiColor) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Zurück", tint = uiColor)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = uiColor)
                     }
                 }
             )
@@ -125,7 +117,7 @@ fun ProjectEditScreen(
             OutlinedTextField(
                 value = desc,
                 onValueChange = { desc = it },
-                label = { Text("Beschreibung") },
+                label = { Text("Description") },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = isCreator
             )
@@ -136,11 +128,11 @@ fun ProjectEditScreen(
                     "$startDate – $endDate" else "",
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Zeitraum") },
+                label = { Text("Timeframe") },
                 trailingIcon = {
                     Icon(
                         Icons.Default.DateRange,
-                        contentDescription = "Datum wählen",
+                        contentDescription = "Choose Date",
                         modifier = Modifier
                             .size(24.dp)
                             .clickable(enabled = isCreator) { pickDateRange() },
@@ -152,7 +144,6 @@ fun ProjectEditScreen(
             )
             Spacer(Modifier.height(12.dp))
 
-            val allNames = listOf("Alice", "Bob", "Charlie", "David")
 
             var newParticipant by remember { mutableStateOf("") }
 
@@ -163,16 +154,15 @@ fun ProjectEditScreen(
                             user.email.contains(newParticipant, ignoreCase = true)
                 }
             }
-            val suggestionNames  = filteredUsers.map { it.name }
             val suggestionEmails = filteredUsers.map { it.email }
             val suggestionList = remember(newParticipant, assignments, suggestionEmails) {
                 if (newParticipant.isBlank()) {
                     emptyList()
                 } else {
                     suggestionEmails.filter { email ->
-                        // enthält eingegebene Zeichen
+                        // includes entered letters
                         email.contains(newParticipant, ignoreCase = true)
-                                // und ist noch nicht in assignments
+                                // and not in assignments
                                 && assignments.none { it.equals(email, ignoreCase = true) }
                     }
                 }
@@ -180,10 +170,10 @@ fun ProjectEditScreen(
             ChipInputField(
                 entries = assignments,
                 newEntry = newParticipant,
-                inhaltText = "Add team member…",
+                contentText = "Add team member…",
                 suggestions = suggestionList,
                 onSuggestionClick = { name ->
-                    // wenn Name ausgewählt wird, als Chip hinzufügen
+                    // if name is selected add as chip
                     if (name !in assignments) {
                         assignments = assignments + name
                     }
@@ -222,7 +212,7 @@ fun ProjectEditScreen(
                                 onUpdated()
                                 navController.popBackStack()
                             },
-                            onFailure = { /* Fehlerbehandlung */ }
+                            onFailure = { /* TODO Error handling */ }
                         )
                     },
                     modifier = Modifier
@@ -243,7 +233,7 @@ fun ProjectEditScreen(
                                 FirebaseAPI.rmProject(
                                     id = project.id,
                                     onSuccess = { navController.popBackStack() },
-                                    onFailure = { /* Fehlerbehandlung */ }
+                                    onFailure = { /* TODO Error handling */ }
                                 )
                             }
                         }

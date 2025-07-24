@@ -1,7 +1,7 @@
 package com.example.viewboard.backend.dataLayout
 
 import com.google.firebase.firestore.DocumentId
-import com.example.viewboard.backend.Timestamp
+import com.example.viewboard.backend.util.Timestamp
 
 data class ProjectLayout (
     @DocumentId
@@ -18,7 +18,10 @@ data class ProjectLayout (
     var labels: ArrayList<String> = ArrayList<String>(),
     var views: ArrayList<String> = ArrayList<String>(),
     var users: ArrayList<String> = ArrayList<String>(),
+    // Timestamp Creation: Time of creation
     var creationTS: String = Timestamp().export(),
+    // Timestamp Start: Time of project start
     var startTS: String = Timestamp().export(),
+    // Timestamp Deadline: Time of project deadline
     var deadlineTS: String = Timestamp().export()
 )
