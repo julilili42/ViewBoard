@@ -17,18 +17,20 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ProfilePicture(
     painter: Painter,
-    contentDescription: String = "Profilbild",
+    contentDescription: String = "profile image",
     size: Dp = 120.dp,
     borderColor: Color = MaterialTheme.colorScheme.primary,
-    borderWidth: Dp = 2.dp
+    borderWidth: Dp = 2.dp,
+    modifier: Modifier = Modifier
 ) {
     Image(
         painter = painter,
         contentDescription = contentDescription,
         contentScale = ContentScale.Crop,
-        modifier = Modifier
+        modifier = modifier
             .size(size)
             .clip(CircleShape)
             .border(borderWidth, borderColor, CircleShape)
     )
 }
+
