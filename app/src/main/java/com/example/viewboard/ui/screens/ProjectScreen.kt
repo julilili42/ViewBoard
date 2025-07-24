@@ -33,39 +33,12 @@ import androidx.compose.runtime.getValue
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.ui.utils.CustomSearchField
-
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.runtime.collectAsState
 import com.example.viewboard.stateholder.ProjectViewModel
 import com.example.viewboard.ui.utils.ProjectSortMenuSimple
 import com.example.viewboard.ui.views.EdgeToEdgeRoundedRightItemWithBadge
 
-object AppColors {
-    // Deine Basisfarben
-    val Orange      = Color(0xFFFFB74D)  // kräftiges Orange
-    val Green       = Color(0xFF81C784)  // sattes Grün
-    val LightBlue   = Color(0xFFBEDBFF)  // helles, aber lebhaftes Blau
-    val DeepOrange  = Color(0xFFFF8A65)
-    val LimeGreen   = Color(0xFF9CCC65)
-    val SkyBlue     = Color(0xFF64B5F6)
-    val Teal        = Color(0xFF4DB6AC)
-    val Purple      = Color(0xFFBA68C8)
-    val Coral       = Color(0xFFFF7043)
-    val Mint        = Color(0xFF4CAF50)
-
-    val StrongPalette = listOf(
-        Orange,
-        Green,
-        LightBlue,
-        DeepOrange,
-        LimeGreen,
-        SkyBlue,
-        Teal,
-        Purple,
-        Coral,
-        Mint
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
