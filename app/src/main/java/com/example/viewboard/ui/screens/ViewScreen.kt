@@ -154,11 +154,7 @@ fun ViewScreen(
                     },
                     onDelete = { viewId ->
                         coroutineScope.launch {
-                            FirebaseAPI.deleteView(
-                                viewId,
-                                onSuccess = { Log.d("ViewScreen", "Deleted view $viewId") },
-                                onFailure = { error -> Log.e("ViewScreen", "Failed to delete: $error") }
-                            )
+                            FirebaseAPI.rmView(AuthAPI.getUid(), viewId)
                         }
                     }
                 )
@@ -185,9 +181,8 @@ fun ViewScreen(
                         if (newName.isNotBlank()) {
                             coroutineScope.launch {
                                 AuthAPI.getUid()?.let {
-                                    FirebaseAPI.createViewForUser(
-
-                                        it,
+                                    FirebaseAPI.addView(
+                                        AuthAPI.getUid(),
                                         ViewLayout(
                                             name = newName,
                                             creationTS = System.currentTimeMillis().toString(),
