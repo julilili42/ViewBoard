@@ -60,7 +60,7 @@ fun Navigation(modifier: Modifier = Modifier) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val isLoggedIn = FirebaseProvider.auth.currentUser != null
-    val start = if (isLoggedIn) "main" else Screen.LoginScreen.route
+    val start = if (isLoggedIn) "main" else NavScreens.LoginNavScreens.route
 
     Scaffold(
         modifier = modifier,
@@ -70,10 +70,10 @@ fun Navigation(modifier: Modifier = Modifier) {
             startDestination = start,
             modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
         ) {
-            composable(Screen.LoginScreen.route) {
+            composable(NavScreens.LoginNavScreens.route) {
                 LoginScreen(navController = navController)
             }
-            composable(Screen.RegistrationScreen.route) {
+            composable(NavScreens.RegistrationNavScreens.route) {
                 RegistrationScreen(navController = navController)
             }
 
@@ -162,7 +162,7 @@ fun Navigation(modifier: Modifier = Modifier) {
             }
 
             composable(
-                route = Screen.ProjectScreen.route,
+                route = NavScreens.ProjectNavScreens.route,
                 arguments = listOf(navArgument("projectName") {
                     type = NavType.StringType
                 })
@@ -181,7 +181,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                 }
             }
 
-            composable(route = Screen.HelpSupportScreen.route) {
+            composable(route = NavScreens.HelpSupportNavScreens.route) {
                 MainLayout(navController, currentRoute) { padding ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
@@ -192,7 +192,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                 }
             }
 
-            composable(route = Screen.ChangePasswordScreen.route) {
+            composable(route = NavScreens.ChangePasswordNavScreens.route) {
                 MainLayout(navController, currentRoute) { padding ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
@@ -202,7 +202,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                 }
             }
 
-            composable(route = Screen.ChangeEmailScreen.route) {
+            composable(route = NavScreens.ChangeEmailNavScreens.route) {
                 MainLayout(navController, currentRoute) { padding ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
@@ -213,7 +213,7 @@ fun Navigation(modifier: Modifier = Modifier) {
             }
 
             composable(
-                route = Screen.IssueEditScreen.route,
+                route = NavScreens.IssueEditNavScreens.route,
                 arguments = listOf(
                     navArgument("projectId") { type = NavType.StringType },
                     navArgument("issueId"  ) { type = NavType.StringType }
@@ -262,7 +262,7 @@ fun Navigation(modifier: Modifier = Modifier) {
             }
 
             composable(
-                route = Screen.IssueCreationScreen.route,
+                route = NavScreens.IssueCreationNavScreens.route,
                 arguments = listOf(navArgument("projectId") { type = NavType.StringType }
                 )
             ) { backStack ->
@@ -281,7 +281,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                 }
             }
 
-            composable(route = Screen.ProjectCreationScreen.route) {
+            composable(route = NavScreens.ProjectCreationNavScreens.route) {
                 MainLayout(navController, currentRoute) { padding ->
                     Box(modifier = Modifier
                         .fillMaxWidth()
@@ -292,7 +292,7 @@ fun Navigation(modifier: Modifier = Modifier) {
             }
 
             composable(
-                route = Screen.IssueScreen.route,
+                route = NavScreens.IssueNavScreens.route,
                 arguments = listOf(
                     navArgument("projectName") { type = NavType.StringType },
                     navArgument("projectId"  ) { type = NavType.StringType }
@@ -322,7 +322,7 @@ fun Navigation(modifier: Modifier = Modifier) {
             }
 
             composable(
-                route = Screen.ViewIssueScreen.route,
+                route = NavScreens.ViewIssueNavScreens.route,
                 arguments = listOf(
                     navArgument("viewID")   { type = NavType.StringType },
                     navArgument("projID")   { type = NavType.StringType }

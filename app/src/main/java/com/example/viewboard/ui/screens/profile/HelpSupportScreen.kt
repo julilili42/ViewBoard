@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import com.example.viewboard.components.profile.SectionCard
-import com.example.viewboard.ui.navigation.BackButton
+import com.example.viewboard.ui.navigation.utils.BackButton
 
 @Composable
 fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavController) {

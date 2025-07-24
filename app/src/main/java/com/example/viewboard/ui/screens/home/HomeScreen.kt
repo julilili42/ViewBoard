@@ -19,9 +19,9 @@ import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
 import com.example.viewboard.components.homeScreen.ProgressCard
-import com.example.viewboard.components.homeScreen.ProjectGrid
-import com.example.viewboard.ui.navigation.Screen
-import com.example.viewboard.components.homeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.project.ProjectGrid
+import com.example.viewboard.ui.navigation.NavScreens
+import com.example.viewboard.components.homeScreen.profile.ProfileHeader
 import com.example.viewboard.stateholder.IssueViewModel
 import com.example.viewboard.stateholder.MainViewModel
 import com.example.viewboard.stateholder.ViewsViewModel
@@ -90,7 +90,7 @@ fun HomeScreen(
                     projects = activeProjects,
                     title = stringResource(R.string.ActiveProjects)
                 ) { projectName ->
-                    navController.navigate(Screen.ProjectScreen.createRoute(projectName))
+                    navController.navigate(NavScreens.ProjectNavScreens.createRoute(projectName))
                 }
                 Spacer(Modifier.height(24.dp))
 

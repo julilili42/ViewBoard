@@ -8,8 +8,8 @@ import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.IssueProgress
 import com.example.viewboard.backend.dataLayout.ViewLayout
-import com.example.viewboard.components.homeScreen.IssueProgressCalculator
-import com.example.viewboard.components.homeScreen.next
+import com.example.viewboard.components.homeScreen.issueProgress.IssueProgressCalculator
+import com.example.viewboard.components.homeScreen.issueProgress.next
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.navigation
+package com.example.viewboard.ui.navigation.utils
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable

@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
 import com.example.viewboard.backend.dataLayout.IssueProgress
 import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.components.homeScreen.IssueProgressCalculator
+import com.example.viewboard.components.homeScreen.issueProgress.IssueProgressCalculator
 import com.example.viewboard.ui.utils.gradientColorList
 
 @Composable

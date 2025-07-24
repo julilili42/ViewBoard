@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
+import com.example.viewboard.components.homeScreen.issueProgress.next
 import kotlin.math.roundToInt
 
 private enum class Period(val label: String, val short: String) {

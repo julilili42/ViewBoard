@@ -16,8 +16,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
-import com.example.viewboard.components.homeScreen.ProjectCardTasks
-import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.components.homeScreen.project.ProjectCardTasks
+import com.example.viewboard.ui.navigation.NavScreens
 
 /**
  * Screen displaying "My Tasks" with a sort button and fade-edge effect.
@@ -74,7 +74,7 @@ fun MyTasksScreen(
                                 issueName = it.title,
                                 projectId= it.projID,
                                 dueDate = it.deadlineTS,
-                                onClick = {navController.navigate(Screen.IssueScreen.createRoute(
+                                onClick = {navController.navigate(NavScreens.IssueNavScreens.createRoute(
                                     projectName,
                                     cleanId),)
                                 },

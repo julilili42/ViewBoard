@@ -1,4 +1,4 @@
-package com.example.viewboard.components.homeScreen
+package com.example.viewboard.components.homeScreen.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border

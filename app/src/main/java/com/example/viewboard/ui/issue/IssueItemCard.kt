@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
 import colorFromCode
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
-import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.ui.navigation.NavScreens
 import kotlinx.coroutines.launch
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -112,7 +112,7 @@ fun IssueItemCard(
                             onClick = {
                                 expandedOptions  = false
                                 navController.navigate(
-                                    Screen.IssueEditScreen.createRoute(projectId.trim('{','}'),"", issueId)
+                                    NavScreens.IssueEditNavScreens.createRoute(projectId.trim('{','}'),"", issueId)
                                 )
 
                             }

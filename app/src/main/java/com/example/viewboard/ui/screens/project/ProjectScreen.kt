@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.res.stringResource
 import com.example.viewboard.R
-import com.example.viewboard.components.homeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.profile.ProfileHeader
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.layout.Row
@@ -31,7 +31,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.ui.navigation.NavScreens
 import com.example.viewboard.ui.utils.CustomSearchField
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.runtime.collectAsState
@@ -91,7 +91,7 @@ fun ProjectsScreen(
                         .padding(16.dp)
                         .clip(CircleShape),
                     onClick = {
-                        navController.navigate(Screen.ProjectCreationScreen.route)
+                        navController.navigate(NavScreens.ProjectCreationNavScreens.route)
                     }
                 )
             }
@@ -144,7 +144,7 @@ fun ProjectsScreen(
                     navController = navController,
                     onClick = {
                         navController.navigate(
-                            Screen.IssueScreen.createRoute(project.name, project.id)
+                            NavScreens.IssueNavScreens.createRoute(project.name, project.id)
                         )
                     },
                     editable = editable

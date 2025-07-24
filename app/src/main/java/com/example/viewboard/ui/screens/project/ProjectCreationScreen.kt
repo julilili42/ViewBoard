@@ -31,7 +31,7 @@ import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import com.example.viewboard.ui.navigation.ChipInputField
+import com.example.viewboard.ui.navigation.utils.ChipInputField
 import com.example.viewboard.ui.utils.capitalizeWords
 
 @SuppressLint("UnrememberedMutableState")

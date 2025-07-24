@@ -23,7 +23,7 @@ import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.ui.navigation.ChipInputField
+import com.example.viewboard.ui.navigation.utils.ChipInputField
 import com.example.viewboard.ui.theme.uiColor
 import com.example.viewboard.ui.utils.capitalizeWords
 import java.text.SimpleDateFormat

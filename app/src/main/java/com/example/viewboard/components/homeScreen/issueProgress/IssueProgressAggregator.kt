@@ -1,4 +1,4 @@
-package com.example.viewboard.components.homeScreen
+package com.example.viewboard.components.homeScreen.issueProgress
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.IssueState
 import com.google.firebase.firestore.DocumentChange

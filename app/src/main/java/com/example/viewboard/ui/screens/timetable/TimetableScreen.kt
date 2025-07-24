@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.example.viewboard.components.homeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.profile.ProfileHeader
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

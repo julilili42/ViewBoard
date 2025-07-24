@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import java.util.Locale
 import colorFromCode
 import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.components.homeScreen.IssueProgressCalculator
+import com.example.viewboard.components.homeScreen.issueProgress.IssueProgressCalculator
 import generateProjectCodeFromDbId
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

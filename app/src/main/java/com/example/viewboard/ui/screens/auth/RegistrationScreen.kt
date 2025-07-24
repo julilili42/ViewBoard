@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.viewboard.R
-import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.ui.navigation.NavScreens
 import com.example.viewboard.ui.theme.Black
 import com.example.viewboard.ui.theme.BlueGray
 import com.example.viewboard.ui.theme.Roboto
@@ -151,7 +151,7 @@ fun RegisterSection(navController: NavController, modifier: Modifier = Modifier)
                     onSuccess = {
                         Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT)
                             .show()
-                        navController.navigate(Screen.HomeScreen.route)
+                        navController.navigate(NavScreens.HomeNavScreens.route)
                     },
                     onError = { msg ->
                         Toast.makeText(context, "Error: $msg", Toast.LENGTH_SHORT).show()
@@ -222,7 +222,7 @@ fun RegisterLoginSection(navController: NavController, modifier: Modifier = Modi
             .fillMaxWidth()
             .wrapContentWidth(Alignment.CenterHorizontally)
             .padding(bottom = 24.dp)
-            .clickable(onClick = { navController.navigate(Screen.LoginScreen.route) })
+            .clickable(onClick = { navController.navigate(NavScreens.LoginNavScreens.route) })
         ,
         text = annotatedText
     )

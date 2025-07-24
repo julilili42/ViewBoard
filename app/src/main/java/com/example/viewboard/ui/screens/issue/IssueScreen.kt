@@ -29,11 +29,11 @@ import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.IssueState
 import com.example.viewboard.backend.dataLayout.SortOptionsIssues
-import com.example.viewboard.components.homeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.profile.ProfileHeader
 import com.example.viewboard.ui.issue.IssueItemCard
 import com.example.viewboard.stateholder.IssueViewModel
 import com.example.viewboard.ui.navigation.BottomBarScreen
-import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.ui.navigation.NavScreens
 import com.example.viewboard.ui.utils.CustomSearchField
 import com.example.viewboard.ui.timetable.CustomIcon
 import com.example.viewboard.ui.utils.IssueSortMenuSimple
@@ -88,7 +88,7 @@ fun IssueScreen(
                     .offset(y = 40.dp)
                     .padding(16.dp)
                     .clip(CircleShape),
-                onClick       = { navController.navigate(Screen.IssueCreationScreen.createRoute(projectName,projectId)) }
+                onClick       = { navController.navigate(NavScreens.IssueCreationNavScreens.createRoute(projectName,projectId)) }
             )
         }
     ) { paddingValues ->

@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.navigation.NavController
 import com.example.viewboard.backend.auth.abstraction.AuthServerAPI
 import com.example.viewboard.backend.dataLayout.UserLayout
-import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.ui.navigation.NavScreens
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FieldPath
@@ -204,7 +204,7 @@ object AuthAPI : AuthServerAPI() {
             .signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    navController.navigate(Screen.HomeScreen.route)
+                    navController.navigate(NavScreens.HomeNavScreens.route)
                     Toast.makeText(context, "Welcome!", Toast.LENGTH_SHORT).show()
                     fetchAndSaveFcmToken()
                 } else {
@@ -314,7 +314,7 @@ object AuthAPI : AuthServerAPI() {
     override fun logout(navController: NavController) {
         FirebaseProvider.auth.signOut()
 
-        navController.navigate(Screen.LoginScreen.route) {
+        navController.navigate(NavScreens.LoginNavScreens.route) {
             popUpTo(navController.graph.id) { inclusive = true }
         }
     }

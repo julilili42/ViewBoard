@@ -1,4 +1,4 @@
-package com.example.viewboard.components.homeScreen
+package com.example.viewboard.components.homeScreen.profile
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.ui.navigation.BackButton
+import com.example.viewboard.ui.navigation.utils.BackButton
 
 @Composable
 fun ProfileHeader(

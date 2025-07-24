@@ -1,4 +1,4 @@
-package com.example.viewboard.components.homeScreen
+package com.example.viewboard.components.homeScreen.issueProgress
 
 import android.util.Log
 import com.example.viewboard.backend.auth.impl.AuthAPI

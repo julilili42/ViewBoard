@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
-import com.example.viewboard.ui.navigation.ChipInputField
+import com.example.viewboard.ui.navigation.utils.ChipInputField
 import com.example.viewboard.ui.utils.capitalizeWords
 
 @SuppressLint("UnrememberedMutableState")

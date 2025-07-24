@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.viewboard.R
-import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.ui.navigation.NavScreens
 import com.example.viewboard.ui.theme.Black
 import com.example.viewboard.ui.theme.BlueGray
 import com.example.viewboard.ui.theme.Roboto
@@ -148,7 +148,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
                             "Willkommen ${authResult.result.user?.displayName}",
                             Toast.LENGTH_SHORT
                         ).show()
-                        navController.navigate(Screen.HomeScreen.route)
+                        navController.navigate(NavScreens.HomeNavScreens.route)
                     } else {
                         Toast.makeText(context, "Fehlgeschlagen", Toast.LENGTH_SHORT).show()
                     }
@@ -279,7 +279,7 @@ fun LoginRegisterSection(modifier: Modifier = Modifier, navController: NavContro
                 .fillMaxWidth()
                 .wrapContentWidth(Alignment.CenterHorizontally)
                 .padding(bottom = 24.dp)
-                .clickable(onClick = { navController.navigate(Screen.RegistrationScreen.route) }),
+                .clickable(onClick = { navController.navigate(NavScreens.RegistrationNavScreens.route) }),
             text = annotatedText
         )
     }

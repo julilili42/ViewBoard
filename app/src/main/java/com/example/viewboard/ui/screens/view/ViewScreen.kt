@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.res.stringResource
 import com.example.viewboard.R
-import com.example.viewboard.components.homeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.profile.ProfileHeader
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.shape.CircleShape
@@ -43,7 +43,7 @@ import androidx.compose.foundation.lazy.grid.items
 import com.example.viewboard.stateholder.IssueViewModel
 import com.example.viewboard.stateholder.ProjectViewModel
 import com.example.viewboard.stateholder.ViewsViewModel
-import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.ui.navigation.NavScreens
 import com.example.viewboard.ui.utils.CustomSearchField
 import com.example.viewboard.ui.utils.ViewSortMenuSimple
 import com.example.viewboard.ui.views.EdgeToEdgeRoundedRightItemWithBadge
@@ -148,7 +148,7 @@ fun ViewScreen(
                     color = Color.Gray,
                     onClick = {
                         navController.navigate(
-                            Screen.ViewIssueScreen.createRoute(view.id, "", view.name)
+                            NavScreens.ViewIssueNavScreens.createRoute(view.id, "", view.name)
                         )
                     },
                     onDelete = { viewId ->

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.components.homeScreen.ProfileHeader
+import com.example.viewboard.components.homeScreen.profile.ProfileHeader
 import com.example.viewboard.ui.issue.IssueItemCard
 import com.example.viewboard.stateholder.IssueViewModel
 import com.example.viewboard.stateholder.ProjectViewModel

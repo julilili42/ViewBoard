@@ -32,8 +32,8 @@ import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
-import com.example.viewboard.components.homeScreen.ProfilePicture
-import com.example.viewboard.ui.navigation.Screen
+import com.example.viewboard.components.homeScreen.profile.ProfilePicture
+import com.example.viewboard.ui.navigation.NavScreens
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.example.viewboard.components.profile.SectionCard
@@ -141,11 +141,11 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                 SectionCard(title = "Account") {
                     MenuItem(
                         text = "Change E-Mail",
-                        onClick = { navController.navigate(Screen.ChangeEmailScreen.route) })
+                        onClick = { navController.navigate(NavScreens.ChangeEmailNavScreens.route) })
                     Divider()
                     MenuItem(
                         text = "Change Password",
-                        onClick = { navController.navigate(Screen.ChangePasswordScreen.route) })
+                        onClick = { navController.navigate(NavScreens.ChangePasswordNavScreens.route) })
                 }
                 Spacer(modifier = Modifier.size(24.dp))
             }
@@ -159,7 +159,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                     Divider()
                     MenuItem(
                         text = "Help & Support",
-                        onClick = { navController.navigate(Screen.HelpSupportScreen.route) })
+                        onClick = { navController.navigate(NavScreens.HelpSupportNavScreens.route) })
                 }
             }
         }

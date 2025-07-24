@@ -1,4 +1,4 @@
-package com.example.viewboard.components.homeScreen
+package com.example.viewboard.components.homeScreen.project
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
