@@ -1,4 +1,4 @@
-package com.example.viewboard.backend.dataLayout
+package com.example.viewboard.backend.data
 
 import com.google.firebase.firestore.DocumentId
 import com.example.viewboard.backend.util.Timestamp

@@ -1,46 +1,27 @@
 package com.example.viewboard.components.view
 
 import OptionsMenuButton
-import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
-import java.time.Month
-import java.time.format.TextStyle
-import java.util.Locale
-import coil.compose.AsyncImage
 import colorFromCode
-import com.example.viewboard.backend.util.Timestamp
-import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.dataLayout.IssueState
-import com.example.viewboard.backend.dataLayout.ViewLayout
-import com.example.viewboard.backend.util.filterIssuesByStates
+import com.example.viewboard.backend.data.ViewLayout
 import generateProjectCodeFromDbId
-import kotlinx.coroutines.flow.Flow
 
 /**
  * @param name is the view name
@@ -55,7 +36,7 @@ fun ViewItem(
     creator: String,
     color: Color,
     onClick: () -> Unit,
-    onDelete: (String) -> Unit // <-- hinzufügen
+    onDelete: (String) -> Unit
 
 ) {
     val viewNameCode = generateProjectCodeFromDbId(view.name)
@@ -83,7 +64,6 @@ fun ViewItem(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Options‑Button oben rechts
             OptionsMenuButton(
                 options = listOf(
                     "Delete" to { Log.d("ViewItem", "Delete clicked for ${view.id}")
@@ -93,7 +73,6 @@ fun ViewItem(
                 icon = Icons.Default.MoreVert
             )
 
-            // Inhalt: Name zentriert
             Column(
                 modifier = Modifier
                     .fillMaxSize()

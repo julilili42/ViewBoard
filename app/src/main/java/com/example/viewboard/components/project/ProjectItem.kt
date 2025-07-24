@@ -33,35 +33,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 import colorFromCode
-import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.components.homeScreen.IssueProgress
+import com.example.viewboard.backend.data.ProjectLayout
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
-import com.example.viewboard.components.homeScreen.TimeSpanFilter
 import generateProjectCodeFromDbId
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.navigation.NavController
+import com.example.viewboard.backend.data.IssueDeadlineFilter
+import com.example.viewboard.backend.data.IssueProgress
 
 
-/**
- * Ein Project-Item mit Gradient-Hintergrund, Pill-Phase, Titel, Zeitraum,
- * Fortschrittsbalken und unten links überlappenden Avataren.
- *
- * @param name                Projektname
- * @param phase               Kürzel (z.B. "#A23")
- * @param startMonth          Startmonat (1–12)
- * @param endMonth            Endmonat (1–12)
- * @param color               Basisfarbe für den Hintergrund‐Gradient
- * @param totalMilestones     Gesamtzahl der Meilensteine
- * @param completedMilestones Bereits abgeschlossene Meilensteine
- * @param avatarUris          Liste von URIs zu lokalen Profilbildern
- * @param onClick             Callback bei Klick auf die gesamte Card
- */
 
 @Composable
 fun ProjectItem(
     project: ProjectLayout,
-    color: Color=Color.White,
+    color: Color = Color.White,
     calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },
     avatarUris: List<Uri>,
     editable: Boolean = true,
@@ -69,25 +55,22 @@ fun ProjectItem(
     onClick: () -> Unit
 ) {
     val progress by produceState<IssueProgress>(
-        initialValue = IssueProgress(0,0,0f),
+        initialValue = IssueProgress(0, 0, 0f),
         key1 = project.id,
-        key2 = TimeSpanFilter.ALL_TIME
+        key2 = IssueDeadlineFilter.ALL_TIME
     ) {
         calculator
-            .getProjectProgressFlow(project.id, TimeSpanFilter.ALL_TIME)
+            .getProjectProgressFlow(project.id, IssueDeadlineFilter.ALL_TIME)
             .collect { value = it }
     }
 
     val start = project.startTS
-    val end   = project.deadlineTS
-    val startLabel = labelFromIsoDate(start) // z. B. "Jan 25"
-    val endLabel   = labelFromIsoDate(end)   // z. B. "Dez 25"
+    val end = project.deadlineTS
+    val startLabel = labelFromIsoDate(start)
+    val endLabel = labelFromIsoDate(end)
     val projectNameCode = generateProjectCodeFromDbId(project.id)
     val projectNamecolor = colorFromCode(projectNameCode)
-// Avatare: maximal 3 anzeigen
-    val showCount     = avatarUris.size.coerceAtMost(3)
-    val avatarSize    = 18.dp
-    val avatarOverlap = 12.dp
+    val avatarSize = 18.dp
 
 
     Card(
@@ -101,7 +84,12 @@ fun ProjectItem(
         Box(
             Modifier
                 .background(
-                    brush = Brush.linearGradient(listOf(projectNamecolor, projectNamecolor.copy(alpha = 0.6f))),
+                    brush = Brush.linearGradient(
+                        listOf(
+                            projectNamecolor,
+                            projectNamecolor.copy(alpha = 0.6f)
+                        )
+                    ),
                     shape = RoundedCornerShape(16.dp)
                 )
                 .fillMaxSize()
@@ -135,8 +123,8 @@ fun ProjectItem(
                                     scope.launch {
                                         FirebaseAPI.rmProject(
                                             id = project.id,
-                                            onSuccess = { /* Optional: Liste refreshen oder zurück navigieren */ },
-                                            onFailure = { /* Fehlerbehandlung */ }
+                                            onSuccess = { /* TODO */ },
+                                            onFailure = { /* TODO */ }
                                         )
                                     }
                                     showConfirmDialog = false
@@ -153,20 +141,19 @@ fun ProjectItem(
                             text = { Text("Do you really want to delete the project?") }
                         )
                     }
-if(editable) {
-    OptionsMenuButton(
-        options = listOf(
-            "Edit" to {
-                navController.navigate("project/edit/${project.id}")
-            },
-            "Delete" to {
-                showConfirmDialog = true
-            }
-        ),
-        modifier = Modifier
-    )
-}
-
+                    if (editable) {
+                        OptionsMenuButton(
+                            options = listOf(
+                                "Edit" to {
+                                    navController.navigate("project/edit/${project.id}")
+                                },
+                                "Delete" to {
+                                    showConfirmDialog = true
+                                }
+                            ),
+                            modifier = Modifier
+                        )
+                    }
                 }
                 Text(
                     text = "$startLabel – $endLabel",
@@ -188,8 +175,6 @@ if(editable) {
                         .height(avatarSize),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Avatar-Stack (überlappend)
-
 
 
                     Icon(
@@ -206,7 +191,7 @@ if(editable) {
 
                     Spacer(Modifier.weight(1f))
                     LinearProgressIndicator(
-                        progress =progress.completedIssues.toFloat()/ progress.totalIssues.toFloat(),
+                        progress = progress.completedIssues.toFloat() / progress.totalIssues.toFloat(),
                         modifier = Modifier
                             .width(80.dp)
                             .height(8.dp),

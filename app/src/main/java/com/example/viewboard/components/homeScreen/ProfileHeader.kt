@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.components.ProfilePicture
 import com.example.viewboard.ui.navigation.BackButton
 import com.example.viewboard.ui.navigation.hasSoftNavigationBar
 
@@ -24,16 +23,12 @@ fun ProfileHeader(
     onProfileClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    val usesSoftNav = hasSoftNavigationBar()
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Profilbild
-
         ProfilePicture(
             painter = painterResource(id = R.drawable.logotest),
             contentDescription = "Profilbild Raoul",
@@ -44,7 +39,6 @@ fun ProfileHeader(
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        // Name + Untertitel
         Column {
             Text(
                 text = AuthAPI.getCurrentDisplayName() ?: "failed to load username",
@@ -60,7 +54,6 @@ fun ProfileHeader(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Zeige BackButton ganz rechts nur, wenn Soft-Navigation aktiv ist
         if (showBackButton) {
             BackButton(
                 text = "Back",

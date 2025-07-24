@@ -2,20 +2,13 @@ package com.example.viewboard.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -24,12 +17,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.components.homeScreen.CustomDropdownMenu
+import com.example.viewboard.backend.data.IssueDeadlineFilter
 import com.example.viewboard.components.homeScreen.ProgressCard
 import com.example.viewboard.components.homeScreen.ProjectGrid
 import com.example.viewboard.ui.navigation.Screen
 import com.example.viewboard.components.homeScreen.ProfileHeader
-import com.example.viewboard.components.homeScreen.TimeSpanFilter
 import com.example.viewboard.stateholder.IssueViewModel
 import com.example.viewboard.stateholder.MainViewModel
 import com.example.viewboard.stateholder.ViewsViewModel
@@ -52,7 +44,7 @@ fun HomeScreen(
     var screenHeightPx by remember { mutableStateOf(0) }
     val density = LocalDensity.current
     val span by viewModel.timeSpan.collectAsState(
-        initial = TimeSpanFilter.CURRENT_MONTH
+        initial = IssueDeadlineFilter.CURRENT_MONTH
     )
     val contactHeight = 300.dp
     val topBlockHeightPx = with(density) { contactHeight.toPx() }

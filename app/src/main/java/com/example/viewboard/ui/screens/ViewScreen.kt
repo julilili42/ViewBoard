@@ -37,7 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.dataLayout.ViewLayout
+import com.example.viewboard.backend.data.ViewLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.components.view.ViewItem
 import androidx.compose.foundation.lazy.grid.items

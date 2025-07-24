@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.components.homeScreen.TimeSpanFilter
+import com.example.viewboard.backend.data.IssueDeadlineFilter
+import com.example.viewboard.backend.data.IssueLayout
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
@@ -101,7 +101,7 @@ fun gradientColorList(
 ): List<Color> {
     require(steps > 0) { "steps must be > 0" }
     return List(steps + 1) { i ->
-        val fraction = i / steps.toFloat()      // 0f .. 1f
+        val fraction = i / steps.toFloat()
         lerp(startColor, endColor, fraction)
     }
 }
@@ -123,9 +123,9 @@ fun dayOfYearFromIso(
     return adjusted.dayOfYear
 }
 
-fun TimeSpanFilter.next(): TimeSpanFilter = when (this) {
-    TimeSpanFilter.CURRENT_YEAR  -> TimeSpanFilter.CURRENT_MONTH
-    TimeSpanFilter.CURRENT_MONTH -> TimeSpanFilter.CURRENT_WEEK
-    TimeSpanFilter.CURRENT_WEEK  -> TimeSpanFilter.CURRENT_YEAR
-    TimeSpanFilter.ALL_TIME -> TimeSpanFilter.ALL_TIME
+fun IssueDeadlineFilter.next(): IssueDeadlineFilter = when (this) {
+    IssueDeadlineFilter.CURRENT_YEAR  -> IssueDeadlineFilter.CURRENT_MONTH
+    IssueDeadlineFilter.CURRENT_MONTH -> IssueDeadlineFilter.CURRENT_WEEK
+    IssueDeadlineFilter.CURRENT_WEEK  -> IssueDeadlineFilter.CURRENT_YEAR
+    IssueDeadlineFilter.ALL_TIME -> IssueDeadlineFilter.ALL_TIME
 }

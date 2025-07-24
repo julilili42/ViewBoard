@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.viewboard.R
-import com.example.viewboard.dataclass.SortOptionsIssues
+import com.example.viewboard.backend.data.SortOptionsIssues
 import com.example.viewboard.stateholder.IssueViewModel
 import com.example.viewboard.stateholder.IssueViewModel.SortField
 import com.example.viewboard.stateholder.IssueViewModel.SortOrder

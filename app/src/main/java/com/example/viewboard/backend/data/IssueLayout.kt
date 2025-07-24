@@ -1,7 +1,8 @@
-package com.example.viewboard.backend.dataLayout
+package com.example.viewboard.backend.data
 
 import com.google.firebase.firestore.DocumentId
 import com.example.viewboard.backend.util.Timestamp
+import com.example.viewboard.stateholder.IssueViewModel
 
 /**
  * Current progress state of an issue
@@ -15,6 +16,27 @@ enum class IssueState {
     ONGOING,
     DONE
 }
+
+// issue progress tracking
+data class IssueProgress(
+    val totalIssues: Int,
+    val completedIssues: Int,
+    val percentComplete: Float
+)
+
+// filter for issue deadline time spans
+enum class IssueDeadlineFilter(val label: String, val short: String) {
+    ALL_TIME("All time", "A"),
+    CURRENT_YEAR("Yearly", "Y"),
+    CURRENT_MONTH("Monthly", "M"),
+    CURRENT_WEEK("Weekly", "W"),
+}
+
+// options for sorting
+data class SortOptionsIssues(
+    val label: String,
+    val field: IssueViewModel.SortField
+)
 
 /**
  * @property id the id of the project
