@@ -13,8 +13,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
-import com.example.viewboard.ui.issue.IssueViewModel
-import com.example.viewboard.ui.issue.MainViewModel
+import com.example.viewboard.stateholder.IssueViewModel
 
 internal val LocalDragTargetInfo = compositionLocalOf { DragTargetInfo() }
 

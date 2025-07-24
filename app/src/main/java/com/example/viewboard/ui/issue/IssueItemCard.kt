@@ -27,35 +27,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import androidx.compose.ui.res.painterResource
 import com.example.viewboard.R
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import colorFromCode
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
-import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.navigation.Screen
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.util.Locale
-import androidx.compose.foundation.clickable
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.unit.sp
 import colorFromEmail
-import com.example.viewboard.backend.auth.impl.AuthAPI
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.ZonedDateTime
+import com.example.viewboard.ui.utils.emailToInitials
+import com.example.viewboard.ui.utils.formatGermanShortDate
+import com.example.viewboard.ui.utils.formatRemaining
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -263,7 +251,6 @@ fun IssueItemCard(
                                 .width(200.dp)
                                 .background(Color.White)
                         ) {
-                            // Horizontal scrollbare Leiste mit allen Avataren
                             Row(
                                 modifier = Modifier
                                     .horizontalScroll(rememberScrollState())
@@ -312,72 +299,5 @@ fun AvatarInitialBox(email: String, avatarSize: Dp) {
             )
         }
     }
-}
-fun formatGermanShortDate(input: String): String {
-    // 1) Nur den Datums‑Teil nehmen (vor 'T' oder Leerzeichen)
-    val datePart = input
-        .substringBefore('T')
-        .substringBefore(' ')
-        .trim()
-
-    // 2) In LocalDate parsen
-    val date = LocalDate.parse(datePart)  // wirft bei ungültigem Format
-
-    // 3) Formatter für "DD. MMM yy" in Deutsch
-    val formatter = DateTimeFormatter.ofPattern("dd. MMM yy", Locale.GERMAN)
-
-    // 4) Formatiertes Ergebnis zurückliefern
-    return date.format(formatter)
-}
-
-fun formatRemaining(isoTimestamp: String): String {
-    // 1) Parse das Instant in UTC und addiere 2 Stunden
-    val instantUtc = Instant.parse(isoTimestamp).plus(1, ChronoUnit.HOURS)
-
-    val now = Instant.now()
-    if (instantUtc.isBefore(now)) {
-        return "expired"
-    }
-
-    // 2) Berechne die Dauer zwischen jetzt und dem korrigierten Zeitpunkt
-    val duration = Duration.between(now, instantUtc)
-
-    return if (duration.toHours() < 24) {
-        val hours = duration.toHours().toInt().coerceAtLeast(0)
-        when (hours) {
-            0    -> "expired"
-            1    -> "1 hour"
-            else -> "$hours hours"
-        }
-    } else {
-        val days = duration.toDays().toInt()
-        when (days) {
-            0    -> "expired"
-            1    -> "1 day"
-            else -> "$days days"
-        }
-    }
-}
-
-fun emailToInitials(email: String): String {
-    // 1) Lokalen Teil vor '@' extrahieren
-    val local = email.substringBefore('@', "").lowercase()
-
-    // 2) Auftrenner definieren und splitten (explizites ignoreCase nötig)
-    val separators = arrayOf(".", "_", "-")
-    val parts = local.split(
-        *separators,
-        ignoreCase = true   // jetzt passt die Signatur vararg String + Boolean
-    ).filter { it.isNotBlank() }
-
-    // 3) Initialen bestimmen wie gehabt
-    val initials = when {
-        parts.size >= 2 -> "${parts[0][0]}${parts[1][0]}"
-        local.length >= 2 -> "${local[0]}${local[1]}"
-        local.length == 1 -> "${local[0]}"
-        else -> "??"
-    }
-
-    return initials.uppercase()
 }
 

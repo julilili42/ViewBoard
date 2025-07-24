@@ -1,9 +1,6 @@
 package com.example.viewboard.ui.screens
 
-import android.net.Uri
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,39 +22,23 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import com.example.viewboard.components.project.ProjectItem
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.timetable.CustomIcon
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.Screen
-import com.example.viewboard.ui.project.CustomSearchField
-import kotlinx.coroutines.flow.map
+import com.example.viewboard.ui.utils.CustomSearchField
 
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.runtime.collectAsState
-import com.example.viewboard.ui.issue.ProjectViewModel
-import com.example.viewboard.ui.timetable.CustomIconMenu
-import com.example.viewboard.ui.timetable.ProjectSortMenu
-import com.example.viewboard.ui.timetable.ProjectSortMenuSimple
-import com.example.viewboard.ui.timetable.SortOptions
-import generateProjectCodeFromDbId
-
-
-/**
- * Beispiel-Liste von Projekten für Preview und Tests.
- */
+import com.example.viewboard.stateholder.ProjectViewModel
+import com.example.viewboard.ui.utils.ProjectSortMenuSimple
+import com.example.viewboard.ui.views.EdgeToEdgeRoundedRightItemWithBadge
 
 object AppColors {
     // Deine Basisfarben
@@ -86,20 +67,11 @@ object AppColors {
     )
 }
 
-/**
- * Zeigt eine anpassbare Grid-Liste von Projekten.
- *
- * @param navController Navigation-Controller für Klicks
- * @param projects      Liste der Projekte
- * @param columns       Anzahl der Spalten im Grid (z. B. 1, 2, 3…)
- */
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen(
     navController: NavController,
     projectName: String,
-    @Suppress("UNUSED_PARAMETER")
     projectViewModel: ProjectViewModel,
     onSort: () -> Unit = {},
 ) {
@@ -110,18 +82,12 @@ fun ProjectsScreen(
         else      -> ProjectFilter.CREATED
     }
 
-    // Sobald filterMode sich ändert: Filter im ViewModel setzen und neu laden
     LaunchedEffect(filterMode) {
         projectViewModel.setFilter(filterMode)
     }
-
-    // Beobachte die gefilterten & gesuchten Projekte aus dem ViewModel
     val projects by projectViewModel.displayedProjects.collectAsState()
     val editable = filterMode == ProjectFilter.CREATED
-    // Lokaler State für die Such-Query
     val query by projectViewModel.query.collectAsState()
-    val currentField by projectViewModel.sortField.collectAsState()
-    val currentOrder by projectViewModel.sortOrder.collectAsState()
     val columns = 2
     Scaffold(
         topBar = {
@@ -198,8 +164,6 @@ fun ProjectsScreen(
                     }
                 }
             }
-
-            // Grid-Items für jedes Projekt
             itemsIndexed(projects) { index, project ->
                 ProjectItem(
                     project = project,

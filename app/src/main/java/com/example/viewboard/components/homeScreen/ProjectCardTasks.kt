@@ -42,30 +42,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import colorFromCode
 import com.example.viewboard.R
-import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.ui.issue.AvatarInitialBox
-import com.example.viewboard.ui.issue.formatGermanShortDate
-import com.example.viewboard.ui.issue.formatRemaining
+import com.example.viewboard.ui.utils.formatGermanShortDate
+import com.example.viewboard.ui.utils.formatRemaining
 
 @Composable
 fun ProjectCardTasks(
-    name: String,
+    issueName: String,
     projectId: String,
-    assignments: List<String>,
-    emailsState:List<String?>,
     dueDate: String,
     onClick: () -> Unit,
     onMenuClick: () -> Unit
 ) {
-    // Datum formatieren
     val dateLabel = formatGermanShortDate(dueDate)
     val issueDueTime = formatRemaining(dueDate)
-    val avatarSize = 18.dp
-    var expandedUser by remember { mutableStateOf(false) }
-    val scrollState = rememberScrollState()
-
-
     Card(
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -73,16 +62,13 @@ fun ProjectCardTasks(
             .fillMaxWidth()
             .height(70.dp)
             .clickable(onClick = onClick),
-
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .border(BorderStroke(1.dp, Color.Black.copy(alpha = 0.2f)), shape = MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.medium)
-
         ) {
-            // Hauptinhalt
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -122,9 +108,9 @@ fun ProjectCardTasks(
                                 .weight(1f)
                                 .padding(start = 8.dp)
                         ) {
-
-
-                            Text(text = name, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(text = issueName,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(modifier = Modifier.height(6.dp))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -154,66 +140,10 @@ fun ProjectCardTasks(
 
                         }
                     }
-
                     IconButton(onClick = onMenuClick) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More options", tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
-            }
-
-            // Avatare unten rechts einfügen
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(8.dp)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-                    ) { expandedUser = true }
-            ) {
-                val showCount = 3
-                val extraCount = (emailsState.size - showCount).coerceAtLeast(0)
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy((-avatarSize / 3)),
-                ) {
-                    emailsState.take(showCount).forEach { email ->
-                        email?.let { AvatarInitialBox(it, avatarSize) }
-                    }
-                    if (extraCount > 0) {
-                        Box(
-                            modifier = Modifier
-                                .size(avatarSize + 3.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.onSurfaceVariant),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "+$extraCount",
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    }
-                }
-
-                // Dropdown mit allen Avataren
-                androidx.compose.material3.DropdownMenu(
-                    expanded = expandedUser,
-                    onDismissRequest = { expandedUser = false },
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .width(200.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .horizontalScroll(scrollState)
-                            .padding(vertical = 4.dp, horizontal = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        emailsState.forEach { email ->
-                            email?.let { AvatarInitialBox(it, avatarSize) }
-                        }
+                        Icon(imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More options",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }

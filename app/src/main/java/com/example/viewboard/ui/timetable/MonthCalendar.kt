@@ -32,7 +32,7 @@ import java.util.Locale
 @Composable
 fun MonthCalendar(
     year: Int,
-    month: Int, // 1..12
+    month: Int,
     issues: List<OffsetDateTime> ,
     modifier: Modifier = Modifier,
     selectedDate: LocalDate? = null,
@@ -58,7 +58,6 @@ fun MonthCalendar(
     val suffixNeeded = totalCells - totalCellsSoFar
     val suffixDates = (1..suffixNeeded).map { nextMonth.atDay(it) }
 
-    // ✅ Beschränke auf maximal 35 Zellen (= 5 Wochen)
     val maxDateCells = 35
     val allDates = (prefixDates + monthDates + suffixDates).take(maxDateCells)
 
@@ -76,7 +75,6 @@ fun MonthCalendar(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         userScrollEnabled = false
     ) {
-        // Wochentags-Kopf
         items(weekdays) { wd ->
             Box(
                 modifier = Modifier
@@ -88,7 +86,6 @@ fun MonthCalendar(
             }
         }
 
-        // Maximal 35 Tage-Zellen
         items(allDates) { date ->
             val isCurrent = date.monthValue == safeMonth
             val issueCount = issues.count { it.toLocalDate()  == date }

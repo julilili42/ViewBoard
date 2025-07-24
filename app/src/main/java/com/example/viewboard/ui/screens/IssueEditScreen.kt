@@ -22,6 +22,7 @@ import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 import com.example.viewboard.ui.theme.uiColor
+import com.example.viewboard.ui.utils.capitalizeWords
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -38,13 +39,9 @@ fun IssueEditScreen(
     val uiColor = uiColor()
     val context = LocalContext.current
     val scroll = rememberScrollState()
-
-    // Initial states
     var title by remember { mutableStateOf(issue.title) }
     var desc by remember { mutableStateOf(issue.desc) }
     var assignments by remember { mutableStateOf(issue.assignments.toList()) }
-
-
 
     val calendar = remember {
         Calendar.getInstance().apply {

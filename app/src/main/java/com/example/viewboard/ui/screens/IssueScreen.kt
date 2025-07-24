@@ -1,20 +1,15 @@
 package com.example.viewboard.ui.screens
 
-import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,43 +21,40 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
-import androidx.compose.runtime.key
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.viewboard.R
+import com.example.viewboard.dataclass.SortOptionsIssues
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.IssueState
 import com.example.viewboard.components.homeScreen.ProfileHeader
 import com.example.viewboard.ui.issue.IssueItemCard
-import com.example.viewboard.ui.issue.IssueViewModel
-import com.example.viewboard.ui.issue.MainViewModel
-import com.example.viewboard.ui.issue.ProjectViewModel
+import com.example.viewboard.stateholder.IssueViewModel
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.navigation.Screen
-import com.example.viewboard.ui.project.CustomSearchField
+import com.example.viewboard.ui.utils.CustomSearchField
 import com.example.viewboard.ui.timetable.CustomIcon
-import com.example.viewboard.ui.timetable.IssueSortMenuSimple
-import com.example.viewboard.ui.timetable.SortOptions
-import com.example.viewboard.ui.timetable.SortOptions2
-import generateProjectCodeFromDbId
+import com.example.viewboard.ui.utils.IssueSortMenuSimple
+import com.example.viewboard.ui.views.EdgeToEdgeRoundedRightItemWithBadge
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IssueScreen(
-    mainViewModel: MainViewModel,
-    navController: NavController,
     projectName: String,
-    issueViewModel: IssueViewModel,
     projectId: String,
+    issueViewModel: IssueViewModel,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
-
-    var showOnlyMyIssues by rememberSaveable { mutableStateOf(true) }
     var selectedTab by rememberSaveable { mutableStateOf(0) }
-    // Lokaler State für die Such-Query
+    LaunchedEffect(selectedTab) {
+        val state = stateFromIndex(selectedTab)
+        issueViewModel.setFilter(state)
+        Log.d("IssueScreen", "Tab gewechselt: $selectedTab → setFilter($state)")
+    }
     val query by issueViewModel.query.collectAsState()
     val onlyMine by issueViewModel.showOnlyMyIssues.collectAsState()
     LaunchedEffect(projectId) {
@@ -70,20 +62,8 @@ fun IssueScreen(
     }
     val categories = listOf("New", "Ongoing", "Completed")
     var filterMode by remember { mutableStateOf<IssueState?>(null) }
-
-    LaunchedEffect(selectedTab) {
-        val state = stateFromIndex(selectedTab)
-        issueViewModel.setFilter(state)
-        Log.d("IssueScreen", "Tab gewechselt: $selectedTab → setFilter($state)")
-    }
-    //val displayed = issueViewModel.getItemsForCategory(stateFromIndex(selectedTab))
-    val displayed by issueViewModel.displayedIssues.collectAsState()
-    val email by issueViewModel.emailsByIssue.collectAsState()
-
-    /*val displayed = remember(baseList, query) {
-        if (query.isBlank()) baseList
-        else baseList.filter { it.title.contains(query, ignoreCase = true) }
-    }*/
+    val issues by issueViewModel.displayedIssues.collectAsState()
+    val email by issueViewModel.emailsForIssue.collectAsState()
 
     Scaffold(
         topBar = {
@@ -133,8 +113,8 @@ fun IssueScreen(
             }
             // 2) Search & filter row
             val sortOptions = listOf(
-                SortOptions2("Sort by Date", IssueViewModel.SortField.DATE),
-                SortOptions2("Sort by Name", IssueViewModel.SortField.NAME),
+                SortOptionsIssues("Sort by Date", IssueViewModel.SortField.DATE),
+                SortOptionsIssues("Sort by Name", IssueViewModel.SortField.NAME),
                 )
             item {
                 Row(
@@ -232,7 +212,7 @@ fun IssueScreen(
                 }
             }
             // 4) Issue list
-            items(displayed, key = { it.id }) { item ->
+            items(issues) { item ->
                 val mails: List<String?> = email[item.id].orEmpty()
                 DragTarget(
                     dataToDrop = item,

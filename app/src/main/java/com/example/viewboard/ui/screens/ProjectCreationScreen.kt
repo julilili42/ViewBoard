@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import com.example.viewboard.ui.navigation.ChipInputField
+import com.example.viewboard.ui.utils.capitalizeWords
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -44,7 +45,6 @@ fun ProjectCreationScreen(
 ) {
     val uiColor = uiColor()
     val scroll = rememberScrollState()
-
     var name by remember { mutableStateOf("") }
     var desc by remember { mutableStateOf("") }
     var startDate by remember { mutableStateOf("") }
@@ -74,7 +74,6 @@ fun ProjectCreationScreen(
             { _, y1, m1, d1 ->
                 calendar.set(y1, m1, d1)
                 startDate = formatter.format(calendar.time)
-                // nun Enddatum
                 DatePickerDialog(
                     context,
                     { _, y2, m2, d2 ->
@@ -158,8 +157,6 @@ fun ProjectCreationScreen(
             }
             Spacer(Modifier.height(24.dp))
 
-            val allNames = listOf("Alice", "Bob", "Charlie", "David")
-
             var newParticipant by remember { mutableStateOf("") }
 
             val filteredUsers = remember(newParticipant, users) {
@@ -169,7 +166,6 @@ fun ProjectCreationScreen(
                             user.email.contains(newParticipant, ignoreCase = true)
                 }
             }
-            val suggestionNames  = filteredUsers.map { it.name }
             val suggestionEmails = filteredUsers.map { it.email }
 
             val suggestionList = remember(newParticipant, assignments, suggestionEmails) {
@@ -177,9 +173,7 @@ fun ProjectCreationScreen(
                     emptyList()
                 } else {
                     suggestionEmails.filter { email ->
-                        // enthält eingegebene Zeichen
                         email.contains(newParticipant, ignoreCase = true)
-                                // und ist noch nicht in assignments
                                 && assignments.none { it.equals(email, ignoreCase = true) }
                     }
                 }
@@ -190,7 +184,7 @@ fun ProjectCreationScreen(
                 inhaltText = "Add team member…",
                 suggestions = suggestionList,
                 onSuggestionClick = { name ->
-                    // wenn Name ausgewählt wird, als Chip hinzufügen
+
                     if (name !in assignments) {
                         assignments = assignments + name
                     }

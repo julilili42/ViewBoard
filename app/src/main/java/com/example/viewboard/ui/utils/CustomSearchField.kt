@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.project
+package com.example.viewboard.ui.utils
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

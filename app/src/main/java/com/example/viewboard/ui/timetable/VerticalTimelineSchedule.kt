@@ -27,7 +27,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.viewboard.dataclass.Project
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -49,6 +48,9 @@ import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.components.homeScreen.IssueProgress
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
 import com.example.viewboard.components.homeScreen.TimeSpanFilter
+import com.example.viewboard.ui.utils.dayOfYearFromIso
+import com.example.viewboard.ui.utils.gradientColorList
+import com.example.viewboard.ui.utils.toDp
 import generateProjectCodeFromDbId
 import java.time.LocalDate
 import java.time.Year
@@ -67,7 +69,6 @@ fun VerticalTimelineSchedule(
         val scrollState      = rememberScrollState()
         val density          = LocalDensity.current
 
-        // Heute-Linie berechnen
         val today     = LocalDate.now()
         val todayInDays = dayOfYearFromIso(LocalDate.now().toString())
         val monthFrac = (today.dayOfMonth - 1) / today.lengthOfMonth().toFloat()
@@ -77,7 +78,6 @@ fun VerticalTimelineSchedule(
         val todayDp   = with(density) { todayPx.toDp() }
         Box(modifier = Modifier.fillMaxSize()) {
             Row(modifier = Modifier.fillMaxSize()) {
-                // 1) Feste Monats-Labels (nicht scrollbar)
                 Column(
                     modifier = Modifier
                         .width(80.dp)
@@ -154,7 +154,6 @@ fun VerticalTimelineSchedule(
                                     .padding(vertical = 4.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                // Phase‑Label für dieses eine Projekt
                                 ProjectLabel(
                                     name = projectNameCode,
                                     modifier = Modifier
@@ -167,8 +166,6 @@ fun VerticalTimelineSchedule(
                                 )
 
                                 Spacer(Modifier.height(8.dp))
-
-                                // Balken **nur** für dieses eine Projekt
                                 Box(
                                     modifier = Modifier
                                         .offset(y = startDp)
@@ -200,8 +197,6 @@ fun VerticalTimelineSchedule(
                     }
                 }
             }
-
-            // Scroll-Indikator
             val progress = if (scrollState.maxValue > 0)
                 scrollState.value.toFloat() / scrollState.maxValue else 0f
 
@@ -223,157 +218,6 @@ fun VerticalTimelineSchedule(
     }
 }
 
-// VerticalMilestoneBar und ProjectLabel bleiben unverändert
 
 
 
-// VerticalMilestoneBar bleibt unverändert
-@Composable
-fun VerticalMilestoneBar(
-    project: ProjectLayout,
-    timeSpan: TimeSpanFilter,
-    total: Int=4,
-    calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },
-    colors: List<Color>,
-    modifier: Modifier = Modifier,
-    width: Dp = 8.dp,
-    spacing: Dp = 2.dp,
-    corner: Dp = 4.dp
-) {
-    val brush = gradientColorList(colors.first(), colors.last(), total)
-    val progress by produceState<IssueProgress>(
-        initialValue = IssueProgress(0,0,0f),
-        key1 = project.id,
-        key2 = timeSpan
-    ) {
-        calculator
-            .getProjectProgressFlow(project.id, timeSpan)
-            .collect { value = it }
-    }
-
-    Column(
-        modifier = modifier.width(width),
-        verticalArrangement = Arrangement.spacedBy(spacing)
-    ) {
-        repeat(total) { idx ->
-            val fillFrac = (progress.completedIssues.toFloat() - idx).coerceIn(0f,1f)
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(corner))
-                    .background(Color.LightGray.copy(alpha = 0.3f))
-            ) {
-                if (fillFrac > 0f) {
-                    // Wähle die Basis-Farben für diesen Index
-                    val baseColor = brush[idx]
-                    val nextColor = brush[idx+1]
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(fillFrac)
-                            .clip(RoundedCornerShape(corner))
-                            .background(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(
-                                        baseColor.copy(alpha = 1f),    // oben etwas kräftiger
-                                        nextColor.copy(alpha = 1f)     // unten etwas transparenter
-                                    ),
-                                    startY = 0.0f,
-                                    endY   = Float.POSITIVE_INFINITY,
-                                    tileMode = TileMode.Clamp
-                                )
-                            )
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-
-@Composable
-fun ProjectLabel(
-    name: String,
-    textSize: TextUnit = 8.sp,
-    modifier: Modifier = Modifier
-) {
-    // 1) Read your primary color here, in a Composable context:
-    val arrowColor = Color.Black
-    Box(
-        modifier = modifier
-            .drawBehind {
-                // 2) Now use the captured arrowColor inside DrawScope
-                val pointerWidth  = with(density) { 12.dp.toPx() }
-                val pointerHeight = with(density) { 6.dp.toPx() }
-                val cx = size.width / 2f
-                val y0 = size.height
-
-                val path = Path().apply {
-                    moveTo(cx - pointerWidth/2, y0)
-                    lineTo(cx + pointerWidth/2, y0)
-                    lineTo(cx,                 y0 + pointerHeight)
-                    close()
-                }
-                drawPath(path, color = arrowColor)
-            }
-            .padding(horizontal = 6.dp, vertical = 4.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = name,
-            fontSize = textSize,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onBackground //MaterialTheme.colorScheme.primary
-        )
-    }
-}
-
-fun gradientColorList(
-    startColor: Color,
-    endColor:   Color,
-    steps:      Int
-): List<Color> {
-    require(steps > 0) { "steps must be > 0" }
-    return List(steps + 1) { i ->
-        val fraction = i / steps.toFloat()      // 0f .. 1f
-        lerp(startColor, endColor, fraction)
-    }
-}
-
-fun randomAccumulatedDays(month: Int): Int {
-    // Aktuelles Jahr
-    val year = Year.now().value
-
-    // Clamp month auf 1..12
-    val m = month.coerceIn(1, 12)
-
-    // 1) Summe der Tage von Monat 1 bis m
-    val daysSum = (1..m).sumOf { mo ->
-        YearMonth.of(year, mo).lengthOfMonth()
-    }
-
-    // 2) Zufallszugabe 0..31
-    val randomExtra = Random.nextInt(from = 0, until = 32)
-
-    return daysSum + randomExtra
-}
-
-fun dayOfYearFromIso(
-    dateTimeStr: String,
-    monthOffset: Long = 0L
-): Int {
-    // Nur den Datums‑Teil übernehmen
-    val datePart = dateTimeStr
-        .substringBefore('T')
-        .substringBefore(' ')
-        .trim()
-
-    // Parsen und Monats‑Verschiebung
-    val adjusted = LocalDate.parse(datePart)
-        .plusMonths(monthOffset)
-
-    return adjusted.dayOfYear
-}

@@ -7,8 +7,6 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -24,22 +22,15 @@ import com.example.viewboard.backend.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.runtime.rememberCoroutineScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import kotlinx.coroutines.launch
 import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.backend.dataLayout.LabelLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
-import kotlinx.coroutines.suspendCancellableCoroutine
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
+import com.example.viewboard.ui.utils.capitalizeWords
 
-// ---------------------------------------------------
-// Dein CreateIssueScreen
-// ---------------------------------------------------
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,9 +41,6 @@ fun IssueCreationScreen(
 
     onCreate: () -> Unit = {}
 ) {
-
-
-
     val uiColor = uiColor()
     val context = LocalContext.current
     val scroll = rememberScrollState()
@@ -77,9 +65,7 @@ fun IssueCreationScreen(
     var dateText by remember { mutableStateOf(dateFormatter.format(calendar.time)) }
     var timeText by remember { mutableStateOf(timeFormatter.format(calendar.time)) }
     val isTitleValid by derivedStateOf { title.trim().isNotEmpty() }
-    val isDescValid  by derivedStateOf { desc.trim().isNotEmpty() }
 
-    // Validität prüfen
     val isDateValid by derivedStateOf {
         try { dateFormatter.parse(dateText); true } catch (_: Exception) { false }
     }
@@ -88,46 +74,17 @@ fun IssueCreationScreen(
     }
     val coroutineScope = rememberCoroutineScope()
 
-
     fun updateDeadlineFromDateText() {
-        val d = dateFormatter.parse(dateText) ?: throw IllegalArgumentException("Ungültiges Datum")
+        val d = dateFormatter.parse(dateText) ?: throw IllegalArgumentException("Invalid date")
         calendar.time = d
         val ts = Timestamp()
         ts.import(d.toInstant())
         deadline = ts
     }
-    val isoFormatter: DateTimeFormatter =
-        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ")
-            .withZone(ZoneOffset.UTC)
-    fun updateDeadlineFromDateTimeText(dateText: String, timeText: String) {
-        // 1) Datum parsen
-        val d = dateFormatter.parse(dateText)
-            ?: throw IllegalArgumentException("Ungültiges Datum")
-        // 2) Zeit parsen
-        val t = timeFormatter.parse(timeText)
-            ?: throw IllegalArgumentException("Ungültige Uhrzeit")
+    var project by remember { mutableStateOf<ProjectLayout?>(null) }
 
-        // 3) Kalender initialisieren mit Datum
-        val cal = Calendar.getInstance().apply { time = d }
-        // 4) Stunden und Minuten setzen
-        val calTime = Calendar.getInstance().apply { time = t }
-        cal.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY))
-        cal.set(Calendar.MINUTE,    calTime.get(Calendar.MINUTE))
-        cal.set(Calendar.SECOND,    calTime.get(Calendar.SECOND))
-        cal.set(Calendar.MILLISECOND, calTime.get(Calendar.MILLISECOND))
-
-        // 5) Instant erzeugen und ins Timestamp‑Objekt schieben
-        val instant = cal.toInstant()
-        val ts = Timestamp().apply { import(instant) }
-        deadline = ts
-
-        // 6) Optional: ISO‑String
-        val isoString = isoFormatter.format(instant)
-        Log.d("Deadline", "Neue Deadline: $isoString")
-        // isoString enthält z.B. "2025-07-21T18:11:34.902588Z"
-    }
     fun updateDeadlineFromTimeText() {
-        val t = timeFormatter.parse(timeText) ?: throw IllegalArgumentException("Ungültige Uhrzeit")
+        val t = timeFormatter.parse(timeText) ?: throw IllegalArgumentException("Invalid date")
         val cal2 = Calendar.getInstance().apply { time = t }
 
         calendar.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY))
@@ -172,7 +129,6 @@ fun IssueCreationScreen(
         ).show()
     }
 
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -203,17 +159,13 @@ fun IssueCreationScreen(
             )
             Spacer(Modifier.height(16.dp))
 
-            var project by remember { mutableStateOf<ProjectLayout?>(null) }
-
-            // 2) Zugehöriges Projekt nur einmal beim ersten Compose laden
             LaunchedEffect(projectId) {
                 val cleanId = projectId.trim('{', '}')
                 try {
                     project = FirebaseAPI
-                        .getProject(cleanId)   // Flow<ProjectLayout>
+                        .getProject(cleanId)
 
                 } catch (e: Exception) {
-                    Log.e("ProjectDetailInline", "Fehler beim Laden von $cleanId", e)
                 }
             }
 
@@ -221,7 +173,6 @@ fun IssueCreationScreen(
                 initialValue = emptyList(),
                 key1 = project?.users
             ) {
-                // Lade die E‑Mails; bei Fehler oder leerem Ergebnis bleibt es bei emptyList
                 val result = runCatching { project?.let { AuthAPI.getEmailsByIds(it.users) } }
                     .getOrNull()
                     ?.getOrNull()
@@ -233,9 +184,6 @@ fun IssueCreationScreen(
                     EmailWithId(userId = id, mail = mail)
                 }
 
-            emailsState
-            val suggestionEmails = project?.users.orEmpty()
-            val suggestionTags = project?.labels
             val emails = emailsState.orEmpty()
                 .filterNotNull()
             Log.d("emails", "emails=${emails}")
@@ -244,24 +192,17 @@ fun IssueCreationScreen(
                     emptyList()
                 } else {
                     emails.filter { email ->
-                        // enthält eingegebene Zeichen
                         email.contains(newParticipant, ignoreCase = true)
-                                // und ist noch nicht in assignments
                                 && assignments.none { it.equals(email, ignoreCase = true) }
                     }
                 }
             }
-
-            val allNames = listOf("Alice", "Bob", "Charlie", "David")
-
-            if (suggestionList != null) {
                 ChipInputField(
                     entries = assignments,
                     newEntry = newParticipant,
                     inhaltText = "Add team member…",
                     suggestions = suggestionList,
                     onSuggestionClick = { name ->
-                        // wenn Name ausgewählt wird, als Chip hinzufügen
                         if (name !in assignments) {
                             assignments = assignments + name
                         }
@@ -269,21 +210,13 @@ fun IssueCreationScreen(
                     },
                     onNewEntryChange = { newParticipant = it },
                     onEntryConfirmed = {
-                        // Option: Akzeptiere nur exakte Übereinstimmung
-                        val match = allNames.find { it.equals(newParticipant.trim(), ignoreCase = true) }
-                        if (match != null && match !in assignments) {
-                            assignments = assignments + match
-                        }
-                        newParticipant = ""
+
                     },
                     onEntryRemove = { removed ->
                         assignments = assignments - removed
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
-            }
-
-
             Spacer(Modifier.height(16.dp))
             ChipInputField(
                 entries = labels,
@@ -363,20 +296,15 @@ fun IssueCreationScreen(
 
                 enabled = isDateValid && isTimeValid&& isFormValid,
                 onClick = {
-                    // Validierung
-
                     if (isDateValid && isTimeValid) {
-                        // Datum/Uhrzeit ins Modell übernehmen
                         updateDeadlineFromDateText()
                         updateDeadlineFromTimeText()
-                        // Issue anlegen und speichern
                         val newIssue = IssueLayout(
                             title       = title.capitalizeWords(),
                             desc        = desc,
                             creator     = currentUserId,
                             assignments = assignmentIds,
                             projectid = projectId,
-//                            labels      = labelObjects,
                             labels      = ArrayList(labels),
                             deadlineTS  = deadline.export()
                         )
@@ -384,7 +312,6 @@ fun IssueCreationScreen(
                             try {
                                 val cleanId = projectId.trim('{', '}')
                                 FirebaseAPI.addIssue(projID = cleanId , issueLayout = newIssue)
-                                // addIssue(projID = projectId, issueLayout = newIssue)
                                 navController.popBackStack()
                             } catch (e: Exception) {
 
@@ -407,13 +334,3 @@ fun IssueCreationScreen(
 }
 
 
-fun String.capitalizeWords(): String =
-    this
-        .split(Regex("\\s+"))                        // nach Leerraum trennen
-        .joinToString(" ") { word ->
-            word
-                .lowercase()                         // zuerst alles klein
-                .replaceFirstChar {                   // dann ersten Buchstaben groß
-                    if (it.isLowerCase()) it.titlecase() else it.toString()
-                }
-        }

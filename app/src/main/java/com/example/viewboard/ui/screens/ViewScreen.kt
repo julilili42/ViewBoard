@@ -2,7 +2,6 @@ package com.example.viewboard.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,42 +25,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import com.example.viewboard.ui.navigation.BottomBarScreen
 import com.example.viewboard.ui.timetable.CustomIcon
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
-import com.example.viewboard.backend.util.filterViewsByCreator
-import com.example.viewboard.backend.util.filterViewsByProjects
-import com.example.viewboard.backend.util.getProjectByView
 import com.example.viewboard.components.view.ViewItem
 import androidx.compose.foundation.lazy.grid.items
-import com.example.viewboard.ui.issue.IssueViewModel
-import com.example.viewboard.ui.issue.ProjectViewModel
-import com.example.viewboard.ui.issue.ViewsViewModel
+import com.example.viewboard.stateholder.IssueViewModel
+import com.example.viewboard.stateholder.ProjectViewModel
+import com.example.viewboard.stateholder.ViewsViewModel
 import com.example.viewboard.ui.navigation.Screen
-import com.example.viewboard.ui.project.CustomSearchField
-import com.example.viewboard.ui.timetable.ProjectSortMenuSimple
-import com.example.viewboard.ui.timetable.ViewSortMenuSimple
-import kotlinx.coroutines.flow.first
+import com.example.viewboard.ui.utils.CustomSearchField
+import com.example.viewboard.ui.utils.ViewSortMenuSimple
+import com.example.viewboard.ui.views.EdgeToEdgeRoundedRightItemWithBadge
 import kotlinx.coroutines.launch
 
 

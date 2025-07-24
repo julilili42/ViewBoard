@@ -22,7 +22,7 @@ import java.util.Locale
 @Composable
 fun MonthYearPicker(
     year: Int,
-    month: Int, // 1 = Januar ... 12 = Dezember
+    month: Int,
     onMonthChange: (Int) -> Unit,
     onYearChange: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -34,11 +34,9 @@ fun MonthYearPicker(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // MONAT-Steuerung
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = {
                 if (month == 1) {
-                    // Von Januar zurück → Dezember Vorjahr
                     onYearChange(year - 1)
                     onMonthChange(12)
                 } else {
@@ -55,7 +53,6 @@ fun MonthYearPicker(
             )
             IconButton(onClick = {
                 if (month == 12) {
-                    // Von Dezember vor → Januar Folgejahr
                     onYearChange(year + 1)
                     onMonthChange(1)
                 } else {
@@ -66,7 +63,6 @@ fun MonthYearPicker(
             }
         }
 
-        // JAHR-Steuerung (optional, kann bleiben oder entfernt werden)
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { onYearChange(year - 1) }) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Vorheriges Jahr")

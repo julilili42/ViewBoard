@@ -33,10 +33,8 @@ import com.example.viewboard.ui.navigation.Screen
 fun MyTasksScreen(
     navController: NavController,
     issues: List<IssueLayout>,
-    mails:Map<String, List<String?>>,
     onSortClick: () -> Unit = {}
 ) {
-    // Root-Container ohne Scaffold
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -72,13 +70,10 @@ fun MyTasksScreen(
 
                         issue?.let {
                             val projectName: String = project?.name ?: ""
-                            val emails : List<String?> = mails[it.id].orEmpty()
                             ProjectCardTasks(
-                                name = it.title,
+                                issueName = it.title,
                                 projectId= it.projectid,
-                                assignments = it.assignments,
                                 dueDate = it.deadlineTS,
-                                emailsState = emails,
                                 onClick = {navController.navigate(Screen.IssueScreen.createRoute(
                                     projectName,
                                     cleanId),)
