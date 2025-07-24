@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.issue
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -166,8 +166,8 @@ fun IssueScreen(
                                 .padding(horizontal = 4.dp),
                             onDrop = { item ->
                                 filterMode = stateFromIndex(idx)
-                                issueViewModel.setState( stateFromIndex(idx))
-                                selectedTab  = idx
+                                issueViewModel.setState(stateFromIndex(idx))
+                                selectedTab = idx
                                 issueViewModel.moveItemToState(item, stateFromIndex(idx))
                             }
                         ) { isOver, _ ->
@@ -177,9 +177,9 @@ fun IssueScreen(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(
                                         when {
-                                            isOver            -> MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                                            isOver -> MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                                             selectedTab == idx -> MaterialTheme.colorScheme.primary
-                                            else               -> Color.Transparent
+                                            else -> Color.Transparent
                                         }
                                     )
                                     .border(
@@ -190,12 +190,14 @@ fun IssueScreen(
                                             MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                         RoundedCornerShape(8.dp)
                                     )
-                                    .clickable { selectedTab = idx
-                                        issueViewModel.setState( stateFromIndex(idx))},
+                                    .clickable {
+                                        selectedTab = idx
+                                        issueViewModel.setState(stateFromIndex(idx))
+                                    },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text  = label,
+                                    text = label,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = if (selectedTab == idx)
                                         MaterialTheme.colorScheme.onPrimary
@@ -212,17 +214,17 @@ fun IssueScreen(
                 val mails: List<String?> = email[item.id].orEmpty()
                 DragTarget(
                     dataToDrop = item,
-                    viewModel  = issueViewModel
+                    viewModel = issueViewModel
                 ) {
                     IssueItemCard(
-                        title        = item.title,
-                        date         = item.deadlineTS,
+                        title = item.title,
+                        date = item.deadlineTS,
                         emailsState = mails,
-                        projectId    = projectId,
-                        issueId      = item.id,
-                        navController= navController,
+                        projectId = projectId,
+                        issueId = item.id,
+                        navController = navController,
                         issuelabels = emptyList(), // TODO remove
-                        modifier     = Modifier.clip(RoundedCornerShape(12.dp))
+                        modifier = Modifier.clip(RoundedCornerShape(12.dp))
                     )
                 }
             }

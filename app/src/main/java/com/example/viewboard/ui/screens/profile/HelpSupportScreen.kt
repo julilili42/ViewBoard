@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.profile
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn

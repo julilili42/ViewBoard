@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

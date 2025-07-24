@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
+import com.example.viewboard.ui.screens.project.ProjectIssueDialog
 import com.example.viewboard.ui.utils.CustomSearchField
 import com.example.viewboard.ui.views.EdgeToEdgeRoundedRightItemWithBadge
 

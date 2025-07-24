@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.ui.screens.ProjectFilter
+import com.example.viewboard.ui.screens.project.ProjectFilter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

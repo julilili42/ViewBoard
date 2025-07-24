@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.ui.screens.MyTasksScreen
+import com.example.viewboard.ui.screens.issue.MyTasksScreen
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter

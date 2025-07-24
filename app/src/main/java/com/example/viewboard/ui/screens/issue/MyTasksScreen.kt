@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.issue
 
 import android.annotation.SuppressLint
 import android.util.Log

@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.timetable
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController

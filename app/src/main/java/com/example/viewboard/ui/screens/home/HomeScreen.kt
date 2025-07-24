@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.home
 
 import android.util.Log
 import androidx.compose.foundation.background

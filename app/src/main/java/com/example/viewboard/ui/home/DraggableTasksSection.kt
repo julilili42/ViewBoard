@@ -35,7 +35,7 @@ import androidx.navigation.NavController
 import com.example.viewboard.components.homeScreen.CustomDropdownMenu
 import com.example.viewboard.stateholder.IssueViewModel
 import com.example.viewboard.stateholder.ViewsViewModel
-import com.example.viewboard.ui.screens.MyTasksScreen
+import com.example.viewboard.ui.screens.issue.MyTasksScreen
 
 @Composable
 fun DraggableMyTasksSection(

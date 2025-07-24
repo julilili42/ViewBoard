@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.project
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog

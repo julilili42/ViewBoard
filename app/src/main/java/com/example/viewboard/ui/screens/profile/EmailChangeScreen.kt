@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.profile
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*

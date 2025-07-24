@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.profile
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Switch

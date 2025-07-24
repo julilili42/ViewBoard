@@ -1,4 +1,4 @@
-package com.example.viewboard.ui.screens
+package com.example.viewboard.ui.screens.issue
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
@@ -142,7 +142,7 @@ fun IssueCreationScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(top = innerPadding .calculateTopPadding())
+                .padding(top = innerPadding.calculateTopPadding())
                 .fillMaxSize()
                 .verticalScroll(scroll)
                 .padding(bottom =16.dp , top = 0.dp, start = 16.dp, end = 16.dp),
@@ -292,7 +292,6 @@ fun IssueCreationScreen(
                 ArrayList(ids)
             }
             Button(
-
                 enabled = isDateValid && isTimeValid&& isFormValid,
                 onClick = {
                     if (isDateValid && isTimeValid) {
