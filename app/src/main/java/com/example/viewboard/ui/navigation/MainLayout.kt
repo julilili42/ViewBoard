@@ -75,7 +75,7 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
                 NavigationBarItem(
                     selected = selected,
                     colors = NavigationBarItemDefaults.colors(
-                        indicatorColor        = Color(0xFF795548), // z.B. Braun
+                        indicatorColor        = Color(0xFF495D92), // z.B. Braun
                         selectedIconColor     = Color.White,
                         selectedTextColor     = Color.White,
                         unselectedIconColor   = Color(0xFF757575),

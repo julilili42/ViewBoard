@@ -13,7 +13,6 @@ import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.ui.navigation.BackButton
-import com.example.viewboard.ui.navigation.hasSoftNavigationBar
 
 @Composable
 fun ProfileHeader(
