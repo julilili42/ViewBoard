@@ -1,6 +1,5 @@
 package com.example.viewboard.backend.util
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.IssueState
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +31,7 @@ fun filterIssuesByLabels(issues: Flow<List<IssueLayout>>, labels: List<String>) 
  */
 fun filterIssuesByAssignments(issues: Flow<List<IssueLayout>>, assignments: List<String>) : Flow<List<IssueLayout>> {
     return issues.map { issue ->
-        issue.filter { it.assignments.containsAll(assignments) }
+        issue.filter { it.users.containsAll(assignments) }
             .ifEmpty { emptyList() }
     }
 }

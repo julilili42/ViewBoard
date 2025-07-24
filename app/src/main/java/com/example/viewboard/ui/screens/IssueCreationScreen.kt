@@ -302,8 +302,8 @@ fun IssueCreationScreen(
                             title       = title.capitalizeWords(),
                             desc        = desc,
                             creator     = currentUserId,
-                            assignments = assignmentIds,
-                            projectid = projectId,
+                            users = assignmentIds,
+                            projID = projectId,
                             labels      = ArrayList(labels),
                             deadlineTS  = deadline.export()
                         )

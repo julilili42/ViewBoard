@@ -229,15 +229,8 @@ fun ProjectCreationScreen(
                     val endMonth   = cal2.get(Calendar.MONTH) + 1
                     val p = ProjectLayout(
                         name = name.capitalizeWords(),
-                        desc = desc,
                         creator ="",
-                        phase = "",
-                        startMonth = startMonth,
-                        endMonth = endMonth,
-                        completedMilestones = 0f,
                         issues = arrayListOf(),
-                        labels = arrayListOf(),
-                        views = arrayListOf(),
                         users = assignmentIds,
                         startTS = startDate,
                         deadlineTS = endDate,

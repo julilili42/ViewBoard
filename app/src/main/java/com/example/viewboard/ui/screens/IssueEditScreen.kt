@@ -44,7 +44,7 @@ fun IssueEditScreen(
 
     var title by remember { mutableStateOf(issue.title) }
     val desc by remember { mutableStateOf(issue.desc) }
-    var assignmentIds by remember { mutableStateOf(issue.assignments.toMutableList()) }
+    var assignmentIds by remember { mutableStateOf(issue.users.toMutableList()) }
     var newEmail by remember { mutableStateOf("") }
 
     // load all users
@@ -161,7 +161,7 @@ fun IssueEditScreen(
                         val updatedIssue = issue.copy(
                             title = title.capitalizeWords(),
                             desc = desc,
-                            assignments = ArrayList(assignmentIds),
+                            users = ArrayList(assignmentIds),
                             labels = ArrayList(),
                             deadlineTS = newDeadlineTS
                         )

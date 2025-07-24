@@ -240,7 +240,7 @@ class IssueViewModel : ViewModel() {
                     .map { list ->
                         if (onlyMine) {
                             list.filter { issue ->
-                                issue.assignments.contains(userId)
+                                issue.users.contains(userId)
                             }
                         } else {
                             list
@@ -346,7 +346,7 @@ class IssueViewModel : ViewModel() {
                         issues.map { issue ->
                             async {
                                 val mails = runCatching {
-                                    AuthAPI.getEmailsByIds(issue.assignments)
+                                    AuthAPI.getEmailsByIds(issue.users)
                                 }.getOrNull()?.getOrNull() ?: emptyList()
                                 issue.id to mails
                             }
