@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -44,6 +43,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.ui.platform.LocalContext
 
 
@@ -72,10 +77,40 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
         }
     }
 
-    Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background, // hier die Surface‑Farbe
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 40.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                OutlinedButton(
+                    onClick = { AuthAPI.logout(navController) },
+                    modifier = Modifier
+                        .height(40.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                        containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "Log out",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
+                    )
+                }
+            }
+
+        }
+    ) { innerPadding ->
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
         ) {
             item {
                 // profile image
@@ -103,10 +138,14 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
 
             item {
                 // account settings
-                SectionCard (title = "Account") {
-                    MenuItem(text = "Change E-Mail", onClick = { navController.navigate(Screen.ChangeEmailScreen.route) })
+                SectionCard(title = "Account") {
+                    MenuItem(
+                        text = "Change E-Mail",
+                        onClick = { navController.navigate(Screen.ChangeEmailScreen.route) })
                     Divider()
-                    MenuItem(text = "Change Password", onClick = {navController.navigate(Screen.ChangePasswordScreen.route)})
+                    MenuItem(
+                        text = "Change Password",
+                        onClick = { navController.navigate(Screen.ChangePasswordScreen.route) })
                 }
                 Spacer(modifier = Modifier.size(24.dp))
             }
@@ -118,19 +157,10 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                         onClick = { showNotifDialog = true }
                     )
                     Divider()
-                    MenuItem(text = "Help & Support", onClick = { navController.navigate(Screen.HelpSupportScreen.route) })
+                    MenuItem(
+                        text = "Help & Support",
+                        onClick = { navController.navigate(Screen.HelpSupportScreen.route) })
                 }
-                Spacer(modifier = Modifier.size(170.dp))
-            }
-            item {
-                Text(
-                    modifier = Modifier
-                        .clickable { AuthAPI.logout(navController) }
-                        .padding(8.dp),
-                    text = "Log out",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                    color = MaterialTheme.colorScheme.error
-                )
             }
         }
         if (showNotifDialog) {
@@ -161,6 +191,8 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
         }
     }
 }
+
+
 
 @Composable
 private fun MenuItem(text: String, onClick: () -> Unit) {

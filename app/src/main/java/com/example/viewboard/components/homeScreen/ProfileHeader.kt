@@ -1,5 +1,6 @@
 package com.example.viewboard.components.homeScreen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,12 +35,15 @@ fun ProfileHeader(
             contentDescription = "Profilbild Raoul",
             size = 48.dp,
             borderColor = MaterialTheme.colorScheme.primary,
-            borderWidth = 3.dp
+            borderWidth = 3.dp,
+            modifier = Modifier.clickable{onProfileClick()}
         )
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        Column {
+        Column(
+            modifier = Modifier.clickable{onProfileClick()}
+        ) {
             Text(
                 text = AuthAPI.getCurrentDisplayName() ?: "failed to load username",
                 style = MaterialTheme.typography.titleMedium
