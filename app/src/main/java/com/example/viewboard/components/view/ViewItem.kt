@@ -36,7 +36,7 @@ fun ViewItem(
     creator: String,
     color: Color,
     onClick: () -> Unit,
-    onDelete: (String) -> Unit // <-- hinzufügen
+    onDelete: (String) -> Unit
 
 ) {
     val viewNameCode = generateProjectCodeFromDbId(view.name)
@@ -64,7 +64,6 @@ fun ViewItem(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Options‑Button oben rechts
             OptionsMenuButton(
                 options = listOf(
                     "Delete" to { Log.d("ViewItem", "Delete clicked for ${view.id}")
@@ -74,7 +73,6 @@ fun ViewItem(
                 icon = Icons.Default.MoreVert
             )
 
-            // Inhalt: Name zentriert
             Column(
                 modifier = Modifier
                     .fillMaxSize()

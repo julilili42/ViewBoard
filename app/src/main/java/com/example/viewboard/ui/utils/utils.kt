@@ -101,7 +101,7 @@ fun gradientColorList(
 ): List<Color> {
     require(steps > 0) { "steps must be > 0" }
     return List(steps + 1) { i ->
-        val fraction = i / steps.toFloat()      // 0f .. 1f
+        val fraction = i / steps.toFloat()
         lerp(startColor, endColor, fraction)
     }
 }
