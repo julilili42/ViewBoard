@@ -53,7 +53,7 @@ fun IssueScreen(
     LaunchedEffect(selectedTab) {
         val state = stateFromIndex(selectedTab)
         issueViewModel.setFilter(state)
-        Log.d("IssueScreen", "Tab gewechselt: $selectedTab → setFilter($state)")
+        Log.d("IssueScreen", "Tab switched: $selectedTab → setFilter($state)")
     }
     val query by issueViewModel.query.collectAsState()
     val onlyMine by issueViewModel.showOnlyMyIssues.collectAsState()
@@ -105,7 +105,6 @@ fun IssueScreen(
             // 1) Title
 
             item {
-
                 EdgeToEdgeRoundedRightItemWithBadge(
                     viewName = projectName,
                     projectId = projectId,
@@ -139,7 +138,7 @@ fun IssueScreen(
                             iconRes         = iconRes,
                             contentDesc     = "",
                             backgroundColor = MaterialTheme.colorScheme.primary,
-                            iconTint   = MaterialTheme.colorScheme.onSurface,
+                            iconTint   = Color.White,
                             width           = 40.dp,
                             height          = 40.dp,
                             onClick         = { issueViewModel.setShowOnlyMine() },
@@ -147,7 +146,7 @@ fun IssueScreen(
                         )
                         IssueSortMenuSimple(issueViewModel,
                             sortOptions,
-                            iconTint = MaterialTheme.colorScheme.onSurface,
+                            iconTint = Color.White,
                             backgroundColor = MaterialTheme.colorScheme.primary,
                             iconRes = R.drawable.sort_desc_svgrepo_com,
                             contentDesc = "Sort")

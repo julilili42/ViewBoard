@@ -2,6 +2,7 @@ package com.example.viewboard.ui.screens
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -19,7 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.backend.Timestamp
 import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 import com.example.viewboard.ui.theme.uiColor
 import com.example.viewboard.ui.utils.capitalizeWords
@@ -39,10 +42,49 @@ fun IssueEditScreen(
     val uiColor = uiColor()
     val context = LocalContext.current
     val scroll = rememberScrollState()
+
     var title by remember { mutableStateOf(issue.title) }
     val desc by remember { mutableStateOf(issue.desc) }
-    val assignments by remember { mutableStateOf(issue.assignments.toList()) }
+    var assignmentIds by remember { mutableStateOf(issue.assignments.toMutableList()) }
+    var newEmail by remember { mutableStateOf("") }
 
+    // 1) Lade alle Benutzer (UID + E-Mail)
+    val allUsers by produceState(initialValue = emptyList<UserLayout>(), key1 = projectId) {
+        value = AuthAPI.getListOfAllUsers()
+            .getOrNull()
+            .orEmpty()
+    }
+
+    // 2) Paare UID ↔ E-Mail
+    data class EmailWithId(val userId: String, val mail: String?)
+    val pairedList = remember(allUsers) {
+        allUsers.map { EmailWithId(it.uid, it.email) }
+    }
+
+    // 3) Zeige für die aktuell zugewiesenen IDs die korrekten E-Mails
+    val displayedAssignments by remember(assignmentIds, pairedList) {
+        derivedStateOf {
+            assignmentIds.mapNotNull { id ->
+                pairedList.find { it.userId == id }?.mail
+            }
+        }
+    }
+
+    // 4) Vorschläge basierend auf Eingabe (ohne Duplikate)
+    val suggestions by remember(newEmail, pairedList, displayedAssignments) {
+        derivedStateOf {
+            if (newEmail.isBlank()) emptyList()
+            else pairedList
+                .mapNotNull { it.mail }
+                .filter { mail ->
+                    mail.contains(newEmail, ignoreCase = true)
+                }
+                .distinct()
+                .minus(displayedAssignments.toSet())
+        }
+    }
+
+    // Datum/Zeit wie gehabt
     val calendar = remember {
         Calendar.getInstance().apply {
             val instant = Instant.parse(issue.deadlineTS)
@@ -109,6 +151,37 @@ fun IssueEditScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Button(
+                    onClick = {
+                        updateDeadline()
+                        val updatedIssue = issue.copy(
+                            title = title.capitalizeWords(),
+                            desc = desc,
+                            assignments = ArrayList(assignmentIds),
+                            labels = ArrayList(),
+                            deadlineTS = newDeadlineTS
+                        )
+                        FirebaseAPI.updIssue(
+                            updatedIssue,
+                            onSuccess = { _ -> onUpdated() },
+                            onFailure = { _ -> Log.e("IssueEdit", "Error while saving ${issue.id}") }
+                        )
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ) {
+                    Text("Save Changes")
+                }
+            }
         }
     ) { padding ->
         Column(
@@ -126,17 +199,27 @@ fun IssueEditScreen(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(12.dp))
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(24.dp))
+
+            // ChipInputField für E-Mails
             ChipInputField(
-                entries = assignments,
-                newEntry = "",
+                entries = displayedAssignments,
+                newEntry = newEmail,
                 inhaltText = "Add Assignee…",
-                onNewEntryChange = {},
-                onEntryConfirmed = { /* implement */ },
-                onEntryRemove = { /* implement */ },
+                suggestions = suggestions,
+                onSuggestionClick = { mail ->
+                    pairedList.find { it.mail == mail }?.userId
+                        ?.let { assignmentIds = (assignmentIds + it).toMutableList() }
+                    newEmail = ""
+                },
+                onNewEntryChange = { newEmail = it },
+                onEntryRemove = { removedMail ->
+                    pairedList.find { it.mail == removedMail }?.userId
+                        ?.let { id -> assignmentIds = assignmentIds.filter { it != id }.toMutableList() }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(Modifier.height(12.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -148,7 +231,7 @@ fun IssueEditScreen(
                         Icon(
                             Icons.Default.DateRange,
                             contentDescription = null,
-                            modifier = Modifier.clickable { pickDate() }
+                            Modifier.clickable { pickDate() }
                         )
                     },
                     modifier = Modifier.weight(1f)
@@ -171,52 +254,6 @@ fun IssueEditScreen(
                     modifier = Modifier.weight(1f)
                 )
             }
-            Spacer(Modifier.height(24.dp))
-            Button(
-                onClick = {
-                    updateDeadline()
-                    val updatedIssue = issue.copy(
-                        title = title.capitalizeWords(),
-                        desc = desc,
-                        assignments = ArrayList(assignments),
-                        labels = ArrayList(),
-                        deadlineTS = newDeadlineTS
-                    )
-                    FirebaseAPI.updIssue(
-                        updatedIssue,
-                        onSuccess = { id ->
-                            onUpdated()
-                            navController.popBackStack()
-                        },
-                        onFailure = { id -> }
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-            ) {
-                Text("Save Changes")
-            }
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = "Delete Issue",
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable {
-                        scope.launch {
-                            FirebaseAPI.rmIssue(
-                                projID = projectId,
-                                id = issue.id,
-                                onSuccess = { _ -> navController.popBackStack() },
-                                onFailure = { _ -> /* Fehlerbehandlung */ }
-                            )
-                        }
-                    },
-                color = MaterialTheme.colorScheme.error
-            )
-
         }
     }
 }
-
