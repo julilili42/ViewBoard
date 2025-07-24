@@ -19,10 +19,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.components.homeScreen.IssueProgress
+import com.example.viewboard.backend.data.IssueDeadlineFilter
+import com.example.viewboard.backend.data.IssueProgress
+import com.example.viewboard.backend.data.ProjectLayout
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
-import com.example.viewboard.components.homeScreen.TimeSpanFilter
 import com.example.viewboard.ui.utils.gradientColorList
 
 @Composable
@@ -31,7 +31,7 @@ fun VerticalMilestoneBar(
     width: Dp = 8.dp,
     spacing: Dp = 2.dp,
     corner: Dp = 4.dp,
-    timeSpan: TimeSpanFilter,
+    timeSpan: IssueDeadlineFilter,
     total: Int=4,
     colors: List<Color>,
     calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },

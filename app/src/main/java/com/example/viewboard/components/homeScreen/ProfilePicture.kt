@@ -1,4 +1,4 @@
-package com.example.viewboard.components
+package com.example.viewboard.components.homeScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -25,7 +25,7 @@ fun ProfilePicture(
     Image(
         painter = painter,
         contentDescription = contentDescription,
-        contentScale = ContentScale.Crop, // ✅ Füllt den Kreis vollständig
+        contentScale = ContentScale.Crop,
         modifier = Modifier
             .size(size)
             .clip(CircleShape)

@@ -3,7 +3,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
-import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.data.ProjectLayout
 import com.example.viewboard.ui.screens.ProjectFilter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ProjectViewModel : ViewModel() {
-
     enum class SortField { DATE, NAME }
     enum class SortOrder { ASC, DESC }
 

@@ -24,7 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
-import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.data.IssueLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.stateholder.IssueViewModel
 import com.example.viewboard.ui.screens.LoginScreen
@@ -47,7 +47,7 @@ import com.example.viewboard.ui.screens.ProfileScreen
 import com.example.viewboard.ui.screens.ProjectCreationScreen
 import com.example.viewboard.ui.screens.ViewIssueScreen
 import com.example.viewboard.ui.screens.ViewScreen
-import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.data.ProjectLayout
 
 /**
  * Root of the app's navigation graph, deciding start destination based on auth state

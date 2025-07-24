@@ -1,9 +1,9 @@
 package com.example.viewboard.backend.storage.abstraction
 
-import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.backend.dataLayout.LabelLayout
-import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.backend.dataLayout.ViewLayout
+import com.example.viewboard.backend.data.IssueLayout
+import com.example.viewboard.backend.data.LabelLayout
+import com.example.viewboard.backend.data.ProjectLayout
+import com.example.viewboard.backend.data.ViewLayout
 import kotlinx.coroutines.flow.Flow
 
 abstract class StorageServerAPI () {

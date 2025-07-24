@@ -115,7 +115,7 @@ fun DraggableMyTasksSection(
                             Log.d("selectedName", "viewid =$view ")
                             viewsViewModel.selectView(view)},
                         modifier = Modifier
-                            .fillMaxWidth(0.4f)   // 80% of width
+                            .fillMaxWidth(0.4f)
                             .padding()
                     )
                     Spacer(modifier = Modifier.weight(1f))

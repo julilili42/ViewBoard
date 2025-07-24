@@ -28,7 +28,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.data.IssueLayout
 import com.example.viewboard.ui.screens.MyTasksScreen
 import java.time.LocalDate
 import java.time.OffsetDateTime

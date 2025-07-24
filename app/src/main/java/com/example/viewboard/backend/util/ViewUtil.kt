@@ -1,7 +1,7 @@
 package com.example.viewboard.backend.util
 
-import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.backend.dataLayout.ViewLayout
+import com.example.viewboard.backend.data.ProjectLayout
+import com.example.viewboard.backend.data.ViewLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

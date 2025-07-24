@@ -2,9 +2,11 @@ package com.example.viewboard.components.homeScreen
 
 import android.util.Log
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.backend.dataLayout.IssueState
-import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.data.IssueDeadlineFilter
+import com.example.viewboard.backend.data.IssueLayout
+import com.example.viewboard.backend.data.IssueProgress
+import com.example.viewboard.backend.data.IssueState
+import com.example.viewboard.backend.data.ProjectLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -13,54 +15,33 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 
-/**
- * Mögliche Zeitspannen für das Deadline‑Filter.
- */
-enum class TimeSpanFilter(val label: String, val short: String) {
-    ALL_TIME("All time", "A"),
-    CURRENT_YEAR("Yearly", "Y"),
-    CURRENT_MONTH("Monthly", "M"),
-    CURRENT_WEEK("Weekly", "W"),
+fun IssueDeadlineFilter.next(): IssueDeadlineFilter = when (this) {
+    IssueDeadlineFilter.CURRENT_YEAR  -> IssueDeadlineFilter.CURRENT_MONTH
+    IssueDeadlineFilter.CURRENT_MONTH -> IssueDeadlineFilter.CURRENT_WEEK
+    IssueDeadlineFilter.CURRENT_WEEK  -> IssueDeadlineFilter.CURRENT_YEAR
+    IssueDeadlineFilter.ALL_TIME -> IssueDeadlineFilter.ALL_TIME
 }
-
-
-fun TimeSpanFilter.next(): TimeSpanFilter = when (this) {
-    TimeSpanFilter.CURRENT_YEAR  -> TimeSpanFilter.CURRENT_MONTH
-    TimeSpanFilter.CURRENT_MONTH -> TimeSpanFilter.CURRENT_WEEK
-    TimeSpanFilter.CURRENT_WEEK  -> TimeSpanFilter.CURRENT_YEAR
-    TimeSpanFilter.ALL_TIME -> TimeSpanFilter.ALL_TIME
-}
-data class IssueProgress(
-    val totalIssues: Int,
-    val completedIssues: Int,
-    val percentComplete: Float // 0.0 .. 100.0
-)
 
 class IssueProgressCalculator {
-
     /**
-     * Liefert den Fortschritt für alle Issues, deren deadlineTS
-     * innerhalb der angegebenen TimeSpanFilter liegt.
+     * Returns a Flow emitting overall progress (total, done count, percentage)
+     * across all projects of the current user, filtered by the given time span.
      *
-     * @param filterMode: CREATED, SHARED oder ALL
-     * @param timeSpan: CURRENT_YEAR, CURRENT_MONTH oder CURRENT_WEEK
+     * @param timeSpan Defines the date window for filtering issue deadlines.
+     * @return Flow of IssueProgress containing total, completed, and percent.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getProgressFlow(
-        timeSpan: TimeSpanFilter
+        timeSpan: IssueDeadlineFilter
     ): Flow<IssueProgress> {
         val userId = AuthAPI.getUid()
-
-        // 1) Berechne Zeitfenster in Millisekunden
         val (fromTs, toTs) = calculateWindow(timeSpan)
 
-        // 2) Projekte‑Flow je nach FilterMode
         val projectsFlow: Flow<List<ProjectLayout>> =
                 FirebaseAPI.getProjectsFromUser(userId)
 
 
 
-        // 3) FlatMap und combine wie gehabt, aber mit Deadline‑Filter
         return projectsFlow
             .flatMapLatest { projects ->
                 val issueFlows = projects.map { project ->
@@ -76,7 +57,6 @@ class IssueProgressCalculator {
                             .asList()
                             .flatten()
                         val filteredIssues: List<IssueLayout> = filtered.filter { issue ->
-                            // denk dran: deadlineTS ist ein String, daher vorher parsen
                             val millis = Instant.parse(issue.deadlineTS).toEpochMilli()
                             Log.d(
                                 "IssueProgressFilter",
@@ -95,43 +75,51 @@ class IssueProgressCalculator {
             }
     }
 
+    /**
+     * Returns a Flow emitting progress for a single project,
+     * filtered by the given time span.
+     *
+     * @param projectId The ID of the project to analyze.
+     * @param timeSpan  Defines the date window for filtering issue deadlines.
+     * @return Flow of IssueProgress for that project.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getProjectProgressFlow(
         projectId: String,
-        timeSpan: TimeSpanFilter
+        timeSpan: IssueDeadlineFilter
     ): Flow<IssueProgress> {
         val userId = AuthAPI.getUid()
         val (fromTs, toTs) = calculateWindow(timeSpan)
 
-        // 1) Nur dieser eine Flow<List<IssueLayout>>
         return FirebaseAPI
             .getIssuesFromUser(userId, projectId)
             .map { list ->
-                // 2) Filter direkt nach Deadline
                 val filtered = list.filter { issue ->
                     val millis = Instant.parse(issue.deadlineTS).toEpochMilli()
                     millis in fromTs..toTs
                 }
-                // 3) Zähle Gesamt und DONE
                 val total     = filtered.size
                 val completed = filtered.count { it.state == IssueState.DONE }
                 val percent   = if (total > 0) completed * 100f / total else 0f
                 IssueProgress(total, completed, percent)
             }
     }
+
     /**
-     * Erzeugt aus dem TimeSpanFilter das (fromTs, toTs)-Tupel in Epoch‑Millis.
+     * Calculates the start and end timestamps (in ms) for the specified time span.
+     *
+     * @param timeSpan The desired window (all time, year, month, or week).
+     * @return Pair of (fromTimestamp, toTimestamp) in epoch milliseconds.
      */
-    private fun calculateWindow(timeSpan: TimeSpanFilter): Pair<Long, Long> {
+    private fun calculateWindow(timeSpan: IssueDeadlineFilter): Pair<Long, Long> {
         val zone = ZoneId.systemDefault()
         val now  = ZonedDateTime.now(zone)
 
         return when (timeSpan) {
-            TimeSpanFilter.ALL_TIME -> {
-                // Unbegrenzte Zeitspanne: von der Unix‑Epoch bis ins Unendliche
+            IssueDeadlineFilter.ALL_TIME -> {
                 0L to Long.MAX_VALUE
             }
-            TimeSpanFilter.CURRENT_YEAR -> {
+            IssueDeadlineFilter.CURRENT_YEAR -> {
                 val start = now
                     .with(TemporalAdjusters.firstDayOfYear())
                     .truncatedTo(ChronoUnit.DAYS)
@@ -144,7 +132,7 @@ class IssueProgressCalculator {
                     .toEpochMilli()
                 start to end
             }
-            TimeSpanFilter.CURRENT_MONTH -> {
+            IssueDeadlineFilter.CURRENT_MONTH -> {
                 val start = now
                     .with(TemporalAdjusters.firstDayOfMonth())
                     .truncatedTo(ChronoUnit.DAYS)
@@ -157,7 +145,7 @@ class IssueProgressCalculator {
                     .toEpochMilli()
                 start to end
             }
-            TimeSpanFilter.CURRENT_WEEK -> {
+            IssueDeadlineFilter.CURRENT_WEEK -> {
                 val firstDayOfWeek = WeekFields.ISO.firstDayOfWeek
                 val startOfWeek = now
                     .with(TemporalAdjusters.previousOrSame(firstDayOfWeek))

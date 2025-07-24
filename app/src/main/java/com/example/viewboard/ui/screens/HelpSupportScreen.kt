@@ -27,7 +27,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
-import com.example.viewboard.components.SectionCard
+import com.example.viewboard.components.profile.SectionCard
 import com.example.viewboard.ui.navigation.BackButton
 
 @Composable

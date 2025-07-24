@@ -25,8 +25,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.rememberCoroutineScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import kotlinx.coroutines.launch
-import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.data.IssueLayout
+import com.example.viewboard.backend.data.ProjectLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 import com.example.viewboard.ui.utils.capitalizeWords

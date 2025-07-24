@@ -2,7 +2,7 @@ package com.example.viewboard.backend.auth.abstraction
 
 import android.content.Context
 import androidx.navigation.NavController
-import com.example.viewboard.backend.dataLayout.UserLayout
+import com.example.viewboard.backend.data.UserLayout
 
 abstract class AuthServerAPI {
     /**

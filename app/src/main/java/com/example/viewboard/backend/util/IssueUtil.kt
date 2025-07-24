@@ -1,8 +1,7 @@
 package com.example.viewboard.backend.util
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.backend.dataLayout.IssueState
+import com.example.viewboard.backend.data.IssueLayout
+import com.example.viewboard.backend.data.IssueState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

@@ -18,9 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.viewboard.backend.data.IssueDeadlineFilter
 import kotlin.math.roundToInt
 
-/** Die drei Zeiträume mit Label und Kurz-Icon */
 private enum class Period(val label: String, val short: String) {
     WEEKLY("Weekly", "W"),
     MONTHLY("Monthly", "M"),
@@ -33,23 +33,17 @@ private enum class Period(val label: String, val short: String) {
     }
 }
 
-/**
- * Eine Card mit Titel, Period-Switcher-Icon, Progress-Bar und Fortschritts-Text
- *
- * @param progress Wert zwischen 0f und 1f
- */
 @Composable
 fun ProgressCard(
     progress: Float,
     modifier: Modifier = Modifier,
-    title: TimeSpanFilter,
+    title: IssueDeadlineFilter,
     onClick: () -> Unit = {}
 ) {
     var period by remember { mutableStateOf(title) }
     val title = "${period.label} Targets"
     val percent = progress.roundToInt()
     val targetFraction = (progress.coerceIn(0f, 100f)) / 100f
-    // 2) Animate den Float-Wert, wenn sich targetFraction ändert
     val animatedProgress by animateFloatAsState(
         targetValue = targetFraction,
         animationSpec = tween(

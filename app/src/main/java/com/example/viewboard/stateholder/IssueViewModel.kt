@@ -6,13 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import com.example.viewboard.backend.data.IssueDeadlineFilter
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
-import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.backend.dataLayout.IssueState
-import com.example.viewboard.backend.dataLayout.ViewLayout
-import com.example.viewboard.components.homeScreen.IssueProgress
+import com.example.viewboard.backend.data.IssueLayout
+import com.example.viewboard.backend.data.IssueProgress
+import com.example.viewboard.backend.data.IssueState
+import com.example.viewboard.backend.data.ViewLayout
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
-import com.example.viewboard.components.homeScreen.TimeSpanFilter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -57,7 +57,7 @@ class IssueViewModel : ViewModel() {
     private val _items = mutableStateListOf<IssueLayout>()
     val items: List<IssueLayout> get() = _items
 
-    private val _timeSpan   = MutableStateFlow(TimeSpanFilter.CURRENT_MONTH)
+    private val _timeSpan   = MutableStateFlow(IssueDeadlineFilter.CURRENT_MONTH)
     private val _progress = MutableStateFlow(IssueProgress(0, 0, 0.0f))
     private val calculator = IssueProgressCalculator()
 

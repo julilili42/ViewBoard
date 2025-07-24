@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.navigation.NavController
 import com.example.viewboard.backend.auth.abstraction.AuthServerAPI
-import com.example.viewboard.backend.dataLayout.UserLayout
+import com.example.viewboard.backend.data.UserLayout
 import com.example.viewboard.ui.navigation.Screen
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest

@@ -33,8 +33,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalDensity
 import colorFromCode
-import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.components.homeScreen.TimeSpanFilter
+import com.example.viewboard.backend.data.IssueDeadlineFilter
+import com.example.viewboard.backend.data.ProjectLayout
 import com.example.viewboard.ui.utils.dayOfYearFromIso
 import com.example.viewboard.ui.utils.toDp
 import generateProjectCodeFromDbId
@@ -58,7 +58,6 @@ fun VerticalTimelineSchedule(
         val todayPx   = ((today.monthValue - 1)*30 + monthFrac) * monthPx
         val todayInDaysPx   = (todayInDays * monthPx) + 60
         val todayInDaysDP= with(density) { todayInDaysPx .toDp() }
-        val todayDp   = with(density) { todayPx.toDp() }
         Box(modifier = Modifier.fillMaxSize()) {
             Row(modifier = Modifier.fillMaxSize()) {
                 Column(
@@ -93,7 +92,7 @@ fun VerticalTimelineSchedule(
                     }
                 }
 
-                // 2) Scrollbarer Bereich (Phasen + gestrichelte Heute-Linie)
+                // scrollable area
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -165,7 +164,7 @@ fun VerticalTimelineSchedule(
                                         project = project,
                                         total     = total,
                                         colors    = primaryGradient,
-                                        timeSpan = TimeSpanFilter.ALL_TIME,
+                                        timeSpan = IssueDeadlineFilter.ALL_TIME,
                                         modifier  = Modifier
                                             .fillMaxSize()
                                             .padding(vertical = 1.dp),

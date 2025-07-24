@@ -3,10 +3,10 @@ package com.example.viewboard.backend.storage.impl
 import android.util.Log
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
-import com.example.viewboard.backend.dataLayout.IssueLayout
-import com.example.viewboard.backend.dataLayout.LabelLayout
-import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.backend.dataLayout.ViewLayout
+import com.example.viewboard.backend.data.IssueLayout
+import com.example.viewboard.backend.data.LabelLayout
+import com.example.viewboard.backend.data.ProjectLayout
+import com.example.viewboard.backend.data.ViewLayout
 import com.example.viewboard.backend.storage.abstraction.StorageServerAPI
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference

@@ -1,6 +1,5 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -17,9 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 
-/**
- * @param options Liste von Pair(Label, Aktion)
- */
+
 @Composable
 fun OptionsMenuButton(
     options: List<Pair<String, () -> Unit>>,

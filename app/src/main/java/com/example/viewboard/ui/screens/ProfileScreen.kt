@@ -33,12 +33,11 @@ import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
-import com.example.viewboard.components.ProfilePicture
+import com.example.viewboard.components.homeScreen.ProfilePicture
 import com.example.viewboard.ui.navigation.Screen
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.example.viewboard.components.SectionCard
+import com.example.viewboard.components.profile.SectionCard
 import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult

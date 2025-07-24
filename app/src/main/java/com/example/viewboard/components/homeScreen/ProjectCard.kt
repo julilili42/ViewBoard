@@ -44,35 +44,13 @@ fun ProjectCard(
             modifier = Modifier
                 .fillMaxSize()
                 .background(brush = Brush.linearGradient(colors = gradientColors))
-               // .background(MaterialTheme.colorScheme.primary)
         ) {
-            // Projektname zentriert
             Text(
                 text = name,
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White,
                 modifier = Modifier.align(Alignment.Center)
             )
-
-           /* // Oben rechts: Weißer Kasten mit Gradient-Zahl
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                        .background(Color.White, shape = MaterialTheme.shapes.small)
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                ) {
-                    // Gradient-farbiger Text
-                    Text(
-                        text = count.toString(),
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            brush = Brush.linearGradient(gradientColors)
-                        )
-                    )
-
-            }*/
         }
     }
 }
@@ -94,6 +72,6 @@ fun randomGradientColors(): List<Color> {
     )
     return listOf(
         colors.random(),
-        colors.filterNot { it == colors.first() }.random() // zwei unterschiedliche Farben
+        colors.filterNot { it == colors.first() }.random()
     )
 }
