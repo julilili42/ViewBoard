@@ -215,7 +215,7 @@ fun ProjectCreationScreen(
             Spacer(Modifier.height(32.dp))
             val assignmentIds: ArrayList<String> = remember(assignments, users) {
                 val ids = assignments.mapNotNull { email ->
-                    users.find { it.email.equals(email, ignoreCase = true) }?.uid
+                    users.find { it.email.equals(email, ignoreCase = true) }?.id
                 }
                 ArrayList(ids)
             }

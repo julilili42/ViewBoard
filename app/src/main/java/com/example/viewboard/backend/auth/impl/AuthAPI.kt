@@ -165,7 +165,7 @@ object AuthAPI : AuthServerAPI() {
 
         ref.documents.mapNotNull { user ->
             user.toObject(UserLayout::class.java)
-                ?.copy(uid = user.id)
+                ?.copy(id = user.id)
         }
     }
 
@@ -261,7 +261,7 @@ object AuthAPI : AuthServerAPI() {
                 } else {
                     // create Profile
                     val profile = UserLayout(
-                        uid = uid,
+                        id = uid,
                         name = currentUser.displayName ?: "",
                         email = currentUser.email ?: "",
                     )
@@ -307,7 +307,7 @@ object AuthAPI : AuthServerAPI() {
 
         // convert to UserLayout and set uid
         doc.toObject(UserLayout::class.java)
-            ?.copy(uid = doc.id)
+            ?.copy(id = doc.id)
             ?: throw IllegalStateException("Failed to parse UserLayout for ID $userID")
     }
 

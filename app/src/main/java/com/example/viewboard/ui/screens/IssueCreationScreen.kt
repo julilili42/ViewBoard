@@ -304,7 +304,6 @@ fun IssueCreationScreen(
                             creator     = currentUserId,
                             users = assignmentIds,
                             projID = projectId,
-                            labels      = ArrayList(labels),
                             deadlineTS  = deadline.export()
                         )
                         coroutineScope.launch {

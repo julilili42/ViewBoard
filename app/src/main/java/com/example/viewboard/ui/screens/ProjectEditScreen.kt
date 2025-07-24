@@ -49,12 +49,12 @@ fun ProjectEditScreen(
         }
     }
     var name by remember { mutableStateOf(project.name) }
-    var desc by remember { mutableStateOf(project.desc) }
+    var desc by remember { mutableStateOf("") } // TODO remove
     var startDate by remember { mutableStateOf(project.startTS) }
     var endDate by remember { mutableStateOf(project.deadlineTS) }
 
     val names = project.users.toList().mapNotNull { email ->
-        users.find { it.uid .equals(email, ignoreCase = true) }?.email
+        users.find { it.id .equals(email, ignoreCase = true) }?.email
     }
     var assignments by remember(names) {
         mutableStateOf(names)
@@ -192,7 +192,7 @@ fun ProjectEditScreen(
 
             val assignmentIds: ArrayList<String> = remember(assignments, users) {
                 val ids = assignments.mapNotNull { email ->
-                    users.find { it.email.equals(email, ignoreCase = true) }?.uid
+                    users.find { it.email.equals(email, ignoreCase = true) }?.id
                 }
                 ArrayList(ids)
             }
@@ -201,7 +201,6 @@ fun ProjectEditScreen(
                     onClick = {
                         val updated = project.copy(
                             name = name,
-                            desc = desc,
                             users = ArrayList(assignmentIds),
                             startTS = startDate,
                             deadlineTS = endDate

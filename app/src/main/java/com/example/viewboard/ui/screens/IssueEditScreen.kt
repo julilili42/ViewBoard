@@ -57,7 +57,7 @@ fun IssueEditScreen(
     // pair uid email
     data class EmailWithId(val userId: String, val mail: String?)
     val pairedList = remember(allUsers) {
-        allUsers.map { EmailWithId(it.uid, it.email) }
+        allUsers.map { EmailWithId(it.id, it.email) }
     }
 
     // display email for uid
@@ -162,7 +162,6 @@ fun IssueEditScreen(
                             title = title.capitalizeWords(),
                             desc = desc,
                             users = ArrayList(assignmentIds),
-                            labels = ArrayList(),
                             deadlineTS = newDeadlineTS
                         )
                         FirebaseAPI.updIssue(
