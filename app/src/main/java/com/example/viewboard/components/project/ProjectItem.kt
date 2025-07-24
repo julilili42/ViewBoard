@@ -33,14 +33,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 import colorFromCode
-import com.example.viewboard.backend.data.ProjectLayout
+import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
 import generateProjectCodeFromDbId
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.navigation.NavController
-import com.example.viewboard.backend.data.IssueDeadlineFilter
-import com.example.viewboard.backend.data.IssueProgress
+import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
+import com.example.viewboard.backend.dataLayout.IssueProgress
 
 
 

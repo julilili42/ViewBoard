@@ -6,12 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.data.IssueDeadlineFilter
+import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
-import com.example.viewboard.backend.data.IssueLayout
-import com.example.viewboard.backend.data.IssueProgress
-import com.example.viewboard.backend.data.IssueState
-import com.example.viewboard.backend.data.ViewLayout
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.IssueProgress
+import com.example.viewboard.backend.dataLayout.IssueState
 import com.example.viewboard.components.homeScreen.IssueProgressCalculator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

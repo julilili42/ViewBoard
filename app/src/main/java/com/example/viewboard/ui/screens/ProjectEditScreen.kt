@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.backend.auth.impl.AuthAPI.getListOfAllUsers
 import com.example.viewboard.backend.auth.impl.FirebaseProvider.auth
-import com.example.viewboard.backend.data.ProjectLayout
-import com.example.viewboard.backend.data.UserLayout
+import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 import com.example.viewboard.ui.theme.uiColor

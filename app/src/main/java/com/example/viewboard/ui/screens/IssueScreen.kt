@@ -26,9 +26,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.data.IssueLayout
-import com.example.viewboard.backend.data.IssueState
-import com.example.viewboard.backend.data.SortOptionsIssues
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.IssueState
+import com.example.viewboard.backend.dataLayout.SortOptionsIssues
 import com.example.viewboard.components.homeScreen.ProfileHeader
 import com.example.viewboard.ui.issue.IssueItemCard
 import com.example.viewboard.stateholder.IssueViewModel

@@ -19,8 +19,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.backend.util.Timestamp
-import com.example.viewboard.backend.data.IssueLayout
-import com.example.viewboard.backend.data.UserLayout
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.ui.navigation.ChipInputField

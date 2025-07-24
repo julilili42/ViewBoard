@@ -1,4 +1,4 @@
-package com.example.viewboard.backend.data
+package com.example.viewboard.backend.dataLayout
 
 import com.google.firebase.firestore.DocumentId
 

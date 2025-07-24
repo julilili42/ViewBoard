@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import colorFromCode
-import com.example.viewboard.backend.data.ViewLayout
+import com.example.viewboard.backend.dataLayout.ViewLayout
 import generateProjectCodeFromDbId
 
 /**

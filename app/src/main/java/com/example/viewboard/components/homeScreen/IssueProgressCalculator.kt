@@ -2,11 +2,11 @@ package com.example.viewboard.components.homeScreen
 
 import android.util.Log
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.data.IssueDeadlineFilter
-import com.example.viewboard.backend.data.IssueLayout
-import com.example.viewboard.backend.data.IssueProgress
-import com.example.viewboard.backend.data.IssueState
-import com.example.viewboard.backend.data.ProjectLayout
+import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
+import com.example.viewboard.backend.dataLayout.IssueLayout
+import com.example.viewboard.backend.dataLayout.IssueProgress
+import com.example.viewboard.backend.dataLayout.IssueState
+import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*

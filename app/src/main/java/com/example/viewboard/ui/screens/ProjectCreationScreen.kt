@@ -25,8 +25,8 @@ import androidx.compose.ui.text.input.ImeAction
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.AuthAPI.getListOfAllUsers
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
-import com.example.viewboard.backend.data.ProjectLayout
-import com.example.viewboard.backend.data.UserLayout
+import com.example.viewboard.backend.dataLayout.ProjectLayout
+import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import java.text.SimpleDateFormat
 import java.util.Calendar

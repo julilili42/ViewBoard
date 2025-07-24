@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.viewboard.backend.data.IssueDeadlineFilter
-import com.example.viewboard.backend.data.IssueLayout
+import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
+import com.example.viewboard.backend.dataLayout.IssueLayout
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
