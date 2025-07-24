@@ -70,15 +70,6 @@ class IssueViewModel : ViewModel() {
     private val _state = MutableStateFlow<IssueState>(IssueState.NEW)
     val state: StateFlow<IssueState> = _state
     var isDragging by mutableStateOf(false)
-    private val _viewsFlow: StateFlow<List<ViewLayout>> =
-        FirebaseAPI
-            .getAllViews()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList()
-            )
-    val views: StateFlow<List<ViewLayout>> = _viewsFlow
 
     
 
