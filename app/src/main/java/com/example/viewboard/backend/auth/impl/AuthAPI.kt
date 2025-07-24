@@ -227,6 +227,7 @@ object AuthAPI : AuthServerAPI() {
         onSuccess: (String) -> Unit,
         onFailure: (String) -> Unit
     ): String? {
+        // use cache s.t. unnecessary queries can be avoided
         val name = UserDisplayNameCache.get(userID)
         return if (name != null) {
             onSuccess(name)
@@ -244,7 +245,7 @@ object AuthAPI : AuthServerAPI() {
         val currentUser = FirebaseProvider.auth.currentUser
 
         if (uid.isNullOrBlank() || currentUser == null) {
-            onError("Kein eingeloggter User")
+            onError("No logged-in user")
             return
         }
 
@@ -252,21 +253,13 @@ object AuthAPI : AuthServerAPI() {
             .collection("users")
             .document(uid)
 
-        // 1) Prüfe, ob’s schon ein Doc gibt
         userRef.get()
             .addOnSuccessListener { snapshot ->
                 if (snapshot.exists()) {
-                    // Profil existiert bereits
+                    // profile exists
                     onSuccess()
                 } else {
-                    // Profil anlegen
-                    // UserLayout wird hier angenommen so aufgebaut:
-                    // data class UserLayout(
-                    //   val uid: String = "",
-                    //   val name: String = "",
-                    //   val email: String = "",
-                    //   val notificationsEnabled: Boolean = true
-                    // )
+                    // create Profile
                     val profile = UserLayout(
                         uid = uid,
                         name = currentUser.displayName ?: "",
@@ -276,27 +269,26 @@ object AuthAPI : AuthServerAPI() {
                     userRef.set(profile)
                         .addOnSuccessListener { onSuccess() }
                         .addOnFailureListener { e ->
-                            onError(e.message ?: "Fehler beim Anlegen des Profils")
+                            onError(e.message ?: "Error while creating profile")
                         }
                 }
             }
             .addOnFailureListener { e ->
-                onError(e.message ?: "Fehler bei der Abfrage des Profils")
+                onError(e.message ?: "Error while retrieving profile")
             }
     }
 
     override suspend fun getEmailsByIds(userIds: List<String>): Result<List<String?>> = runCatching {
-        val firestore = FirebaseProvider.firestore
-        // 1) In Batches zu je max. 10 IDs aufteilen
+        // split userIds in size 10 chunks, s.t. less queries are needed
         userIds.chunked(10).flatMap { chunk ->
-            // 2) Einmal-Query statt einzelne get()
-            val snapshot = firestore
+
+            val snapshot = FirebaseProvider.firestore
                 .collection("users")
                 .whereIn(FieldPath.documentId(), chunk)
                 .get()
                 .await()
 
-            // 3) Emails extrahieren
+            // extract list of emails from snapshot
             snapshot.documents.map { it.getString("email") }
         }
     }
@@ -308,12 +300,12 @@ object AuthAPI : AuthServerAPI() {
             .get()
             .await()
 
-        // Dokument existiert nicht?
+        // check if document exists
         if (!doc.exists()) {
             throw NoSuchElementException("User with ID $userID not found")
         }
 
-        // In UserLayout umwandeln und die uid setzen
+        // convert to UserLayout and set uid
         doc.toObject(UserLayout::class.java)
             ?.copy(uid = doc.id)
             ?: throw IllegalStateException("Failed to parse UserLayout for ID $userID")

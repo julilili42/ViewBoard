@@ -1,22 +1,24 @@
 package com.example.viewboard.backend.dataLayout
 
 import com.google.firebase.firestore.DocumentId
-import com.example.viewboard.backend.Timestamp
+import com.example.viewboard.backend.util.Timestamp
 
+/**
+ * @property id the id of the project
+ * @property name the name of the project
+ * @property creator the user who creates the project
+ * @property issues the issues associated with the project
+ * @property users the users associated with the project
+ * @property creationTS the creation timestamp of the project
+ * @property startTS the start timestamp of the project
+ * @property deadlineTS the deadline timestamp of the project
+ */
 data class ProjectLayout (
     @DocumentId
     var id: String = "",
     var name: String = "",
-    var desc: String = "",
     var creator: String = "",
-    var phase: String = "",
-    var startMonth: Int = 0, // 1–12
-    var endMonth: Int = 0,   // 1–12
-    var totalMilestones: Int = 0,
-    var completedMilestones: Float = 0f,
     var issues: ArrayList<String> = ArrayList<String>(),
-    var labels: ArrayList<String> = ArrayList<String>(),
-    var views: ArrayList<String> = ArrayList<String>(),
     var users: ArrayList<String> = ArrayList<String>(),
     var creationTS: String = Timestamp().export(),
     var startTS: String = Timestamp().export(),

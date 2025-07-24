@@ -25,7 +25,7 @@ class IssueProgressAggregator(
             when (change.type) {
                 DocumentChange.Type.ADDED -> {
                     totalCount.value += 1
-                    if (issue.assignments.contains(userId) && issue.state == IssueState.DONE)
+                    if (issue.users.contains(userId) && issue.state == IssueState.DONE)
                         completedCount.value += 1
                 }
                 DocumentChange.Type.MODIFIED -> {
@@ -45,7 +45,7 @@ class IssueProgressAggregator(
                 }
                 DocumentChange.Type.REMOVED -> {
                     totalCount.value -= 1
-                    if (issue.assignments.contains(userId) && issue.state == IssueState.DONE)
+                    if (issue.users.contains(userId) && issue.state == IssueState.DONE)
                         completedCount.value -= 1
                 }
             }

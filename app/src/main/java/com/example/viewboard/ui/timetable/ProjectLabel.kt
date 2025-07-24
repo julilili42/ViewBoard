@@ -20,12 +20,10 @@ fun ProjectLabel(
     textSize: TextUnit = 8.sp,
     modifier: Modifier = Modifier
 ) {
-    // 1) Read your primary color here, in a Composable context:
     val arrowColor = Color.Black
     Box(
         modifier = modifier
             .drawBehind {
-                // 2) Now use the captured arrowColor inside DrawScope
                 val pointerWidth  = with(density) { 12.dp.toPx() }
                 val pointerHeight = with(density) { 6.dp.toPx() }
                 val cx = size.width / 2f
@@ -46,7 +44,7 @@ fun ProjectLabel(
             text = name,
             fontSize = textSize,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onBackground //MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }

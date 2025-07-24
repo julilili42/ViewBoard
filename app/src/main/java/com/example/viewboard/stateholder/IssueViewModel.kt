@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.IssueState
 import com.example.viewboard.backend.dataLayout.ViewLayout
@@ -240,7 +240,7 @@ class IssueViewModel : ViewModel() {
                     .map { list ->
                         if (onlyMine) {
                             list.filter { issue ->
-                                issue.assignments.contains(userId)
+                                issue.users.contains(userId)
                             }
                         } else {
                             list
@@ -346,7 +346,7 @@ class IssueViewModel : ViewModel() {
                         issues.map { issue ->
                             async {
                                 val mails = runCatching {
-                                    AuthAPI.getEmailsByIds(issue.assignments)
+                                    AuthAPI.getEmailsByIds(issue.users)
                                 }.getOrNull()?.getOrNull() ?: emptyList()
                                 issue.id to mails
                             }

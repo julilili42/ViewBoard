@@ -110,13 +110,13 @@ fun dayOfYearFromIso(
     dateTimeStr: String,
     monthOffset: Long = 0L
 ): Int {
-    // Nur den Datums‑Teil übernehmen
+    // Only use date part
     val datePart = dateTimeStr
         .substringBefore('T')
         .substringBefore(' ')
         .trim()
 
-    // Parsen und Monats‑Verschiebung
+    // parse and month offset
     val adjusted = LocalDate.parse(datePart)
         .plusMonths(monthOffset)
 

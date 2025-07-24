@@ -1,4 +1,4 @@
-package com.example.viewboard.backend.storageServer.abstraction
+package com.example.viewboard.backend.storage.abstraction
 
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.LabelLayout
@@ -398,13 +398,14 @@ abstract class StorageServerAPI () {
      * @return the views when they have been successfully retrieved
      */
     public abstract fun getViewsFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<ViewLayout>>
+
     /**
-     * Fügt eine View‐ID in das "views"-Feld des User‑Dokuments ein.
+     * Adds a view ID to the "views" field of the user's document.
      *
-     * @param userID    die Firebase‑UID des Users
-     * @param viewID    die View‑ID, die hinzugefügt werden soll
-     * @param onSuccess Callback, aufgerufen mit viewID bei erfolgreichem Update
-     * @param onFailure Callback, aufgerufen mit Fehlermeldung bei Fehler
+     * @param userID    The Firebase UID of the user
+     * @param viewID    The view ID to add
+     * @param onSuccess Callback invoked with the viewID upon successful update
+     * @param onFailure Callback invoked with an error message if the update fails
      */
     abstract suspend fun addViewToUser(
         userID: String,
@@ -412,18 +413,22 @@ abstract class StorageServerAPI () {
         onSuccess: (String) -> Unit,
         onFailure: (String) -> Unit
     )
+
     /**
-     * Lädt alle Views eines Users anhand seiner User‑ID.
-     * @param userID die Firebase‑UID des Users (oder null)
-     * @return Liste aller ViewLayout‑Objekte dieses Users
-     */
-    /**
-     * Erstellt ein neues View‑Dokument und verknüpft es direkt mit dem User.
+     * Loads all views belonging to a user by their user ID.
      *
-     * @param projID     die ID des Projekts, in dem das View angelegt werden soll
-     * @param viewLayout das ViewLayout, das angelegt werden soll
-     * @param onSuccess  Callback mit der erzeugten viewID bei Erfolg
-     * @param onFailure  Callback mit Fehlermeldung bei Misserfolg
+     * @param userID The Firebase UID of the user (or null)
+     * @return A list of all ViewLayout objects for this user
+     */
+    abstract suspend fun getViewsFromUser(userID: String?): List<ViewLayout>
+
+    /**
+     * Creates a new view document and immediately associates it with the user.
+     *
+     * @param projID     The ID of the project under which the view should be created
+     * @param viewLayout The ViewLayout object to create
+     * @param onSuccess  Callback invoked with the newly created viewID on success
+     * @param onFailure  Callback invoked with an error message on failure
      */
     abstract suspend fun createViewForUser(
         projID: String,
@@ -431,7 +436,8 @@ abstract class StorageServerAPI () {
         onSuccess: (String) -> Unit,
         onFailure: (String) -> Unit
     )
-    abstract suspend fun getViewsFromUser(userID: String?): List<ViewLayout>
+
+    /** Local flow references to Firestore collections */
     protected lateinit var m_projects: Flow<List<ProjectLayout>>
     protected lateinit var m_labels: Flow<List<LabelLayout>>
     protected lateinit var m_issues: Flow<List<IssueLayout>>

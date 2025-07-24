@@ -1,15 +1,14 @@
 package com.example.viewboard
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.example.viewboard.backend.NotificationHelper
+import com.example.viewboard.backend.notification.impl.Notification
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.Navigation
 import com.example.viewboard.ui.theme.ComposeLoginScreenInitTheme
 import kotlinx.coroutines.launch
@@ -24,16 +23,16 @@ class MainActivity : ComponentActivity() {
             onSuccess = {},
             onError = {}
         )
-        NotificationHelper.createNotificationChannel(this)
+        Notification.createNotificationChannel(this)
 
         AuthAPI.ensureUserProfileExists(
             onSuccess = {
                 lifecycleScope.launch {
-                    NotificationHelper.checkUpcomingDeadlines(this@MainActivity)
-                    NotificationHelper.checkNewIssueAssignments(this@MainActivity)
-                    NotificationHelper.checkNewProjectAssignments(this@MainActivity)                }
+                    Notification.checkUpcomingDeadlines(this@MainActivity)
+                    Notification.checkNewIssueAssignments(this@MainActivity)
+                    Notification.checkNewProjectAssignments(this@MainActivity)                }
             },
-            onError = { /* Fehlerbehandlung */ }
+            onError = { /* TODO error handling */ }
         )
 
         setContent {

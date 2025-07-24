@@ -2,7 +2,7 @@ package com.example.viewboard.stateholder
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.ui.screens.ProjectFilter
 import kotlinx.coroutines.flow.MutableStateFlow

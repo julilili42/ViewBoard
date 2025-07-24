@@ -295,8 +295,6 @@ fun PasswordResetDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    val context = LocalContext.current
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Reset Password") },

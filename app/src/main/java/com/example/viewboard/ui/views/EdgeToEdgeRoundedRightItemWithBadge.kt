@@ -36,16 +36,13 @@ fun EdgeToEdgeRoundedRightItemWithBadge(
             bottomEnd = 24.dp
         ),
         modifier = modifier
-            // Card selbst füllt die Breite
             .fillMaxWidth()
             .offset(x = -parentHorizontalPadding)
 
-            // entferne inneres Card-Padding
             .padding(horizontal = 0.dp, vertical = 0.dp),
-        colors = CardDefaults.cardColors(), // Standard‑Hintergrund
-        elevation = CardDefaults.cardElevation(defaultElevation = 30.dp) // Standard‑Elevation
+        colors = CardDefaults.cardColors(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 30.dp)
     ) {
-        // Inhalt der Card: deine edge‑to‑edge Box
         Box(
             modifier = Modifier
                 .fillMaxWidth()

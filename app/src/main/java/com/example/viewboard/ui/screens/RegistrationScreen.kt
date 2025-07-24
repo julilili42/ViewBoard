@@ -149,12 +149,12 @@ fun RegisterSection(navController: NavController, modifier: Modifier = Modifier)
                     email = email,
                     password = password,
                     onSuccess = {
-                        Toast.makeText(context, "Registrierung erfolgreich", Toast.LENGTH_SHORT)
+                        Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT)
                             .show()
                         navController.navigate(Screen.HomeScreen.route)
                     },
                     onError = { msg ->
-                        Toast.makeText(context, "Fehler: $msg", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Error: $msg", Toast.LENGTH_SHORT).show()
                     }
                 )
             },

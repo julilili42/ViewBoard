@@ -28,7 +28,6 @@ fun TimelineSchedule(
     onselectDate: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavController
-
 ) {
     Box(modifier = modifier.height(height)) {
         val issuesList by issueViewModel.displayedAllIssues.collectAsState()

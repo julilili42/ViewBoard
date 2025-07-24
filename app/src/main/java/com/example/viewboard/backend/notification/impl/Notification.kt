@@ -1,5 +1,6 @@
-package com.example.viewboard.backend
+package com.example.viewboard.backend.notification.impl
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -9,24 +10,23 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import com.example.viewboard.R
 import com.example.viewboard.backend.auth.impl.FirebaseProvider
+import com.example.viewboard.backend.notification.abstraction.NotificationServerAPI
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import kotlin.random.Random
-import java.time.Instant
 import java.time.format.DateTimeFormatter
-import androidx.core.content.edit
+import kotlin.random.Random
 
-
-object NotificationHelper {
-
+object Notification: NotificationServerAPI() {
     private const val CHANNEL_ID = "default"
 
-    fun createNotificationChannel(context: Context) {
+    public override fun createNotificationChannel(context: Context) {
         val channel = NotificationChannel(
             CHANNEL_ID,
             "Notifications",
@@ -36,22 +36,22 @@ object NotificationHelper {
         manager.createNotificationChannel(channel)
     }
 
-    fun saveSeenProject(context: Context, projectId: String) {
+    public override fun saveSeenProject(context: Context, projectId: String) {
         val prefs = context.getSharedPreferences("seen_projects", Context.MODE_PRIVATE)
         prefs.edit() { putBoolean(projectId, true) }
     }
 
-    fun hasSeenProject(context: Context, projectId: String): Boolean {
+    public override fun hasSeenProject(context: Context, projectId: String): Boolean {
         val prefs = context.getSharedPreferences("seen_projects", Context.MODE_PRIVATE)
         return prefs.getBoolean(projectId, false)
     }
 
-    fun sendNotification(context: Context, title: String, message: String) {
-        // Android 13+ → Permission prüfen
+    public override fun sendNotification(context: Context, title: String, message: String) {
+        // for Android 13+ check permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     context,
-                    android.Manifest.permission.POST_NOTIFICATIONS
+                    Manifest.permission.POST_NOTIFICATIONS
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 return
@@ -65,12 +65,12 @@ object NotificationHelper {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         with(NotificationManagerCompat.from(context)) {
-            notify(Random.nextInt(), builder.build())
+            notify(Random.Default.nextInt(), builder.build())
         }
 
     }
 
-    suspend fun checkUpcomingDeadlines(context: Context) {
+    public override suspend fun checkUpcomingDeadlines(context: Context) {
         val uid = FirebaseProvider.auth.currentUser?.uid ?: return
 
         val userDoc = Firebase.firestore.collection("users").document(uid).get().await()
@@ -109,18 +109,19 @@ object NotificationHelper {
 
         }
     }
-    fun saveSeenIssue(context: Context, issueId: String) {
+
+    public override fun saveSeenIssue(context: Context, issueId: String) {
         val prefs = context.getSharedPreferences("seen_issues", Context.MODE_PRIVATE)
         prefs.edit { putBoolean(issueId, true) }
     }
 
-    fun hasSeenIssue(context: Context, issueId: String): Boolean {
+    public override fun hasSeenIssue(context: Context, issueId: String): Boolean {
         val prefs = context.getSharedPreferences("seen_issues", Context.MODE_PRIVATE)
         return prefs.getBoolean(issueId, false)
     }
 
 
-    suspend fun checkNewIssueAssignments(context: Context) {
+    public override suspend fun checkNewIssueAssignments(context: Context) {
         val uid = FirebaseProvider.auth.currentUser?.uid ?: return
 
         val userDoc = Firebase.firestore.collection("users").document(uid).get().await()
@@ -144,9 +145,7 @@ object NotificationHelper {
         }
     }
 
-
-
-    suspend fun checkNewProjectAssignments(context: Context) {
+    public override suspend fun checkNewProjectAssignments(context: Context) {
         val uid = FirebaseProvider.auth.currentUser?.uid ?: return
 
         val projectsSnap = Firebase.firestore.collection("Projects").get().await()
@@ -168,7 +167,4 @@ object NotificationHelper {
             }
         }
     }
-
-
-
 }

@@ -79,7 +79,7 @@ fun DraggableMyTasksSection(
                 .align(Alignment.BottomCenter)
                 .background(Color.White)
         ) {
-            // Ziehgriff
+            // Drag and Drop
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -115,7 +115,7 @@ fun DraggableMyTasksSection(
                             Log.d("selectedName", "viewid =$view ")
                             viewsViewModel.selectView(view)},
                         modifier = Modifier
-                            .fillMaxWidth(0.4f)   // nur 80% der Breite
+                            .fillMaxWidth(0.4f)   // 80% of width
                             .padding()
                     )
                     Spacer(modifier = Modifier.weight(1f))

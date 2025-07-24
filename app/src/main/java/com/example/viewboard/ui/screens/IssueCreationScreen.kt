@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.ui.theme.uiColor
-import com.example.viewboard.backend.Timestamp
+import com.example.viewboard.backend.util.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.OutlinedTextField
@@ -27,7 +27,7 @@ import com.example.viewboard.backend.auth.impl.AuthAPI
 import kotlinx.coroutines.launch
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
-import com.example.viewboard.backend.storageServer.impl.FirebaseAPI
+import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.ui.navigation.ChipInputField
 import com.example.viewboard.ui.utils.capitalizeWords
 
@@ -199,7 +199,7 @@ fun IssueCreationScreen(
                 ChipInputField(
                     entries = assignments,
                     newEntry = newParticipant,
-                    inhaltText = "Add team member…",
+                    contentText = "Add team member…",
                     suggestions = suggestionList,
                     onSuggestionClick = { name ->
                         if (name !in assignments) {
@@ -220,7 +220,7 @@ fun IssueCreationScreen(
             ChipInputField(
                 entries = labels,
                 newEntry = newLabelName,
-                inhaltText = "Add Label…",
+                contentText = "Add Label…",
                 onNewEntryChange = { newLabelName = it },
                 onEntryConfirmed = {
                     if (newLabelName.isNotBlank()) {
@@ -302,8 +302,8 @@ fun IssueCreationScreen(
                             title       = title.capitalizeWords(),
                             desc        = desc,
                             creator     = currentUserId,
-                            assignments = assignmentIds,
-                            projectid = projectId,
+                            users = assignmentIds,
+                            projID = projectId,
                             labels      = ArrayList(labels),
                             deadlineTS  = deadline.export()
                         )

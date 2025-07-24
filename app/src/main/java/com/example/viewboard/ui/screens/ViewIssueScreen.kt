@@ -93,7 +93,7 @@ fun ViewIssueScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(16.dp)
         ) {
-            // Dialog für neue Issue
+            // Dialog new issues
             if (showDialog) {
                 item {
                     ProjectIssueDialog(
@@ -133,9 +133,9 @@ fun ViewIssueScreen(
             items(issues) { issue ->
                 val emailsState by produceState<List<String?>>(
                     initialValue = emptyList(),
-                    key1 = issue .assignments
+                    key1 = issue .users
                 ) {
-                    val result = runCatching { AuthAPI.getEmailsByIds(issue .assignments) }
+                    val result = runCatching { AuthAPI.getEmailsByIds(issue .users) }
                         .getOrNull()
                         ?.getOrNull()
                     value = result ?: emptyList()

@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="24dp"
-    tools:context="com.example.viewboard.account.Login.Login">
+    tools:context="com.example.viewboard.backend.auth.impl.LoginActivity">
 
     <Button
         android:id="@+id/sign_in_button"

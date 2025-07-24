@@ -1,4 +1,4 @@
-package com.example.viewboard.backend
+package com.example.viewboard.backend.util
 
 import java.time.Instant
 import java.time.ZoneId
