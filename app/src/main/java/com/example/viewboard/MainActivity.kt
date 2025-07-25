@@ -1,6 +1,8 @@
 package com.example.viewboard
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,15 +18,20 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // custom start-up screen with app icon
         installSplashScreen()
+
+        // initializes local references to data base
         FirebaseAPI.init()
+
+        // use full screen size
         enableEdgeToEdge()
-        AuthAPI.ensureUserProfileExists(
-            onSuccess = {},
-            onError = {}
-        )
+
+        // created to show/enable notifications
         Notification.createNotificationChannel(this)
 
+        // notification checks
         AuthAPI.ensureUserProfileExists(
             onSuccess = {
                 lifecycleScope.launch {
@@ -32,11 +39,20 @@ class MainActivity : ComponentActivity() {
                     Notification.checkNewIssueAssignments(this@MainActivity)
                     Notification.checkNewProjectAssignments(this@MainActivity)                }
             },
-            onError = { /* TODO error handling */ }
+            onError = { error ->
+                Log.e("MainActivity", "profile could not be established")
+                Toast.makeText(
+                    this@MainActivity,
+                    "Error when loading profile",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         )
 
         setContent {
+            // color theme
             ComposeLoginScreenInitTheme {
+                // app navigation-graph
                 Navigation()
             }
         }
