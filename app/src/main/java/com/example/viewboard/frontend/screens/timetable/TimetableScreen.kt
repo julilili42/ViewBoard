@@ -113,7 +113,6 @@ fun TimetableScreen(issueViewModel: IssueViewModel,
                     VerticalTimelineSchedule(
                         projects = projects,
                         modifier = Modifier.fillMaxSize(),
-                        navController= navController,
                     )
                 } else {
                     contactHeight = 530.dp

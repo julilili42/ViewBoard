@@ -45,7 +45,6 @@ import java.time.LocalDate
 fun VerticalTimelineSchedule(
     projects: List<ProjectLayout>,
     modifier: Modifier = Modifier,
-    navController: NavController
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val primaryColor = MaterialTheme.colorScheme.primary
