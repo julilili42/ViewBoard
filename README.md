@@ -5,13 +5,27 @@
 **ViewBoard** ist eine Android-App zur effizienten Verwaltung von Aufgaben (Issues) in privaten oder geschäftlichen Projektteams. Die App bietet eine klare Struktur, Benachrichtigungen und anpassbare Ansichten für unterschiedliche Nutzerbedürfnisse.
 
 ---
+## 📥 APK
+
+Die Debug‑APK für dieses Projekt liegt im Ordner `/apk`:
+
+```bash
+/apk/app-debug.apk
+```
+
+Zur Installation auf einem verbundenen Gerät oder Emulator:
+
+```bash
+adb install -r apk/app-debug.apk
+```
+---
 
 📌 Zusammenarbeit
 
 - Entwicklung: `develop`
 - Releases & Abgaben: `main`
 - Neue Features: `feature/<name>`
-
+- Commit-Messages: Nutzt Prefixes wie `[feature]`, `[refactor]`, `[fix]`
 ---
 
 ## 🎯 Zielgruppe und Konzept
