@@ -51,11 +51,7 @@ fun VerticalTimelineSchedule(
         val monthPx = totalPx / 365f
         val scrollState = rememberScrollState()
         val density = LocalDensity.current
-
-        val today = LocalDate.now()
         val todayInDays = dayOfYearFromIso(LocalDate.now().toString())
-        val monthFrac = (today.dayOfMonth - 1) / today.lengthOfMonth().toFloat()
-        val todayPx = ((today.monthValue - 1) * 30 + monthFrac) * monthPx
         val todayInDaysPx = (todayInDays * monthPx) + 60
         val todayInDaysDP = with(density) { todayInDaysPx.toDp() }
         Box(modifier = Modifier.fillMaxSize()) {
@@ -168,16 +164,14 @@ fun VerticalTimelineSchedule(
                                         MaterialTheme.colorScheme.secondary,
                                         MaterialTheme.colorScheme.primary
                                     )
-                                    VerticalMilestoneBar(
+                                    VerticalProgressBar(
                                         project = project,
-                                        total = total,
                                         colors = primaryGradient,
                                         timeSpan = IssueDeadlineFilter.ALL_TIME,
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .padding(vertical = 1.dp),
                                         width = 8.dp,
-                                        spacing = 1.dp,
                                         corner = 4.dp
                                     )
                                 }
