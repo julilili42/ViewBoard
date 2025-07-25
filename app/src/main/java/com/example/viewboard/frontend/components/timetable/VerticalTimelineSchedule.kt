@@ -127,7 +127,7 @@ fun VerticalTimelineSchedule(
                             val dayDiff = endDateToDays - startDateToDays
                             val startDp = (startDateToDays * monthPx + 60).toDp()
                             val heightDp = (dayDiff * monthPx - 30).toDp()
-                            val projectNameCode = generateProjectCodeFromDbId(project.name)
+                            val projectNameCode = generateProjectCodeFromDbId(project.id)
                             val projectNamecolor = colorFromCode(projectNameCode)
                             val total = (dayDiff / 15).toInt().coerceAtLeast(1)
                             Log.d("total", "total: $total")
