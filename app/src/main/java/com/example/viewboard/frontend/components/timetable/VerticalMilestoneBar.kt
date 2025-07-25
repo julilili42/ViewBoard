@@ -2,9 +2,7 @@ package com.example.viewboard.frontend.components.timetable
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
@@ -24,16 +22,17 @@ import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
 import com.example.viewboard.backend.dataLayout.IssueProgress
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.frontend.components.home.issueProgress.IssueProgressCalculator
-import com.example.viewboard.frontend.components.utils.gradientColorList
+
 @Composable
 fun VerticalProgressBar(
+    modifier: Modifier = Modifier,
     project: ProjectLayout,
     width: Dp = 8.dp,
     corner: Dp = 4.dp,
     timeSpan: IssueDeadlineFilter,
     colors: List<Color>,
     calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },
-    modifier: Modifier = Modifier,
+
 ) {
     val progress by produceState<IssueProgress>(
         initialValue = IssueProgress(0, 0, 0f),
