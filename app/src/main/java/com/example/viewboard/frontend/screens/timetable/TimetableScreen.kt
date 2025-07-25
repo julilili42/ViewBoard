@@ -128,7 +128,6 @@ fun TimetableScreen(issueViewModel: IssueViewModel,
                             modifier     = Modifier.fillMaxWidth().height(contactHeight),
                             onselectDate = { selectedDate = it },
                             selectedDate = selectedDate,
-                            navController = navController
 
                         )
                     }

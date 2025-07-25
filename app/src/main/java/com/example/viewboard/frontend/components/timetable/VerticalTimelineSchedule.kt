@@ -32,6 +32,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalDensity
+import androidx.navigation.NavController
 import colorFromCode
 import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
 import com.example.viewboard.backend.dataLayout.ProjectLayout
@@ -43,7 +44,8 @@ import java.time.LocalDate
 @Composable
 fun VerticalTimelineSchedule(
     projects: List<ProjectLayout>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val primaryColor = MaterialTheme.colorScheme.primary
