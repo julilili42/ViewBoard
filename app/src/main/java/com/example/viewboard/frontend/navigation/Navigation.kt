@@ -84,15 +84,16 @@ fun Navigation(modifier: Modifier = Modifier) {
                 composable(BottomBarScreen.Home.route) { backStack ->
                     val issueViewModel: IssueViewModel = viewModel(backStack)
                     val viewsViewModel: ViewsViewModel = viewModel(backStack)
-                    val mainViewModel : MainViewModel = viewModel(backStack)
+                    val mainViewModel: MainViewModel = viewModel(backStack)
                     MainLayout(navController, currentRoute) { padding ->
-                        Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(padding)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(padding)
                         ) {
                             HomeScreen(
                                 navController = navController,
-                                viewModel = mainViewModel ,
+                                viewModel = mainViewModel,
                                 modifier = Modifier,
                                 issueViewModel = issueViewModel,
                                 viewsViewModel = viewsViewModel,
@@ -102,39 +103,26 @@ fun Navigation(modifier: Modifier = Modifier) {
 
                 }
 
-                composable(BottomBarScreen.Timetable.route) { backStack->
+                composable(BottomBarScreen.Timetable.route) { backStack ->
                     val issueViewModel: IssueViewModel = viewModel(backStack)
                     val projectViewModel: ProjectViewModel = viewModel(backStack)
                     MainLayout(navController, currentRoute) { padding ->
-                        Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(padding)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(padding)
                         ) {
-                            TimetableScreen(navController = navController,
+                            TimetableScreen(
+                                navController = navController,
                                 issueViewModel = issueViewModel,
-                                projectViewModel = projectViewModel,)
+                                projectViewModel = projectViewModel,
+                            )
                         }
                     }
                 }
 
                 composable(BottomBarScreen.Profile.route) {
                     MainLayout(navController, currentRoute) { padding ->
-                        Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(padding)
-                        ) {
-                            ProfileScreen(navController = navController)
-                        }
-                    }
-                }
-            }
-
-            composable(BottomBarScreen.Profile.route) {
-                MainLayout(navController, currentRoute) { padding ->
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(padding)
-                    ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -146,15 +134,29 @@ fun Navigation(modifier: Modifier = Modifier) {
                 }
             }
 
-            composable(BottomBarScreen.View.route) {backStack->
+            composable(BottomBarScreen.Profile.route) {
+                MainLayout(navController, currentRoute) { padding ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding)
+                    ) {
+                        ProfileScreen(navController = navController)
+                    }
+                }
+            }
+
+            composable(BottomBarScreen.View.route) { backStack ->
                 val viewsViewModel: ViewsViewModel = viewModel(backStack)
                 MainLayout(navController, currentRoute) { padding ->
 
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(padding)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding)
                     ) {
-                        ViewScreen(navController = navController,
+                        ViewScreen(
+                            navController = navController,
                             viewsViewModel = viewsViewModel,
                         )
                     }
@@ -170,22 +172,26 @@ fun Navigation(modifier: Modifier = Modifier) {
                 val projectName = backStackEntry.arguments!!.getString("projectName")!!
                 val projectViewModel: ProjectViewModel = viewModel(backStackEntry)
                 MainLayout(navController, currentRoute) { padding ->
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(padding)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding)
                     ) {
-                        ProjectsScreen(navController = navController,
+                        ProjectsScreen(
+                            navController = navController,
                             projectName = projectName,
-                            projectViewModel = projectViewModel)
+                            projectViewModel = projectViewModel
+                        )
                     }
                 }
             }
 
             composable(route = NavScreens.HelpSupportNavScreens.route) {
                 MainLayout(navController, currentRoute) { padding ->
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(padding)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding)
                     ) {
                         HelpSupportScreen(navController = navController)
                     }
@@ -194,8 +200,9 @@ fun Navigation(modifier: Modifier = Modifier) {
 
             composable(route = NavScreens.ChangePasswordNavScreens.route) {
                 MainLayout(navController, currentRoute) { padding ->
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
                     ) {
                         ChangePasswordScreen(navController = navController)
                     }
@@ -204,8 +211,9 @@ fun Navigation(modifier: Modifier = Modifier) {
 
             composable(route = NavScreens.ChangeEmailNavScreens.route) {
                 MainLayout(navController, currentRoute) { padding ->
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
                     ) {
                         ChangeEmailScreen(navController = navController)
                     }
@@ -216,7 +224,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                 route = NavScreens.IssueEditNavScreens.route,
                 arguments = listOf(
                     navArgument("projectId") { type = NavType.StringType },
-                    navArgument("issueId"  ) { type = NavType.StringType }
+                    navArgument("issueId") { type = NavType.StringType }
                 )
             ) { backStack ->
                 val projId = backStack.arguments!!.getString("projectId")!!
@@ -229,8 +237,8 @@ fun Navigation(modifier: Modifier = Modifier) {
                 if (issue != null) {
                     IssueEditScreen(
                         navController = navController,
-                        projectId     = projId,
-                        issue         = issue!!
+                        projectId = projId,
+                        issue = issue!!
                     )
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -251,9 +259,9 @@ fun Navigation(modifier: Modifier = Modifier) {
                 if (project != null) {
                     ProjectEditScreen(
                         navController = navController,
-                        projectId     = id,
-                        project       = project!!,
-                        onUpdated     = { /* optional: reload or navigate */ }
+                        projectId = id,
+                        project = project!!,
+                        onUpdated = { /* optional: reload or navigate */ }
                     )
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -276,7 +284,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                     ) {
                         IssueCreationScreen(
                             navController = navController,
-                            projectId    = projectId
+                            projectId = projectId
                         )
                     }
                 }
@@ -284,8 +292,9 @@ fun Navigation(modifier: Modifier = Modifier) {
 
             composable(route = NavScreens.ProjectCreationNavScreens.route) {
                 MainLayout(navController, currentRoute) { padding ->
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
                     ) {
                         ProjectCreationScreen(navController = navController)
                     }
@@ -296,11 +305,11 @@ fun Navigation(modifier: Modifier = Modifier) {
                 route = NavScreens.IssueNavScreens.route,
                 arguments = listOf(
                     navArgument("projectName") { type = NavType.StringType },
-                    navArgument("projectId"  ) { type = NavType.StringType }
+                    navArgument("projectId") { type = NavType.StringType }
                 )
             ) { backStack ->
                 val projectName = backStack.arguments!!.getString("projectName")!!
-                val projectId   = backStack.arguments!!.getString("projectId")!!
+                val projectId = backStack.arguments!!.getString("projectId")!!
                 val issueViewModel: IssueViewModel = viewModel(backStack)
                 MainLayout(navController, currentRoute) { padding ->
                     Box(
@@ -312,10 +321,10 @@ fun Navigation(modifier: Modifier = Modifier) {
                             modifier = Modifier.fillMaxSize()
                         ) {
                             IssueScreen(
-                                projectName  = projectName,
-                                projectId    = projectId,
-                                issueViewModel=issueViewModel ,
-                                navController= navController,
+                                projectName = projectName,
+                                projectId = projectId,
+                                issueViewModel = issueViewModel,
+                                navController = navController,
                             )
                         }
                     }
@@ -325,12 +334,12 @@ fun Navigation(modifier: Modifier = Modifier) {
             composable(
                 route = NavScreens.ViewIssueNavScreens.route,
                 arguments = listOf(
-                    navArgument("viewID")   { type = NavType.StringType },
-                    navArgument("projID")   { type = NavType.StringType }
+                    navArgument("viewID") { type = NavType.StringType },
+                    navArgument("projID") { type = NavType.StringType }
                 )
             ) { backStack ->
-                val viewID   = backStack.arguments!!.getString("viewID")!!
-                val projID   = backStack.arguments!!.getString("projID")!!
+                val viewID = backStack.arguments!!.getString("viewID")!!
+                val projID = backStack.arguments!!.getString("projID")!!
                 val viewName = backStack.arguments!!.getString("viewName")!!
                 val issueViewModel: IssueViewModel = viewModel(backStack)
                 val projectViewModel: ProjectViewModel = viewModel(backStack)
@@ -351,7 +360,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                                 projectViewModel = projectViewModel,
                                 navController = navController,
 
-                            )
+                                )
                         }
                     }
                 }
