@@ -32,14 +32,14 @@ fun VerticalMilestoneBar(
     spacing: Dp = 2.dp,
     corner: Dp = 4.dp,
     timeSpan: IssueDeadlineFilter,
-    total: Int=4,
+    total: Int = 4,
     colors: List<Color>,
     calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },
     modifier: Modifier = Modifier,
 ) {
     val brush = gradientColorList(colors.first(), colors.last(), total)
     val progress by produceState<IssueProgress>(
-        initialValue = IssueProgress(0,0,0f),
+        initialValue = IssueProgress(0, 0, 0f),
         key1 = project.id,
         key2 = timeSpan
     ) {
@@ -53,7 +53,7 @@ fun VerticalMilestoneBar(
         verticalArrangement = Arrangement.spacedBy(spacing)
     ) {
         repeat(total) { idx ->
-            val fillFrac = (progress.completedIssues.toFloat() - idx).coerceIn(0f,1f)
+            val fillFrac = (progress.completedIssues.toFloat() - idx).coerceIn(0f, 1f)
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -64,7 +64,7 @@ fun VerticalMilestoneBar(
                 if (fillFrac > 0f) {
                     // Color for index
                     val baseColor = brush[idx]
-                    val nextColor = brush[idx+1]
+                    val nextColor = brush[idx + 1]
 
                     Box(
                         modifier = Modifier
@@ -78,7 +78,7 @@ fun VerticalMilestoneBar(
                                         nextColor.copy(alpha = 1f)
                                     ),
                                     startY = 0.0f,
-                                    endY   = Float.POSITIVE_INFINITY,
+                                    endY = Float.POSITIVE_INFINITY,
                                     tileMode = TileMode.Clamp
                                 )
                             )

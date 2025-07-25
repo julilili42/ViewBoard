@@ -13,7 +13,7 @@ import kotlinx.coroutines.tasks.await
 
 
 object AuthAPI : AuthServerAPI() {
-    public override fun register(
+    override fun register(
         name: String,
         email: String,
         password: String,
@@ -42,14 +42,20 @@ object AuthAPI : AuthServerAPI() {
                         .firestore
                         .collection("users")
                         .document(user.uid)
-                        .set(mapOf("name" to name, "email" to email,"notificationsEnabled" to true))
+                        .set(
+                            mapOf(
+                                "name" to name,
+                                "email" to email,
+                                "notificationsEnabled" to true
+                            )
+                        )
                         .addOnSuccessListener { onSuccess() }
                         .addOnFailureListener { e -> onError(e.message ?: "Firestore error") }
                 }
             }
     }
 
-    public override fun updateEmail(
+    override fun updateEmail(
         oldPassword: String,
         newEmail: String,
         onSuccess: () -> Unit,
@@ -78,7 +84,7 @@ object AuthAPI : AuthServerAPI() {
         )
     }
 
-    public override fun sendPasswordResetMail(
+    override fun sendPasswordResetMail(
         email: String,
         onComplete: (message: String) -> Unit
     ) {
@@ -94,7 +100,7 @@ object AuthAPI : AuthServerAPI() {
     }
 
 
-    public override fun setPassword(
+    override fun setPassword(
         newPassword: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -112,7 +118,7 @@ object AuthAPI : AuthServerAPI() {
             }
     }
 
-    public override fun verifyPassword(
+    override fun verifyPassword(
         password: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -132,7 +138,7 @@ object AuthAPI : AuthServerAPI() {
             }
     }
 
-    public override fun updatePassword(
+    override fun updatePassword(
         oldPassword: String,
         newPassword: String,
         onSuccess: () -> Unit,
@@ -145,19 +151,19 @@ object AuthAPI : AuthServerAPI() {
         )
     }
 
-    public override fun getUid(): String? {
+    override fun getUid(): String? {
         return FirebaseProvider.auth.currentUser?.uid
     }
 
-    public override fun getEmail(): String? {
+    override fun getEmail(): String? {
         return FirebaseProvider.auth.currentUser?.email
     }
 
-    public override fun isLoggedIn(): Boolean {
+    override fun isLoggedIn(): Boolean {
         return FirebaseProvider.auth.currentUser != null
     }
 
-    public override suspend fun getListOfAllUsers(): Result<List<UserLayout>> = runCatching {
+    override suspend fun getListOfAllUsers(): Result<List<UserLayout>> = runCatching {
         val ref = FirebaseProvider.firestore
             .collection("users")
             .get()
@@ -169,7 +175,7 @@ object AuthAPI : AuthServerAPI() {
         }
     }
 
-    public override fun updateFCMToken(token: String, onComplete: (() -> Unit)?) {
+    override fun updateFCMToken(token: String, onComplete: (() -> Unit)?) {
         val uid = getUid() ?: return
         FirebaseProvider.firestore
             .collection("users")
@@ -178,7 +184,7 @@ object AuthAPI : AuthServerAPI() {
             .addOnSuccessListener { onComplete?.invoke() }
     }
 
-    public override fun fetchAndSaveFcmToken(onComplete: (() -> Unit)?) {
+    override fun fetchAndSaveFcmToken(onComplete: (() -> Unit)?) {
         val uid = getUid() ?: return
         FirebaseProvider.messaging().token
             .addOnSuccessListener { token ->
@@ -189,7 +195,7 @@ object AuthAPI : AuthServerAPI() {
     }
 
 
-    public override fun loginWithEmail(
+    override fun loginWithEmail(
         context: Context,
         email: String,
         password: String,
@@ -217,12 +223,12 @@ object AuthAPI : AuthServerAPI() {
             }
     }
 
-    public override fun getCurrentDisplayName(): String? {
+    override fun getCurrentDisplayName(): String? {
         return FirebaseProvider.auth.currentUser?.displayName
     }
 
 
-    public override suspend fun getDisplayName(
+    override suspend fun getDisplayName(
         userID: String,
         onSuccess: (String) -> Unit,
         onFailure: (String) -> Unit
@@ -237,6 +243,7 @@ object AuthAPI : AuthServerAPI() {
             null
         }
     }
+
     override fun ensureUserProfileExists(
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -278,20 +285,21 @@ object AuthAPI : AuthServerAPI() {
             }
     }
 
-    override suspend fun getEmailsByIds(userIds: List<String>): Result<List<String?>> = runCatching {
-        // split userIds in size 10 chunks, s.t. less queries are needed
-        userIds.chunked(10).flatMap { chunk ->
+    override suspend fun getEmailsByIds(userIds: List<String>): Result<List<String?>> =
+        runCatching {
+            // split userIds in size 10 chunks, s.t. less queries are needed
+            userIds.chunked(10).flatMap { chunk ->
 
-            val snapshot = FirebaseProvider.firestore
-                .collection("users")
-                .whereIn(FieldPath.documentId(), chunk)
-                .get()
-                .await()
+                val snapshot = FirebaseProvider.firestore
+                    .collection("users")
+                    .whereIn(FieldPath.documentId(), chunk)
+                    .get()
+                    .await()
 
-            // extract list of emails from snapshot
-            snapshot.documents.map { it.getString("email") }
+                // extract list of emails from snapshot
+                snapshot.documents.map { it.getString("email") }
+            }
         }
-    }
 
     override suspend fun getUserById(userID: String): Result<UserLayout> = runCatching {
         val doc = FirebaseProvider.firestore

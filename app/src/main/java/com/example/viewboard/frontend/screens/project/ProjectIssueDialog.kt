@@ -110,7 +110,7 @@ fun ProjectIssueDialog(
                         startX = 0f,
                         endX = columnWidthPx
                     )
-                    items(projectsWithIssues ) { project ->
+                    items(projectsWithIssues) { project ->
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()

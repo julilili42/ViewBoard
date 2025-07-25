@@ -53,7 +53,7 @@ fun ProjectEditScreen(
     var endDate by remember { mutableStateOf(project.deadlineTS) }
 
     val names = project.users.toList().mapNotNull { email ->
-        users.find { it.id .equals(email, ignoreCase = true) }?.email
+        users.find { it.id.equals(email, ignoreCase = true) }?.email
     }
     var assignments by remember(names) {
         mutableStateOf(names)
@@ -232,9 +232,11 @@ fun ProjectEditScreen(
                         .padding(8.dp)
                 )
             } else {
-                Text("Only the creator can edit or delete this project.\n",
+                Text(
+                    "Only the creator can edit or delete this project.\n",
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(top = 16.dp))
+                    modifier = Modifier.padding(top = 16.dp)
+                )
             }
         }
     }

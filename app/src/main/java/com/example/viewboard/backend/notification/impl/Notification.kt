@@ -23,10 +23,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
-object Notification: NotificationServerAPI() {
+object Notification : NotificationServerAPI() {
     private const val CHANNEL_ID = "default"
 
-    public override fun createNotificationChannel(context: Context) {
+    override fun createNotificationChannel(context: Context) {
         val channel = NotificationChannel(
             CHANNEL_ID,
             "Notifications",
@@ -36,17 +36,17 @@ object Notification: NotificationServerAPI() {
         manager.createNotificationChannel(channel)
     }
 
-    public override fun saveSeenProject(context: Context, projectId: String) {
+    override fun saveSeenProject(context: Context, projectId: String) {
         val prefs = context.getSharedPreferences("seen_projects", Context.MODE_PRIVATE)
         prefs.edit() { putBoolean(projectId, true) }
     }
 
-    public override fun hasSeenProject(context: Context, projectId: String): Boolean {
+    override fun hasSeenProject(context: Context, projectId: String): Boolean {
         val prefs = context.getSharedPreferences("seen_projects", Context.MODE_PRIVATE)
         return prefs.getBoolean(projectId, false)
     }
 
-    public override fun sendNotification(context: Context, title: String, message: String) {
+    override fun sendNotification(context: Context, title: String, message: String) {
         // for Android 13+ check permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
@@ -70,7 +70,7 @@ object Notification: NotificationServerAPI() {
 
     }
 
-    public override suspend fun checkUpcomingDeadlines(context: Context) {
+    override suspend fun checkUpcomingDeadlines(context: Context) {
         val uid = FirebaseProvider.auth.currentUser?.uid ?: return
 
         val userDoc = Firebase.firestore.collection("users").document(uid).get().await()
@@ -87,7 +87,8 @@ object Notification: NotificationServerAPI() {
         for (issueDoc in issuesSnap.documents) {
             val issue = issueDoc.data ?: continue
             val creator = issue["creator"] as? String
-            val assignments = (issue["assignments"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
+            val assignments =
+                (issue["assignments"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
 
 
             if (creator != uid && uid !in assignments) continue
@@ -98,7 +99,10 @@ object Notification: NotificationServerAPI() {
             Log.d("NOTIFY", "Parsed deadlineTS: $deadlineStr → $deadline (local)")
 
             if (deadline == inTwoDays || deadline == tomorrow) {
-                Log.d("NOTIFY", "sendNotification called: Deadline incoming! - The Issue '${issue["title"]}' deadline is due $deadlineFormatted.")
+                Log.d(
+                    "NOTIFY",
+                    "sendNotification called: Deadline incoming! - The Issue '${issue["title"]}' deadline is due $deadlineFormatted."
+                )
 
                 sendNotification(
                     context,
@@ -110,18 +114,18 @@ object Notification: NotificationServerAPI() {
         }
     }
 
-    public override fun saveSeenIssue(context: Context, issueId: String) {
+    override fun saveSeenIssue(context: Context, issueId: String) {
         val prefs = context.getSharedPreferences("seen_issues", Context.MODE_PRIVATE)
         prefs.edit { putBoolean(issueId, true) }
     }
 
-    public override fun hasSeenIssue(context: Context, issueId: String): Boolean {
+    override fun hasSeenIssue(context: Context, issueId: String): Boolean {
         val prefs = context.getSharedPreferences("seen_issues", Context.MODE_PRIVATE)
         return prefs.getBoolean(issueId, false)
     }
 
 
-    public override suspend fun checkNewIssueAssignments(context: Context) {
+    override suspend fun checkNewIssueAssignments(context: Context) {
         val uid = FirebaseProvider.auth.currentUser?.uid ?: return
 
         val userDoc = Firebase.firestore.collection("users").document(uid).get().await()
@@ -132,7 +136,8 @@ object Notification: NotificationServerAPI() {
         for (doc in issuesSnap.documents) {
             val issueId = doc.id
             val data = doc.data ?: continue
-            val assignments = (data["assignments"] as? List<*>)?.mapNotNull { it as? String } ?: continue
+            val assignments =
+                (data["assignments"] as? List<*>)?.mapNotNull { it as? String } ?: continue
 
             if (uid in assignments && !hasSeenIssue(context, issueId)) {
                 sendNotification(
@@ -145,7 +150,7 @@ object Notification: NotificationServerAPI() {
         }
     }
 
-    public override suspend fun checkNewProjectAssignments(context: Context) {
+    override suspend fun checkNewProjectAssignments(context: Context) {
         val uid = FirebaseProvider.auth.currentUser?.uid ?: return
 
         val projectsSnap = Firebase.firestore.collection("Projects").get().await()

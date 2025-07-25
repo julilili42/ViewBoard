@@ -1,4 +1,5 @@
 package com.example.viewboard.frontend.stateholder
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
@@ -27,7 +28,7 @@ class ProjectViewModel : ViewModel() {
     private val _sortOrder = MutableStateFlow(SortOrder.ASC)
     val sortField: StateFlow<SortField> = _sortField.asStateFlow()
     val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
-    
+
     fun setFilter(mode: ProjectFilter) {
         _filter.value = mode
         reload()
@@ -54,7 +55,7 @@ class ProjectViewModel : ViewModel() {
                 }
         }
     }
-    
+
     private val _filteredView = combine(
         _allProjects,
         _query,
@@ -95,10 +96,17 @@ class ProjectViewModel : ViewModel() {
     ) { list, filter, q, sortField ->
         val filtered = when (filter) {
             ProjectFilter.CREATED -> list.filter { it.creator == userId }
-            ProjectFilter.SHARED  -> list.filterNot { it.creator == userId }
-            ProjectFilter.ALL     -> list
+            ProjectFilter.SHARED -> list.filterNot { it.creator == userId }
+            ProjectFilter.ALL -> list
         }
-            .let { base -> if (q.isBlank()) base else base.filter { it.name.contains(q, ignoreCase = true) } }
+            .let { base ->
+                if (q.isBlank()) base else base.filter {
+                    it.name.contains(
+                        q,
+                        ignoreCase = true
+                    )
+                }
+            }
 
         Pair(filtered, sortField)
     }.stateIn(

@@ -11,7 +11,7 @@ abstract class AuthServerAPI {
      * @param email the user's email address
      * @param onComplete callback invoked with a status message when the operation finishes
      */
-    public abstract fun sendPasswordResetMail(
+    abstract fun sendPasswordResetMail(
         email: String,
         onComplete: (message: String) -> Unit
     )
@@ -24,7 +24,7 @@ abstract class AuthServerAPI {
      * @param onSuccess called when the email was updated successfully
      * @param onError called with an error message if the update fails
      */
-    public abstract fun updateEmail(
+    abstract fun updateEmail(
         oldPassword: String,
         newEmail: String,
         onSuccess: () -> Unit,
@@ -38,7 +38,7 @@ abstract class AuthServerAPI {
      * @param onSuccess called when the password is set successfully
      * @param onError called with an error message if setting fails
      */
-    public abstract fun setPassword(
+    abstract fun setPassword(
         newPassword: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -51,7 +51,7 @@ abstract class AuthServerAPI {
      * @param onSuccess called if verification succeeds
      * @param onError called with an error message if verification fails
      */
-    public abstract fun verifyPassword(
+    abstract fun verifyPassword(
         password: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
@@ -65,7 +65,7 @@ abstract class AuthServerAPI {
      * @param onSuccess called when the update succeeds
      * @param onError called with an error message if the update fails
      */
-    public abstract fun updatePassword(
+    abstract fun updatePassword(
         oldPassword: String,
         newPassword: String,
         onSuccess: () -> Unit,
@@ -77,21 +77,21 @@ abstract class AuthServerAPI {
      *
      * @return the user's UID, or null if not logged in
      */
-    public abstract fun getUid(): String?
+    abstract fun getUid(): String?
 
     /**
      * Retrieve the email address of the current user.
      *
      * @return the user's email, or null if not available
      */
-    public abstract fun getEmail(): String?
+    abstract fun getEmail(): String?
 
     /**
      * Check if a user is currently authenticated.
      *
      * @return true if logged in, false otherwise
      */
-    public abstract fun isLoggedIn(): Boolean
+    abstract fun isLoggedIn(): Boolean
 
     /**
      * Perform email/password login and navigate on success.
@@ -101,7 +101,7 @@ abstract class AuthServerAPI {
      * @param password the user's password
      * @param navController controller to handle post-login navigation
      */
-    public abstract fun loginWithEmail(
+    abstract fun loginWithEmail(
         context: Context,
         email: String,
         password: String,
@@ -113,7 +113,7 @@ abstract class AuthServerAPI {
      *
      * @param navController controller to handle post-logout navigation
      */
-    public abstract fun logout(navController: NavController)
+    abstract fun logout(navController: NavController)
 
     /**
      * Register a new user account.
@@ -124,7 +124,7 @@ abstract class AuthServerAPI {
      * @param onSuccess called when registration succeeds
      * @param onError called with an error message if registration fails
      */
-    public abstract fun register(
+    abstract fun register(
         name: String,
         email: String,
         password: String,
@@ -140,7 +140,7 @@ abstract class AuthServerAPI {
      * @param onFailure called with an error message if retrieval fails
      * @return the fetched display name, or null on failure
      */
-    public abstract suspend fun getDisplayName(
+    abstract suspend fun getDisplayName(
         userID: String,
         onSuccess: (String) -> Unit = {},
         onFailure: (String) -> Unit = {}
@@ -151,7 +151,7 @@ abstract class AuthServerAPI {
      *
      * @return the current user's display name, or null if unavailable
      */
-    public abstract fun getCurrentDisplayName(): String?
+    abstract fun getCurrentDisplayName(): String?
 
     /**
      * Update the Firebase Cloud Messaging token for push notifications.
@@ -159,7 +159,7 @@ abstract class AuthServerAPI {
      * @param token the new FCM token
      * @param onComplete optional callback when the update is done
      */
-    public abstract fun updateFCMToken(
+    abstract fun updateFCMToken(
         token: String,
         onComplete: (() -> Unit)? = {}
     )
@@ -174,12 +174,13 @@ abstract class AuthServerAPI {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     )
+
     /**
      * Retrieve and persist the FCM token for the current device.
      *
      * @param onComplete optional callback when the token is fetched and saved
      */
-    public abstract fun fetchAndSaveFcmToken(onComplete: (() -> Unit)? = {})
+    abstract fun fetchAndSaveFcmToken(onComplete: (() -> Unit)? = {})
 
     /**
      * Reads a UserLayout for the given userID from Firestore.
@@ -204,5 +205,5 @@ abstract class AuthServerAPI {
      *
      * @return Result containing a list of UserLayout objects, or an Exception on failure
      */
-    public abstract suspend fun getListOfAllUsers(): Result<List<UserLayout>>
+    abstract suspend fun getListOfAllUsers(): Result<List<UserLayout>>
 }

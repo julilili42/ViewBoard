@@ -51,7 +51,7 @@ fun IssueItemCard(
     date: String,
     projectId: String,
     issueLabels: List<String>,
-    emailsState:List<String?>,
+    emailsState: List<String?>,
     issueId: String,
     modifier: Modifier = Modifier,
     navController: NavController,
@@ -72,9 +72,11 @@ fun IssueItemCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = modifier
             .fillMaxWidth()
-    ){
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding( 16.dp)) {
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(16.dp)
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -95,7 +97,7 @@ fun IssueItemCard(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
                                 onClick = {
-                                    expandedOptions  = true
+                                    expandedOptions = true
                                     onOptionsClick()
                                 },
                                 onLongClick = {}
@@ -104,15 +106,20 @@ fun IssueItemCard(
                     )
 
                     DropdownMenu(
-                        expanded = expandedOptions ,
-                        onDismissRequest = { expandedOptions  = false }
+                        expanded = expandedOptions,
+                        onDismissRequest = { expandedOptions = false }
                     ) {
                         DropdownMenuItem(
                             text = { Text("Edit") },
                             onClick = {
-                                expandedOptions  = false
+                                expandedOptions = false
                                 navController.navigate(
-                                    NavScreens.IssueEditNavScreens.createRoute(projectId = projectId.trim('{','}'), issueId =  issueId, )
+                                    NavScreens.IssueEditNavScreens.createRoute(
+                                        projectId = projectId.trim(
+                                            '{',
+                                            '}'
+                                        ), issueId = issueId,
+                                    )
                                 )
 
                             }
@@ -121,12 +128,12 @@ fun IssueItemCard(
                         DropdownMenuItem(
                             text = { Text("Delete") },
                             onClick = {
-                                expandedOptions  = false
+                                expandedOptions = false
 
                                 scope.launch {
                                     try {
                                         val cleanId = projectId.trim('{', '}')
-                                        FirebaseAPI.rmIssue(projID = cleanId , id = issueId)
+                                        FirebaseAPI.rmIssue(projID = cleanId, id = issueId)
                                     } catch (e: Exception) {
                                         Log.e("IssueItemCard", "Error deleting issue", e)
                                     }
@@ -198,15 +205,18 @@ fun IssueItemCard(
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
                     val extraCount = (emailsState.size - showCount).coerceAtLeast(0)
-                    Box(modifier.height(avatarSize).clickable(
-                        interactionSource = remember { MutableInteractionSource()},
-                        indication = null
-                    )
-                    {
-                        expandedUser = true
-                    }) {
-                        Row(horizontalArrangement = Arrangement.spacedBy((-avatarSize/3))
-                            ,
+                    Box(
+                        modifier
+                            .height(avatarSize)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            )
+                            {
+                                expandedUser = true
+                            }) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy((-avatarSize / 3)),
                         ) {
                             emailsState.take(3).forEach { email ->
                                 if (email != null) {
@@ -260,7 +270,6 @@ fun IssueItemCard(
 }
 
 
-
 @Composable
 fun AvatarInitialBox(email: String, avatarSize: Dp) {
     val initials = emailToInitials(email)
@@ -273,14 +282,19 @@ fun AvatarInitialBox(email: String, avatarSize: Dp) {
             .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        Box(modifier = Modifier
-            .size(avatarSize)
-            .clip(CircleShape)
-            .background(initialsColor)
-            .wrapContentSize(Alignment.Center)) {
+        Box(
+            modifier = Modifier
+                .size(avatarSize)
+                .clip(CircleShape)
+                .background(initialsColor)
+                .wrapContentSize(Alignment.Center)
+        ) {
             Text(
                 text = initials,
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium, fontSize = 8.sp),
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 8.sp
+                ),
                 color = MaterialTheme.colorScheme.onPrimary,
             )
         }

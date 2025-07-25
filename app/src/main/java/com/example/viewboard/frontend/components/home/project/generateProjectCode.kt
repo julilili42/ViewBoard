@@ -26,7 +26,7 @@ fun generateProjectCodeFromDbId(dbId: String): String {
     codePart = when {
         codePart.length < 4 -> codePart.padStart(4, '0')
         codePart.length > 4 -> codePart.take(4)
-        else                 -> codePart
+        else -> codePart
     }
 
     return "#$codePart"

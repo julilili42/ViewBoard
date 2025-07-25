@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.viewboard.frontend.components.theme.uiColor
-import com.example.viewboard.backend.util.Timestamp
+import com.example.viewboard.backend.time.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.OutlinedTextField
@@ -71,11 +71,19 @@ fun IssueCreationScreen(
     val isTitleValid by derivedStateOf { title.trim().isNotEmpty() }
 
     val isDateValid by derivedStateOf {
-        try { dateFormatter.parse(dateText); true } catch (_: Exception) { false }
+        try {
+            dateFormatter.parse(dateText); true
+        } catch (_: Exception) {
+            false
+        }
     }
 
     val isTimeValid by derivedStateOf {
-        try { timeFormatter.parse(timeText); true } catch (_: Exception) { false }
+        try {
+            timeFormatter.parse(timeText); true
+        } catch (_: Exception) {
+            false
+        }
     }
 
     val coroutineScope = rememberCoroutineScope()
@@ -165,7 +173,7 @@ fun IssueCreationScreen(
     val emails = emailsState.orEmpty()
         .filterNotNull()
     Log.d("emails", "emails=${emails}")
-    val suggestionList = remember(newParticipant, users, emails ) {
+    val suggestionList = remember(newParticipant, users, emails) {
         if (newParticipant.isBlank()) {
             emptyList()
         } else {
@@ -194,7 +202,7 @@ fun IssueCreationScreen(
                 .padding(top = innerPadding.calculateTopPadding())
                 .fillMaxSize()
                 .verticalScroll(scroll)
-                .padding(bottom =16.dp , top = 0.dp, start = 16.dp, end = 16.dp),
+                .padding(bottom = 16.dp, top = 0.dp, start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
@@ -207,26 +215,26 @@ fun IssueCreationScreen(
             Spacer(Modifier.height(24.dp))
 
 
-                ChipInputField(
-                    entries = users,
-                    newEntry = newParticipant,
-                    contentText = "Add Assignee…",
-                    suggestions = suggestionList,
-                    onSuggestionClick = { name ->
-                        if (name !in users) {
-                            users = users + name
-                        }
-                        newParticipant = ""
-                    },
-                    onNewEntryChange = { newParticipant = it },
-                    onEntryConfirmed = {
+            ChipInputField(
+                entries = users,
+                newEntry = newParticipant,
+                contentText = "Add Assignee…",
+                suggestions = suggestionList,
+                onSuggestionClick = { name ->
+                    if (name !in users) {
+                        users = users + name
+                    }
+                    newParticipant = ""
+                },
+                onNewEntryChange = { newParticipant = it },
+                onEntryConfirmed = {
 
-                    },
-                    onEntryRemove = { removed ->
-                        users = users - removed
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                },
+                onEntryRemove = { removed ->
+                    users = users - removed
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(Modifier.height(12.dp))
             ChipInputField(
                 entries = labels,
@@ -315,7 +323,7 @@ fun IssueCreationScreen(
                 ArrayList(ids)
             }
             Button(
-                enabled = isDateValid && isTimeValid&& isFormValid,
+                enabled = isDateValid && isTimeValid && isFormValid,
                 onClick = {
                     if (isDateValid && isTimeValid) {
                         updateDeadlineFromDateText()
@@ -323,17 +331,17 @@ fun IssueCreationScreen(
 
 
                         val newIssue = IssueLayout(
-                            title       = title.capitalizeWords(),
-                            desc        = desc,
-                            creator     = currentUserId,
+                            title = title.capitalizeWords(),
+                            desc = desc,
+                            creator = currentUserId,
                             users = assignmentIds,
                             projID = projectId,
-                            deadlineTS  = deadline.export()
+                            deadlineTS = deadline.export()
                         )
                         coroutineScope.launch {
                             try {
                                 val cleanId = projectId.trim('{', '}')
-                                FirebaseAPI.addIssue(projID = cleanId , issueLayout = newIssue)
+                                FirebaseAPI.addIssue(projID = cleanId, issueLayout = newIssue)
                                 navController.popBackStack()
                             } catch (e: Exception) {
 

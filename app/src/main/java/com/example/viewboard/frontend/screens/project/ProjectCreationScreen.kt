@@ -45,7 +45,7 @@ fun ProjectCreationScreen(
     val scroll = rememberScrollState()
     var name by remember { mutableStateOf("") }
     var startDate by remember { mutableStateOf("") }
-    var endDate   by remember { mutableStateOf("") }
+    var endDate by remember { mutableStateOf("") }
     var assignments by remember { mutableStateOf(listOf<String>()) }
     var users by remember { mutableStateOf<List<UserLayout>>(emptyList()) }
     val datePattern = Regex("\\d{4}-\\d{2}-\\d{2}")
@@ -233,10 +233,10 @@ fun ProjectCreationScreen(
                     val cal1 = Calendar.getInstance().apply { time = fmt.parse(startDate)!! }
                     val cal2 = Calendar.getInstance().apply { time = fmt.parse(endDate)!! }
                     val startMonth = cal1.get(Calendar.MONTH) + 1
-                    val endMonth   = cal2.get(Calendar.MONTH) + 1
+                    val endMonth = cal2.get(Calendar.MONTH) + 1
                     val p = ProjectLayout(
                         name = name.capitalizeWords(),
-                        creator ="",
+                        creator = "",
                         issues = arrayListOf(),
                         users = assignmentIds,
                         startTS = startDate,
@@ -259,7 +259,7 @@ fun ProjectCreationScreen(
                     disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                 )
             ) {
-                Text("Create",color = MaterialTheme.colorScheme.onSecondary)
+                Text("Create", color = MaterialTheme.colorScheme.onSecondary)
             }
         }
     }

@@ -89,7 +89,8 @@ fun DraggableMyTasksSection(
                         orientation = Orientation.Vertical,
                         state = rememberDraggableState { delta ->
                             val newHeight = currentSheetHeightPx - delta
-                            currentSheetHeightPx = newHeight.coerceIn(minSheetHeightPx, maxHeightPx * 0.8f) // Max 80%
+                            currentSheetHeightPx =
+                                newHeight.coerceIn(minSheetHeightPx, maxHeightPx * 0.8f) // Max 80%
                         }
                     ),
                 contentAlignment = Alignment.Center
@@ -98,7 +99,10 @@ fun DraggableMyTasksSection(
                     modifier = Modifier
                         .width(40.dp)
                         .height(4.dp)
-                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), shape = MaterialTheme.shapes.small)
+                        .background(
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                            shape = MaterialTheme.shapes.small
+                        )
                 )
                 Row(
                     modifier = Modifier
@@ -110,9 +114,10 @@ fun DraggableMyTasksSection(
                     CustomDropdownMenu(
                         options = viewLayouts,
                         selectedOption = selectedName,
-                        onOptionSelected = {view ->
+                        onOptionSelected = { view ->
                             Log.d("selectedName", "viewid =$view ")
-                            viewsViewModel.selectView(view)},
+                            viewsViewModel.selectView(view)
+                        },
                         modifier = Modifier
                             .fillMaxWidth(0.4f)
                             .padding()

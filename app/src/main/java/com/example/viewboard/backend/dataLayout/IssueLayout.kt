@@ -1,7 +1,7 @@
 package com.example.viewboard.backend.dataLayout
 
 import com.google.firebase.firestore.DocumentId
-import com.example.viewboard.backend.util.Timestamp
+import com.example.viewboard.backend.time.Timestamp
 import com.example.viewboard.frontend.stateholder.IssueViewModel
 
 /**
@@ -16,6 +16,7 @@ enum class IssueState {
     ONGOING,
     DONE
 }
+
 data class EmailWithId(val userId: String, val mail: String?)
 
 // issue progress tracking
@@ -50,7 +51,7 @@ data class SortOptionsIssues(
  * @property creationTS the creation timestamp of the issue
  * @property deadlineTS the deadline timestamp of the issue
  */
-data class IssueLayout (
+data class IssueLayout(
     @DocumentId
     var id: String = "",
     var title: String = "",

@@ -32,7 +32,7 @@ import com.example.viewboard.frontend.stateholder.IssueViewModel.SortField
 import com.example.viewboard.frontend.stateholder.IssueViewModel.SortOrder
 
 @Composable
-public fun IssueSortMenuSimple(
+fun IssueSortMenuSimple(
     issueViewModel: IssueViewModel,
     options: List<SortOptionsIssues>,
     @DrawableRes iconRes: Int,

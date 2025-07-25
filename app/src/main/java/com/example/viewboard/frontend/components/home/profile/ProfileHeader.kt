@@ -18,7 +18,7 @@ import com.example.viewboard.frontend.navigation.utils.BackButton
 fun ProfileHeader(
     name: String,
     subtitle: String,
-    showBackButton: Boolean ,
+    showBackButton: Boolean,
     navController: NavController,
     onProfileClick: () -> Unit,
     onBackClick: () -> Unit
@@ -35,13 +35,13 @@ fun ProfileHeader(
             size = 48.dp,
             borderColor = MaterialTheme.colorScheme.primary,
             borderWidth = 3.dp,
-            modifier = Modifier.clickable{onProfileClick()}
+            modifier = Modifier.clickable { onProfileClick() }
         )
 
         Spacer(modifier = Modifier.width(12.dp))
 
         Column(
-            modifier = Modifier.clickable{onProfileClick()}
+            modifier = Modifier.clickable { onProfileClick() }
         ) {
             Text(
                 text = AuthAPI.getCurrentDisplayName() ?: "failed to load username",

@@ -115,6 +115,7 @@ fun ViewSortMenuSimple(
                                     viewViewModel.setSortOrder(ViewsViewModel.SortOrder.ASC)
                                 }
                             }
+
                             "Sort by Name" -> {
                                 if (currentField == ViewsViewModel.SortField.NAME) {
                                     viewViewModel.setSortOrder(

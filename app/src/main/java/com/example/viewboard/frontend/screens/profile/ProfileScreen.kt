@@ -190,7 +190,6 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
 }
 
 
-
 @Composable
 private fun MenuItem(text: String, onClick: () -> Unit) {
     Row(

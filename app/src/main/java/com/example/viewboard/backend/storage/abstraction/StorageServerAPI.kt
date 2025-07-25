@@ -6,11 +6,11 @@ import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.dataLayout.ViewLayout
 import kotlinx.coroutines.flow.Flow
 
-abstract class StorageServerAPI () {
+abstract class StorageServerAPI() {
     /**
      * Initialize the StorageServerAPI
      */
-    public abstract fun init()
+    abstract fun init()
 
     /**
      * Add a project
@@ -19,7 +19,11 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the project has been successfully added
      * @param onFailure failure callback, if the project has not been added
      */
-    public abstract fun addProject(projectLayout: ProjectLayout, onSuccess: (String) -> Unit = {}, onFailure: (ProjectLayout) -> Unit = {})
+    abstract fun addProject(
+        projectLayout: ProjectLayout,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (ProjectLayout) -> Unit = {}
+    )
 
     /**
      * Remove a project
@@ -28,7 +32,11 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the project has been successfully removed
      * @param onFailure failure callback, if the project has not been removed
      */
-    public abstract fun rmProject(id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract fun rmProject(
+        id: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Update a project
@@ -37,7 +45,11 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the project has been successfully updated
      * @param onFailure failure callback, if the project has not been updated
      */
-    public abstract fun updProject(projectLayout: ProjectLayout, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract fun updProject(
+        projectLayout: ProjectLayout,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Update a project
@@ -47,7 +59,12 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the project has been successfully updated
      * @param onFailure failure callback, if the project has not been updated
      */
-    public abstract fun updProject(id: String, projectLayout: ProjectLayout, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract fun updProject(
+        id: String,
+        projectLayout: ProjectLayout,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Get a project
@@ -58,14 +75,18 @@ abstract class StorageServerAPI () {
      *
      * @return the project if it has been successfully retrieved, otherwise null
      */
-    public abstract suspend fun getProject(id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : ProjectLayout?
+    abstract suspend fun getProject(
+        id: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    ): ProjectLayout?
 
     /**
      * Get all projects
      *
      * @return the projects
      */
-    public abstract fun getAllProjects() : Flow<List<ProjectLayout>>
+    abstract fun getAllProjects(): Flow<List<ProjectLayout>>
 
     /**
      * Get all projects from user
@@ -74,7 +95,7 @@ abstract class StorageServerAPI () {
      *
      * @return the projects when they have been successfully retrieved
      */
-    public abstract fun getProjectsFromUser(userID: String?) : Flow<List<ProjectLayout>>
+    abstract fun getProjectsFromUser(userID: String?): Flow<List<ProjectLayout>>
 
     /**
      * Add a issue
@@ -84,7 +105,12 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the issue has been successfully added
      * @param onFailure failure callback, if the issue has not been added
      */
-    public abstract suspend fun addIssue(projID: String, issueLayout: IssueLayout, onSuccess: (String) -> Unit = {}, onFailure: (IssueLayout) -> Unit = {})
+    abstract suspend fun addIssue(
+        projID: String,
+        issueLayout: IssueLayout,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (IssueLayout) -> Unit = {}
+    )
 
     /**
      * Add an issue
@@ -95,7 +121,13 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the issue has been successfully added
      * @param onFailure failure callback, if the issue has not been added
      */
-    public abstract suspend fun addIssue(projID: String, viewID: String, issueLayout: IssueLayout, onSuccess: (String) -> Unit = {}, onFailure: (IssueLayout) -> Unit = {})
+    abstract suspend fun addIssue(
+        projID: String,
+        viewID: String,
+        issueLayout: IssueLayout,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (IssueLayout) -> Unit = {}
+    )
 
     /**
      * Remove an issue
@@ -105,7 +137,12 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the issue has been successfully removed
      * @param onFailure failure callback, if the issue has not been removed
      */
-    public abstract suspend fun rmIssue(projID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract suspend fun rmIssue(
+        projID: String,
+        id: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Add an issue to a view
@@ -115,7 +152,12 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the issue has been successfully added
      * @param onFailure failure callback, if the issue has not been added
      */
-    public abstract suspend fun addIssueToView(viewID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract suspend fun addIssueToView(
+        viewID: String,
+        id: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Remove an issue from view
@@ -125,7 +167,12 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the issue has been successfully removed
      * @param onFailure failure callback, if the issue has not been removed
      */
-    public abstract suspend fun rmIssueFromView(viewID: String, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract suspend fun rmIssueFromView(
+        viewID: String,
+        id: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Update an issue
@@ -134,7 +181,11 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the issue has been successfully updated
      * @param onFailure failure callback, if the issue has not been updated
      */
-    public abstract fun updIssue(issueLayout: IssueLayout, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract fun updIssue(
+        issueLayout: IssueLayout,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Update an issue
@@ -144,7 +195,12 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the issue has been successfully updated
      * @param onFailure failure callback, if the issue has not been updated
      */
-    public abstract fun updIssue(id: String, issueLayout: IssueLayout, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract fun updIssue(
+        id: String,
+        issueLayout: IssueLayout,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Get an issue
@@ -155,14 +211,18 @@ abstract class StorageServerAPI () {
      *
      * @return the issue if it has been successfully retrieved, otherwise null
      */
-    public abstract suspend fun getIssue(id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : IssueLayout?
+    abstract suspend fun getIssue(
+        id: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    ): IssueLayout?
 
     /**
      * Get all issues
      *
      * @return the issues
      */
-    public abstract fun getAllIssues() : Flow<List<IssueLayout>>
+    abstract fun getAllIssues(): Flow<List<IssueLayout>>
 
     /**
      * Get all issues from view
@@ -173,7 +233,11 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssuesFromView(viewID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<IssueLayout>>
+    abstract fun getIssuesFromView(
+        viewID: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    ): Flow<List<IssueLayout>>
 
     /**
      * Get all issues
@@ -184,7 +248,11 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssuesFromProject(projID: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : Flow<List<IssueLayout>>
+    abstract fun getIssuesFromProject(
+        projID: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    ): Flow<List<IssueLayout>>
 
     /**
      * Get all issues from assignment
@@ -193,7 +261,7 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssuesFromAssignment(userID: String?) : Flow<List<IssueLayout>>
+    abstract fun getIssuesFromAssignment(userID: String?): Flow<List<IssueLayout>>
 
     /**
      * Get all issues from assignment
@@ -203,7 +271,7 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssuesFromAssignment(userID: String?, projID: String) : Flow<List<IssueLayout>>
+    abstract fun getIssuesFromAssignment(userID: String?, projID: String): Flow<List<IssueLayout>>
 
     /**
      * Get all issues from creator
@@ -212,7 +280,7 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssuesFromCreator(userID: String?) : Flow<List<IssueLayout>>
+    abstract fun getIssuesFromCreator(userID: String?): Flow<List<IssueLayout>>
 
     /**
      * Get all issues from creator for a project
@@ -222,7 +290,7 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssuesFromCreator(userID: String?, projID: String) : Flow<List<IssueLayout>>
+    abstract fun getIssuesFromCreator(userID: String?, projID: String): Flow<List<IssueLayout>>
 
     /**
      * Get all issues from user
@@ -231,7 +299,7 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssuesFromUser(userID: String?) : Flow<List<IssueLayout>>
+    abstract fun getIssuesFromUser(userID: String?): Flow<List<IssueLayout>>
 
     /**
      * Get all issues from user for a project
@@ -241,7 +309,7 @@ abstract class StorageServerAPI () {
      *
      * @return the issues when they have been successfully retrieved
      */
-    public abstract fun getIssuesFromUser(userID: String?, projID: String) : Flow<List<IssueLayout>>
+    abstract fun getIssuesFromUser(userID: String?, projID: String): Flow<List<IssueLayout>>
 
     /**
      * Add a view
@@ -251,7 +319,12 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the view has been successfully added
      * @param onFailure failure callback, if the view has not been added
      */
-    public abstract suspend fun addView(userID: String?, viewLayout: ViewLayout, onSuccess: (String) -> Unit = {}, onFailure: (ViewLayout) -> Unit = {})
+    abstract suspend fun addView(
+        userID: String?,
+        viewLayout: ViewLayout,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (ViewLayout) -> Unit = {}
+    )
 
     /**
      * Remove a view
@@ -261,7 +334,12 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the view has been successfully removed
      * @param onFailure failure callback, if the view has not been removed
      */
-    public abstract suspend fun rmView(userID: String?, id: String, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract suspend fun rmView(
+        userID: String?,
+        id: String,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Update a view
@@ -270,7 +348,11 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the view has been successfully updated
      * @param onFailure failure callback, if the view has not been updated
      */
-    public abstract fun updView(viewLayout: ViewLayout, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract fun updView(
+        viewLayout: ViewLayout,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Update a view
@@ -280,7 +362,12 @@ abstract class StorageServerAPI () {
      * @param onSuccess success callback, when the view has been successfully updated
      * @param onFailure failure callback, if the view has not been updated
      */
-    public abstract fun updView(id: String, viewLayout: ViewLayout, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {})
+    abstract fun updView(
+        id: String,
+        viewLayout: ViewLayout,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    )
 
     /**
      * Get all views from a user
@@ -291,14 +378,18 @@ abstract class StorageServerAPI () {
      *
      * @return the views if they have been successfully retrieved, otherwise null
      */
-    public abstract suspend fun getViews(userID: String?, onSuccess: (String) -> Unit = {}, onFailure: (String) -> Unit = {}) : List<ViewLayout>
+    abstract suspend fun getViews(
+        userID: String?,
+        onSuccess: (String) -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    ): List<ViewLayout>
 
     /**
      * Get all views
      *
      * @return the views
      */
-    public abstract fun getAllViews() : Flow<List<ViewLayout>>
+    abstract fun getAllViews(): Flow<List<ViewLayout>>
 
     // abstract flow lists //
     protected lateinit var projects: Flow<List<ProjectLayout>>

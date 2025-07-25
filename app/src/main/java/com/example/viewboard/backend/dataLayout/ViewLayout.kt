@@ -1,7 +1,7 @@
 package com.example.viewboard.backend.dataLayout
 
 import com.google.firebase.firestore.DocumentId
-import com.example.viewboard.backend.util.Timestamp
+import com.example.viewboard.backend.time.Timestamp
 
 /**
  * @property id the id of the view
@@ -10,7 +10,7 @@ import com.example.viewboard.backend.util.Timestamp
  * @property issues the issues associated with the view
  * @property creationTS the creation timestamp of the view
  */
-data class ViewLayout (
+data class ViewLayout(
     @DocumentId
     var id: String = "",
     var name: String = "",

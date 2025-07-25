@@ -16,9 +16,9 @@ import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 
 fun IssueDeadlineFilter.next(): IssueDeadlineFilter = when (this) {
-    IssueDeadlineFilter.CURRENT_YEAR  -> IssueDeadlineFilter.CURRENT_MONTH
+    IssueDeadlineFilter.CURRENT_YEAR -> IssueDeadlineFilter.CURRENT_MONTH
     IssueDeadlineFilter.CURRENT_MONTH -> IssueDeadlineFilter.CURRENT_WEEK
-    IssueDeadlineFilter.CURRENT_WEEK  -> IssueDeadlineFilter.CURRENT_YEAR
+    IssueDeadlineFilter.CURRENT_WEEK -> IssueDeadlineFilter.CURRENT_YEAR
     IssueDeadlineFilter.ALL_TIME -> IssueDeadlineFilter.ALL_TIME
 }
 
@@ -38,7 +38,7 @@ class IssueProgressCalculator {
         val (fromTs, toTs) = calculateWindow(timeSpan)
 
         val projectsFlow: Flow<List<ProjectLayout>> =
-                FirebaseAPI.getProjectsFromUser(userId)
+            FirebaseAPI.getProjectsFromUser(userId)
 
 
 
@@ -98,9 +98,9 @@ class IssueProgressCalculator {
                     val millis = Instant.parse(issue.deadlineTS).toEpochMilli()
                     millis in fromTs..toTs
                 }
-                val total     = filtered.size
+                val total = filtered.size
                 val completed = filtered.count { it.state == IssueState.DONE }
-                val percent   = if (total > 0) completed * 100f / total else 0f
+                val percent = if (total > 0) completed * 100f / total else 0f
                 IssueProgress(total, completed, percent)
             }
     }
@@ -113,12 +113,13 @@ class IssueProgressCalculator {
      */
     private fun calculateWindow(timeSpan: IssueDeadlineFilter): Pair<Long, Long> {
         val zone = ZoneId.systemDefault()
-        val now  = ZonedDateTime.now(zone)
+        val now = ZonedDateTime.now(zone)
 
         return when (timeSpan) {
             IssueDeadlineFilter.ALL_TIME -> {
                 0L to Long.MAX_VALUE
             }
+
             IssueDeadlineFilter.CURRENT_YEAR -> {
                 val start = now
                     .with(TemporalAdjusters.firstDayOfYear())
@@ -132,6 +133,7 @@ class IssueProgressCalculator {
                     .toEpochMilli()
                 start to end
             }
+
             IssueDeadlineFilter.CURRENT_MONTH -> {
                 val start = now
                     .with(TemporalAdjusters.firstDayOfMonth())
@@ -145,6 +147,7 @@ class IssueProgressCalculator {
                     .toEpochMilli()
                 start to end
             }
+
             IssueDeadlineFilter.CURRENT_WEEK -> {
                 val firstDayOfWeek = WeekFields.ISO.firstDayOfWeek
                 val startOfWeek = now

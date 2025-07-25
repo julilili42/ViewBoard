@@ -42,7 +42,7 @@ fun MyTasksScreen(
             columns = GridCells.Fixed(1),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues( start = 16.dp, end = 16.dp, bottom = 16.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
             items(issues) { issue ->
@@ -60,23 +60,34 @@ fun MyTasksScreen(
                         var project by remember { mutableStateOf<ProjectLayout?>(null) }
                         LaunchedEffect(issue.projID) {
                             try {
-                            project = FirebaseAPI.getProject(cleanId)
-                                Log.d("IssueWithProject", "Loaded project for issue ${issue.projID}: $project")
+                                project = FirebaseAPI.getProject(cleanId)
+                                Log.d(
+                                    "IssueWithProject",
+                                    "Loaded project for issue ${issue.projID}: $project"
+                                )
                             } catch (e: Exception) {
-                                Log.e("IssueWithProject", "Failed to load project ${issue.projID}", e)
+                                Log.e(
+                                    "IssueWithProject",
+                                    "Failed to load project ${issue.projID}",
+                                    e
+                                )
                             }
-                        // suspend call
+                            // suspend call
                         }
 
                         issue?.let {
                             val projectName: String = project?.name ?: ""
                             ProjectCardTasks(
                                 issueName = it.title,
-                                projectId= it.projID,
+                                projectId = it.projID,
                                 dueDate = it.deadlineTS,
-                                onClick = {navController.navigate(NavScreens.IssueNavScreens.createRoute(
-                                    projectName,
-                                    cleanId),)
+                                onClick = {
+                                    navController.navigate(
+                                        NavScreens.IssueNavScreens.createRoute(
+                                            projectName,
+                                            cleanId
+                                        ),
+                                    )
                                 },
                                 onMenuClick = {
                                 }

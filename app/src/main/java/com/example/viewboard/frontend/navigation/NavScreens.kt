@@ -26,14 +26,15 @@ sealed class NavScreens(val route: String) {
     }
 
     /** Screen for creating a new issue in a project */
-    object IssueCreationNavScreens : NavScreens("home/project/{projectName}/issueCreation/{projectId}") {
+    object IssueCreationNavScreens :
+        NavScreens("home/project/{projectName}/issueCreation/{projectId}") {
         fun createRoute(projectName: String, projectId: String) =
             "home/project/$projectName/issueCreation/$projectId"
     }
 
     /** Screen for editing an existing issue */
     object IssueEditNavScreens : NavScreens("home/project/issueEdit/{projectId}/{issueId}") {
-        fun createRoute( projectId: String, issueId: String) =
+        fun createRoute(projectId: String, issueId: String) =
             "home/project/issueEdit/$projectId/$issueId"
     }
 

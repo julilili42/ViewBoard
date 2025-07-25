@@ -43,9 +43,10 @@ fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavControlle
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Header back button and title
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         ) {
             BackButton(
                 text = "Back",
@@ -63,7 +64,7 @@ fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavControlle
 
         // faq section
         SectionCard(title = "FAQ") {
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { faqExpanded = !faqExpanded }
@@ -90,9 +91,10 @@ fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavControlle
                 enter = expandVertically() + fadeIn(),
                 exit = shrinkVertically() + fadeOut()
             ) {
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp)
                 ) {
                     Text(
                         text = "1. Start the app and sign in.\n" +
@@ -108,7 +110,7 @@ fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavControlle
             }
 
 
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { passwordExpanded = !passwordExpanded }
@@ -134,9 +136,10 @@ fun HelpSupportScreen(modifier: Modifier = Modifier, navController: NavControlle
                 enter = expandVertically() + fadeIn(),
                 exit = shrinkVertically() + fadeOut()
             ) {
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp)
                 ) {
                     Text(
                         text = "1. Start the app and login.\n" +
