@@ -55,7 +55,7 @@ fun IssueCreationScreen(
     var users by remember { mutableStateOf(listOf<String>()) }
     var newParticipant by remember { mutableStateOf("") }
 
-    var labels by remember { mutableStateOf(listOf<String>()) }
+    val labels = remember { mutableStateListOf<String>() }
     var newLabelName by remember { mutableStateOf("") }
 
     val calendar = remember { Calendar.getInstance() }
@@ -243,11 +243,13 @@ fun IssueCreationScreen(
                 onNewEntryChange = { newLabelName = it },
                 onEntryConfirmed = {
                     if (newLabelName.isNotBlank()) {
-                        labels = labels + newLabelName.trim()
+                        labels.add(newLabelName.trim())
                         newLabelName = ""
                     }
                 },
-                onEntryRemove = { removed -> labels = labels - removed },
+                onEntryRemove = { removed ->
+                    labels.remove(removed)
+                },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -336,7 +338,8 @@ fun IssueCreationScreen(
                             creator = currentUserId,
                             users = assignmentIds,
                             projID = projectId,
-                            deadlineTS = deadline.export()
+                            deadlineTS = deadline.export(),
+                            labels = ArrayList(labels)
                         )
                         coroutineScope.launch {
                             try {

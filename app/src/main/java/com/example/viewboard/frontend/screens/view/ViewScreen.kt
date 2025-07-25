@@ -1,5 +1,6 @@
 package com.example.viewboard.frontend.screens.view
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +41,7 @@ import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.frontend.components.views.ViewItem
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.ui.platform.LocalContext
 import com.example.viewboard.frontend.stateholder.ViewsViewModel
 import com.example.viewboard.frontend.navigation.NavScreens
 import com.example.viewboard.frontend.components.utils.CustomSearchField
@@ -62,11 +64,12 @@ fun ViewScreen(
     val uid = AuthAPI.getUid() ?: return
     val query by viewsViewModel.query.collectAsState()
     val columns = 2
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             ProfileHeader(
                 name = AuthAPI.getCurrentDisplayName() ?: "Unknown User",
-                subtitle = "Welcome back!",
+                subtitle = "Your issues, your view!",
                 navController = navController,
                 showBackButton = true,
                 onProfileClick = {
@@ -147,7 +150,19 @@ fun ViewScreen(
                     },
                     onDelete = { viewId ->
                         coroutineScope.launch {
-                            FirebaseAPI.rmView(AuthAPI.getUid(), viewId)
+                            FirebaseAPI.rmView(AuthAPI.getUid(), viewId, onSuccess = {
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "View successfully deleted",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                            }, onFailure = {
+                                Toast
+                                    .makeText(context, "View deletion failed", Toast.LENGTH_SHORT)
+                                    .show()
+                            })
                         }
                     }
                 )
@@ -180,8 +195,24 @@ fun ViewScreen(
                                             creator = uid,
                                             issues = ArrayList()
                                         ),
-                                        onSuccess = { _ -> },
-                                        onFailure = { err -> /* TODO handle error*/ }
+                                        onSuccess = {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "View successfully added",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        },
+                                        onFailure = {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "Failed to add View",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
+                                        }
                                     )
                                 }
                             }
