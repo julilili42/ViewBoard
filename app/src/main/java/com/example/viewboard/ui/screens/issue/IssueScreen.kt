@@ -209,7 +209,6 @@ fun IssueScreen(
                     }
                 }
             }
-            // issue list
             items(issues) { item ->
                 val mails: List<String?> = email[item.id].orEmpty()
                 DragTarget(
@@ -222,8 +221,8 @@ fun IssueScreen(
                         emailsState = mails,
                         projectId = projectId,
                         issueId = item.id,
+                        issueLabels = item.labels,
                         navController = navController,
-                        issuelabels = emptyList(), // TODO remove
                         modifier = Modifier.clip(RoundedCornerShape(12.dp))
                     )
                 }

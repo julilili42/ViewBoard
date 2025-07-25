@@ -148,7 +148,7 @@ fun ViewIssueScreen(
                     projectId    = projectId,
                     issueId      = issue .id,
                     navController= navController,
-                    issuelabels = emptyList(), // TODO remove
+                    issueLabels = emptyList(),
                     modifier     = Modifier.clip(RoundedCornerShape(12.dp))
                 )
             }

@@ -49,7 +49,6 @@ fun ProjectEditScreen(
         }
     }
     var name by remember { mutableStateOf(project.name) }
-    var desc by remember { mutableStateOf("") } // TODO remove
     var startDate by remember { mutableStateOf(project.startTS) }
     var endDate by remember { mutableStateOf(project.deadlineTS) }
 
@@ -86,6 +85,29 @@ fun ProjectEditScreen(
         ).show()
     }
 
+    var newParticipant by remember { mutableStateOf("") }
+
+    val filteredUsers = remember(newParticipant, users) {
+        if (newParticipant.isBlank()) emptyList()
+        else users.filter { user ->
+            user.name.contains(newParticipant, ignoreCase = true) ||
+                    user.email.contains(newParticipant, ignoreCase = true)
+        }
+    }
+    val suggestionEmails = filteredUsers.map { it.email }
+    val suggestionList = remember(newParticipant, assignments, suggestionEmails) {
+        if (newParticipant.isBlank()) {
+            emptyList()
+        } else {
+            suggestionEmails.filter { email ->
+                // includes entered letters
+                email.contains(newParticipant, ignoreCase = true)
+                        // and not in assignments
+                        && assignments.none { it.equals(email, ignoreCase = true) }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -114,13 +136,27 @@ fun ProjectEditScreen(
             )
             Spacer(Modifier.height(12.dp))
 
-            OutlinedTextField(
-                value = desc,
-                onValueChange = { desc = it },
-                label = { Text("Description") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = isCreator
+            ChipInputField(
+                entries = assignments,
+                newEntry = newParticipant,
+                contentText = "Add team member…",
+                suggestions = suggestionList,
+                onSuggestionClick = { name ->
+                    // if name is selected add as chip
+                    if (name !in assignments) {
+                        assignments = assignments + name
+                    }
+                    newParticipant = ""
+                },
+                onNewEntryChange = { newParticipant = it },
+                onEntryConfirmed = {
+                },
+                onEntryRemove = { removed ->
+                    assignments = assignments - removed
+                },
+                modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(Modifier.height(12.dp))
 
             OutlinedTextField(
@@ -142,51 +178,8 @@ fun ProjectEditScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = isCreator
             )
-            Spacer(Modifier.height(12.dp))
 
 
-            var newParticipant by remember { mutableStateOf("") }
-
-            val filteredUsers = remember(newParticipant, users) {
-                if (newParticipant.isBlank()) emptyList()
-                else users.filter { user ->
-                    user.name.contains(newParticipant, ignoreCase = true) ||
-                            user.email.contains(newParticipant, ignoreCase = true)
-                }
-            }
-            val suggestionEmails = filteredUsers.map { it.email }
-            val suggestionList = remember(newParticipant, assignments, suggestionEmails) {
-                if (newParticipant.isBlank()) {
-                    emptyList()
-                } else {
-                    suggestionEmails.filter { email ->
-                        // includes entered letters
-                        email.contains(newParticipant, ignoreCase = true)
-                                // and not in assignments
-                                && assignments.none { it.equals(email, ignoreCase = true) }
-                    }
-                }
-            }
-            ChipInputField(
-                entries = assignments,
-                newEntry = newParticipant,
-                contentText = "Add team member…",
-                suggestions = suggestionList,
-                onSuggestionClick = { name ->
-                    // if name is selected add as chip
-                    if (name !in assignments) {
-                        assignments = assignments + name
-                    }
-                    newParticipant = ""
-                },
-                onNewEntryChange = { newParticipant = it },
-                onEntryConfirmed = {
-                },
-                onEntryRemove = { removed ->
-                    assignments = assignments - removed
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
 
             Spacer(Modifier.height(24.dp))
 

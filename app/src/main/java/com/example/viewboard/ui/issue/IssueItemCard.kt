@@ -50,7 +50,7 @@ fun IssueItemCard(
     title: String,
     date: String,
     projectId: String,
-    issuelabels: List<String>,
+    issueLabels: List<String>,
     emailsState:List<String?>,
     issueId: String,
     modifier: Modifier = Modifier,
@@ -112,7 +112,7 @@ fun IssueItemCard(
                             onClick = {
                                 expandedOptions  = false
                                 navController.navigate(
-                                    NavScreens.IssueEditNavScreens.createRoute(projectId.trim('{','}'),"", issueId)
+                                    NavScreens.IssueEditNavScreens.createRoute(projectId = projectId.trim('{','}'), issueId =  issueId, )
                                 )
 
                             }
@@ -138,20 +138,16 @@ fun IssueItemCard(
 
             }
 
-
-
-
-
             Row(
                 modifier = Modifier
                     .horizontalScroll(scrollState)
                     .defaultMinSize(minHeight = 32.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (issuelabels.isEmpty()) {
+                if (issueLabels.isEmpty()) {
                     Spacer(modifier = Modifier.height(0.dp))
                 } else {
-                    issuelabels.forEach { label ->
+                    issueLabels.forEach { label ->
                         val labelColor = colorFromCode(label)
                         Box(
                             modifier = Modifier
@@ -217,7 +213,7 @@ fun IssueItemCard(
                                     AvatarInitialBox(email, avatarSize)
                                 }
                             }
-                            if (extraCount > 3) {
+                            if (emailsState.size > 3) {
                                 Box(
                                     modifier = Modifier
                                         .size(avatarSize + 3.dp)

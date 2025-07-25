@@ -24,6 +24,7 @@ import java.util.*
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.rememberCoroutineScope
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import com.example.viewboard.backend.dataLayout.EmailWithId
 import kotlinx.coroutines.launch
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.ProjectLayout
@@ -46,7 +47,7 @@ fun IssueCreationScreen(
     var title by remember { mutableStateOf("") }
     var desc by remember { mutableStateOf("") }
 
-    var assignments by remember { mutableStateOf(listOf<String>()) }
+    var users by remember { mutableStateOf(listOf<String>()) }
     var newParticipant by remember { mutableStateOf("") }
 
     var labels by remember { mutableStateOf(listOf<String>()) }
@@ -67,9 +68,11 @@ fun IssueCreationScreen(
     val isDateValid by derivedStateOf {
         try { dateFormatter.parse(dateText); true } catch (_: Exception) { false }
     }
+
     val isTimeValid by derivedStateOf {
         try { timeFormatter.parse(timeText); true } catch (_: Exception) { false }
     }
+
     val coroutineScope = rememberCoroutineScope()
 
     fun updateDeadlineFromDateText() {
@@ -79,6 +82,7 @@ fun IssueCreationScreen(
         ts.import(d.toInstant())
         deadline = ts
     }
+
     var project by remember { mutableStateOf<ProjectLayout?>(null) }
 
     fun updateDeadlineFromTimeText() {
@@ -127,6 +131,46 @@ fun IssueCreationScreen(
         ).show()
     }
 
+    LaunchedEffect(projectId) {
+        val cleanId = projectId.trim('{', '}')
+        try {
+            project = FirebaseAPI
+                .getProject(cleanId)
+
+        } catch (e: Exception) {
+            Log.e("IssueCreationScreen", "Error fetching project: ${e.message}")
+        }
+    }
+
+    val emailsState by produceState<List<String?>>(
+        initialValue = emptyList(),
+        key1 = project?.users
+    ) {
+        val result = runCatching { project?.let { AuthAPI.getEmailsByIds(it.users) } }
+            .getOrNull()
+            ?.getOrNull()
+        value = result ?: emptyList()
+    }
+
+    val pairedObjects: List<EmailWithId> =
+        (project?.users ?: emptyList()).zip(emailsState) { id, mail ->
+            EmailWithId(userId = id, mail = mail)
+        }
+
+    val emails = emailsState.orEmpty()
+        .filterNotNull()
+    Log.d("emails", "emails=${emails}")
+    val suggestionList = remember(newParticipant, users, emails ) {
+        if (newParticipant.isBlank()) {
+            emptyList()
+        } else {
+            emails.filter { email ->
+                email.contains(newParticipant, ignoreCase = true)
+                        && users.none { it.equals(email, ignoreCase = true) }
+            }
+        }
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -155,55 +199,17 @@ fun IssueCreationScreen(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
-            LaunchedEffect(projectId) {
-                val cleanId = projectId.trim('{', '}')
-                try {
-                    project = FirebaseAPI
-                        .getProject(cleanId)
 
-                } catch (e: Exception) {
-                    Log.e("IssueCreationScreen", "Error fetching project: ${e.message}")
-                }
-            }
-
-            val emailsState by produceState<List<String?>>(
-                initialValue = emptyList(),
-                key1 = project?.users
-            ) {
-                val result = runCatching { project?.let { AuthAPI.getEmailsByIds(it.users) } }
-                    .getOrNull()
-                    ?.getOrNull()
-                value = result ?: emptyList()
-            }
-            data class EmailWithId(val userId: String, val mail: String?)
-            val pairedObjects: List<EmailWithId> =
-                (project?.users ?: emptyList()).zip(emailsState) { id, mail ->
-                    EmailWithId(userId = id, mail = mail)
-                }
-
-            val emails = emailsState.orEmpty()
-                .filterNotNull()
-            Log.d("emails", "emails=${emails}")
-            val suggestionList = remember(newParticipant, assignments, emails ) {
-                if (newParticipant.isBlank()) {
-                    emptyList()
-                } else {
-                    emails.filter { email ->
-                        email.contains(newParticipant, ignoreCase = true)
-                                && assignments.none { it.equals(email, ignoreCase = true) }
-                    }
-                }
-            }
                 ChipInputField(
-                    entries = assignments,
+                    entries = users,
                     newEntry = newParticipant,
-                    contentText = "Add team member…",
+                    contentText = "Add Assignee…",
                     suggestions = suggestionList,
                     onSuggestionClick = { name ->
-                        if (name !in assignments) {
-                            assignments = assignments + name
+                        if (name !in users) {
+                            users = users + name
                         }
                         newParticipant = ""
                     },
@@ -212,11 +218,11 @@ fun IssueCreationScreen(
 
                     },
                     onEntryRemove = { removed ->
-                        assignments = assignments - removed
+                        users = users - removed
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
             ChipInputField(
                 entries = labels,
                 newEntry = newLabelName,
@@ -231,7 +237,7 @@ fun IssueCreationScreen(
                 onEntryRemove = { removed -> labels = labels - removed },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -263,7 +269,7 @@ fun IssueCreationScreen(
                     modifier = Modifier.weight(1f)
                 )
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(24.dp))
 
             if (!isDateValid) {
                 Text(
@@ -283,8 +289,8 @@ fun IssueCreationScreen(
             val isFormValid by derivedStateOf {
                 isTitleValid
             }
-            val assignmentIds: ArrayList<String> = remember(assignments, pairedObjects) {
-                val ids = assignments.mapNotNull { email ->
+            val assignmentIds: ArrayList<String> = remember(users, pairedObjects) {
+                val ids = users.mapNotNull { email ->
                     pairedObjects
                         .find { it.mail.equals(email, ignoreCase = true) }
                         ?.userId

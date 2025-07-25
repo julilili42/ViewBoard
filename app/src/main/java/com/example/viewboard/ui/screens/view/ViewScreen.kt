@@ -55,8 +55,6 @@ import kotlinx.coroutines.launch
 fun ViewScreen(
     navController: NavController,
     viewsViewModel: ViewsViewModel,
-    issueViewModel: IssueViewModel,
-    projectViewModel: ProjectViewModel,
 ) {
 
     val viewLayouts by viewsViewModel.displayedViews.collectAsState()
@@ -111,7 +109,6 @@ fun ViewScreen(
                     viewName = "Views",
                 )
             }
-            // Header, Search, Filter
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Row(
                     modifier = Modifier
@@ -159,8 +156,6 @@ fun ViewScreen(
                 )
             }
         }
-
-        // Dialog to create new View
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },

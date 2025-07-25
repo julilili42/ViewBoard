@@ -1,5 +1,6 @@
 package com.example.viewboard.ui.screens.issue
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.util.Log
@@ -23,13 +24,17 @@ import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.auth.impl.AuthAPI
+import com.example.viewboard.backend.dataLayout.EmailWithId
+import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.ui.navigation.utils.ChipInputField
 import com.example.viewboard.ui.theme.uiColor
 import com.example.viewboard.ui.utils.capitalizeWords
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
+import kotlin.collections.ArrayList
 
+@SuppressLint("MutableCollectionMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IssueEditScreen(
@@ -43,44 +48,49 @@ fun IssueEditScreen(
     val scroll = rememberScrollState()
 
     var title by remember { mutableStateOf(issue.title) }
-    val desc by remember { mutableStateOf(issue.desc) }
-    var assignmentIds by remember { mutableStateOf(issue.users.toMutableList()) }
-    var newEmail by remember { mutableStateOf("") }
 
-    // load all users
-    val allUsers by produceState(initialValue = emptyList<UserLayout>(), key1 = projectId) {
-        value = AuthAPI.getListOfAllUsers()
+    var labels by remember { mutableStateOf(issue.labels) }
+    var newLabelName by remember { mutableStateOf("") }
+    var project by remember { mutableStateOf<ProjectLayout?>(null) }
+    var newParticipant by remember { mutableStateOf("") }
+
+    LaunchedEffect(projectId) {
+        val cleanId = projectId.trim('{', '}')
+        try {
+            project = FirebaseAPI
+                .getProject(cleanId)
+
+        } catch (e: Exception) {
+            Log.e("IssueCreationScreen", "Error fetching project: ${e.message}")
+        }
+    }
+
+    val emailsState by produceState<List<String?>>(
+        initialValue = emptyList(),
+        key1 = project?.users
+    ) {
+        val result = runCatching { project?.let { AuthAPI.getEmailsByIds(it.users) } }
             .getOrNull()
-            .orEmpty()
+            ?.getOrNull()
+        value = result ?: emptyList()
     }
 
-    // pair uid email
-    data class EmailWithId(val userId: String, val mail: String?)
-    val pairedList = remember(allUsers) {
-        allUsers.map { EmailWithId(it.id, it.email) }
-    }
-
-    // display email for uid
-    val displayedAssignments by remember(assignmentIds, pairedList) {
-        derivedStateOf {
-            assignmentIds.mapNotNull { id ->
-                pairedList.find { it.userId == id }?.mail
-            }
+    val pairedObjects: List<EmailWithId> =
+        (project?.users ?: emptyList()).zip(emailsState) { id, mail ->
+            EmailWithId(userId = id, mail = mail)
         }
-    }
+    val mailsOfIssueUsers: List<String> = pairedObjects
+        .filter { it.userId in issue.users }
+        .map    { it.mail.toString() }
 
-    // suggestions for input
-    val suggestions by remember(newEmail, pairedList, displayedAssignments) {
-        derivedStateOf {
-            if (newEmail.isBlank()) emptyList()
-            else pairedList
-                .mapNotNull { it.mail }
-                .filter { mail ->
-                    mail.contains(newEmail, ignoreCase = true)
-                }
-                .distinct()
-                .minus(displayedAssignments.toSet())
+    var users by remember(mailsOfIssueUsers) { mutableStateOf(mailsOfIssueUsers) }
+    val assignmentIds: ArrayList<String> = remember(users, pairedObjects) {
+        val ids = users.mapNotNull { email ->
+            pairedObjects
+                .find { it.mail.equals(email, ignoreCase = true) }
+                ?.userId
         }
+        ArrayList(ids)
     }
 
     val calendar = remember {
@@ -89,6 +99,22 @@ fun IssueEditScreen(
             time = Date.from(instant)
         }
     }
+
+    val emails = emailsState.orEmpty()
+        .filterNotNull()
+    Log.d("emails", "emails=${emails}")
+
+    val suggestionList = remember(newParticipant, users, emails ) {
+        if (newParticipant.isBlank()) {
+            emptyList()
+        } else {
+            emails.filter { email ->
+                email.contains(newParticipant, ignoreCase = true)
+                        && users.none { it.equals(email, ignoreCase = true) }
+            }
+        }
+    }
+
     val dateFmt = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
     val timeFmt = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
     var dateText by remember { mutableStateOf(dateFmt.format(calendar.time)) }
@@ -160,7 +186,7 @@ fun IssueEditScreen(
                         updateDeadline()
                         val updatedIssue = issue.copy(
                             title = title.capitalizeWords(),
-                            desc = desc,
+                            labels = labels,
                             users = ArrayList(assignmentIds),
                             deadlineTS = newDeadlineTS
                         )
@@ -198,20 +224,39 @@ fun IssueEditScreen(
             Spacer(Modifier.height(24.dp))
 
             ChipInputField(
-                entries = displayedAssignments,
-                newEntry = newEmail,
-                contentText = "Add Assignee…",
-                suggestions = suggestions,
-                onSuggestionClick = { mail ->
-                    pairedList.find { it.mail == mail }?.userId
-                        ?.let { assignmentIds = (assignmentIds + it).toMutableList() }
-                    newEmail = ""
+                entries = users,
+                newEntry = newParticipant,
+                contentText = "Add team Assignee…",
+                suggestions = suggestionList,
+                onSuggestionClick = { name ->
+                    if (name !in users) {
+                        users = (users + name) as ArrayList<String>
+                    }
+                    newParticipant = ""
                 },
-                onNewEntryChange = { newEmail = it },
-                onEntryRemove = { removedMail ->
-                    pairedList.find { it.mail == removedMail }?.userId
-                        ?.let { id -> assignmentIds = assignmentIds.filter { it != id }.toMutableList() }
+                onNewEntryChange = { newParticipant = it },
+                onEntryConfirmed = {
+
                 },
+                onEntryRemove = { removed ->
+                    users = (users - removed) as ArrayList<String>
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(12.dp))
+
+            ChipInputField(
+                entries = labels,
+                newEntry = newLabelName,
+                contentText = "Add Label…",
+                onNewEntryChange = { newLabelName = it },
+                onEntryConfirmed = {
+                    if (newLabelName.isNotBlank()) {
+                        labels = (labels + newLabelName.trim()) as ArrayList<String>
+                        newLabelName = ""
+                    }
+                },
+                onEntryRemove = { removed -> labels = (labels - removed) as ArrayList<String> },
                 modifier = Modifier.fillMaxWidth()
             )
 

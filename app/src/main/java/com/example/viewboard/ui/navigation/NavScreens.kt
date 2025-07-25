@@ -32,9 +32,9 @@ sealed class NavScreens(val route: String) {
     }
 
     /** Screen for editing an existing issue */
-    object IssueEditNavScreens : NavScreens("home/project/{projectName}/issueEdit/{projectId}/{issueId}") {
-        fun createRoute(projectName: String, projectId: String, issueId: String) =
-            "home/project/$projectName/issueEdit/$projectId/$issueId"
+    object IssueEditNavScreens : NavScreens("home/project/issueEdit/{projectId}/{issueId}") {
+        fun createRoute( projectId: String, issueId: String) =
+            "home/project/issueEdit/$projectId/$issueId"
     }
 
     /** Screen for creating a new project */

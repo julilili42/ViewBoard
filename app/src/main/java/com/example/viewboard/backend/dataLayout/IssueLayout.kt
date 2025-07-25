@@ -16,6 +16,7 @@ enum class IssueState {
     ONGOING,
     DONE
 }
+data class EmailWithId(val userId: String, val mail: String?)
 
 // issue progress tracking
 data class IssueProgress(
@@ -57,6 +58,7 @@ data class IssueLayout (
     var creator: String = "",
     var projID: String = "",
     var state: IssueState = IssueState.NEW,
+    var labels: ArrayList<String> = ArrayList<String>(),
     var users: ArrayList<String> = ArrayList<String>(),
     var creationTS: String = Timestamp().export(),
     var deadlineTS: String = Timestamp().export()

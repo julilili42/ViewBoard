@@ -44,11 +44,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 
@@ -79,47 +81,17 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
 
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background, // hier die Surface‑Farbe
-        bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 40.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                OutlinedButton(
-                    onClick = { AuthAPI.logout(navController) },
-                    modifier = Modifier
-                        .height(40.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error,
-                        containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = "Log out",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
-                    )
-                }
-            }
-
-        }
-    ) { innerPadding ->
-        LazyColumn(
+    ) { paddingValues ->
+        Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
         ) {
-            item {
-                // profile image
                 Box(contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
                         ProfilePicture(
                             painter = painterResource(id = R.drawable.logotest),
-                            contentDescription = "pb Raoul",
+                            contentDescription = "pb",
                             size = 120.dp,
                             borderColor = MaterialTheme.colorScheme.primary,
                             borderWidth = 3.dp
@@ -134,9 +106,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                     }
                 }
                 Spacer(modifier = Modifier.size(32.dp))
-            }
 
-            item {
                 // account settings
                 SectionCard(title = "Account") {
                     MenuItem(
@@ -148,9 +118,9 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                         onClick = { navController.navigate(NavScreens.ChangePasswordNavScreens.route) })
                 }
                 Spacer(modifier = Modifier.size(24.dp))
-            }
 
-            item {
+
+
                 SectionCard(title = "More") {
                     MenuItem(
                         text = "Notifications",
@@ -161,8 +131,34 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
                         text = "Help & Support",
                         onClick = { navController.navigate(NavScreens.HelpSupportNavScreens.route) })
                 }
+
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    OutlinedButton(
+                        onClick = { AuthAPI.logout(navController) },
+                        modifier = Modifier
+                            .height(40.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error,
+                            containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "Log out",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
+                        )
+                    }
+                }
+
             }
-        }
+
         if (showNotifDialog) {
             NotificationsDialog(
                 enabled = notificationsEnabled,

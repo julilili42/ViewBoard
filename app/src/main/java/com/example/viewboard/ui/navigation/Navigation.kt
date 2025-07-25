@@ -1,6 +1,7 @@
 package com.example.viewboard.ui.navigation
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -68,8 +69,10 @@ fun Navigation(modifier: Modifier = Modifier) {
         NavHost(
             navController = navController,
             startDestination = start,
-            modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
+            modifier = Modifier.padding()
+
         ) {
+            Log.d("Navigation", "start destination: $innerPadding")
             composable(NavScreens.LoginNavScreens.route) {
                 LoginScreen(navController = navController)
             }
@@ -145,8 +148,6 @@ fun Navigation(modifier: Modifier = Modifier) {
 
             composable(BottomBarScreen.View.route) {backStack->
                 val viewsViewModel: ViewsViewModel = viewModel(backStack)
-                val issueViewModel: IssueViewModel = viewModel(backStack)
-                val projectViewModel: ProjectViewModel = viewModel(backStack)
                 MainLayout(navController, currentRoute) { padding ->
 
                     Box(modifier = Modifier
@@ -155,8 +156,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                     ) {
                         ViewScreen(navController = navController,
                             viewsViewModel = viewsViewModel,
-                            issueViewModel = issueViewModel,
-                            projectViewModel = projectViewModel)
+                        )
                     }
                 }
             }
@@ -225,6 +225,7 @@ fun Navigation(modifier: Modifier = Modifier) {
                 LaunchedEffect(issueId) {
                     issue = FirebaseAPI.getIssue(id = issueId)
                 }
+
                 if (issue != null) {
                     IssueEditScreen(
                         navController = navController,

@@ -44,7 +44,6 @@ fun ProjectCreationScreen(
     val uiColor = uiColor()
     val scroll = rememberScrollState()
     var name by remember { mutableStateOf("") }
-    val desc by remember { mutableStateOf("") }
     var startDate by remember { mutableStateOf("") }
     var endDate   by remember { mutableStateOf("") }
     var assignments by remember { mutableStateOf(listOf<String>()) }
@@ -89,6 +88,42 @@ fun ProjectCreationScreen(
         ).show()
     }
 
+    if (!isDateRangeValid && (startDate.isNotBlank() || endDate.isNotBlank())) {
+        Text("Invalid time period", color = MaterialTheme.colorScheme.error)
+    }
+    Spacer(Modifier.height(24.dp))
+
+    var newParticipant by remember { mutableStateOf("") }
+
+    val filteredUsers = remember(newParticipant, users) {
+        if (newParticipant.isBlank()) emptyList()
+        else users.filter { user ->
+            user.name.contains(newParticipant, ignoreCase = true) ||
+                    user.email.contains(newParticipant, ignoreCase = true)
+        }
+    }
+
+    val suggestionEmails = filteredUsers.map { it.email }
+
+    val suggestionList = remember(newParticipant, assignments, suggestionEmails) {
+        if (newParticipant.isBlank()) {
+            emptyList()
+        } else {
+            suggestionEmails.filter { email ->
+                email.contains(newParticipant, ignoreCase = true)
+                        && assignments.none { it.equals(email, ignoreCase = true) }
+            }
+        }
+    }
+
+    LaunchedEffect(users) {
+        try {
+            val result: Result<List<UserLayout>> = getListOfAllUsers()
+            users = result.getOrNull() ?: emptyList()
+        } catch (e: Exception) {
+            users = emptyList()
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -123,60 +158,9 @@ fun ProjectCreationScreen(
                 Text("Name is not allowed to be empty", color = MaterialTheme.colorScheme.error)
             }
             Spacer(Modifier.height(16.dp))
-            LaunchedEffect(users) {
-                try {
-                    val result: Result<List<UserLayout>> = getListOfAllUsers()
-                    users = result.getOrNull() ?: emptyList()
-                } catch (e: Exception) {
-                    users = emptyList()
-                }
-            }
-            // Timeframe
-            OutlinedTextField(
-                value = if (startDate.isNotBlank() && endDate.isNotBlank())
-                    "$startDate – $endDate" else "",
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Time period") },
-                isError = !isDateRangeValid && (startDate.isNotBlank() || endDate.isNotBlank()),
-                modifier = Modifier.fillMaxWidth(),
-                trailingIcon = {
-                    Icon(
-                        painter = painterResource(R.drawable.calender_svgrepo_com),
-                        contentDescription = "Pick time period",
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable { pickDateRange() },
-                        tint = uiColor
-                    )
-                }
-            )
-            if (!isDateRangeValid && (startDate.isNotBlank() || endDate.isNotBlank())) {
-                Text("Invalid time period", color = MaterialTheme.colorScheme.error)
-            }
+
             Spacer(Modifier.height(24.dp))
 
-            var newParticipant by remember { mutableStateOf("") }
-
-            val filteredUsers = remember(newParticipant, users) {
-                if (newParticipant.isBlank()) emptyList()
-                else users.filter { user ->
-                    user.name.contains(newParticipant, ignoreCase = true) ||
-                            user.email.contains(newParticipant, ignoreCase = true)
-                }
-            }
-            val suggestionEmails = filteredUsers.map { it.email }
-
-            val suggestionList = remember(newParticipant, assignments, suggestionEmails) {
-                if (newParticipant.isBlank()) {
-                    emptyList()
-                } else {
-                    suggestionEmails.filter { email ->
-                        email.contains(newParticipant, ignoreCase = true)
-                                && assignments.none { it.equals(email, ignoreCase = true) }
-                    }
-                }
-            }
             ChipInputField(
                 entries = assignments,
                 newEntry = newParticipant,
@@ -197,7 +181,30 @@ fun ProjectCreationScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(24.dp))
+
+            Spacer(Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = if (startDate.isNotBlank() && endDate.isNotBlank())
+                    "$startDate – $endDate" else "",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Time period") },
+                isError = !isDateRangeValid && (startDate.isNotBlank() || endDate.isNotBlank()),
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.calender_svgrepo_com),
+                        contentDescription = "Pick time period",
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable { pickDateRange() },
+                        tint = uiColor
+                    )
+                }
+            )
+
+
 
 
 
