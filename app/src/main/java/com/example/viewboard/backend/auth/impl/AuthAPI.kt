@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.navigation.NavController
 import com.example.viewboard.backend.auth.abstraction.AuthServerAPI
 import com.example.viewboard.backend.dataLayout.UserLayout
-import com.example.viewboard.ui.navigation.NavScreens
+import com.example.viewboard.frontend.navigation.NavScreens
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FieldPath

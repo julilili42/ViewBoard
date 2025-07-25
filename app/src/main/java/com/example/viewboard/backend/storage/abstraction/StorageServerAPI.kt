@@ -300,7 +300,7 @@ abstract class StorageServerAPI () {
      */
     public abstract fun getAllViews() : Flow<List<ViewLayout>>
 
-    // abstract flow Lists //
+    // abstract flow lists //
     protected lateinit var projects: Flow<List<ProjectLayout>>
     protected lateinit var issues: Flow<List<IssueLayout>>
     protected lateinit var views: Flow<List<ViewLayout>>
