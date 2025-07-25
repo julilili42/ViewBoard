@@ -264,6 +264,18 @@ fun IssueEditScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            if (newLabelName.isNotBlank()) {
+                Text(
+                    text = "Press enter to add label",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .align(Alignment.Start)
+                )
+            }
+
+
             Spacer(Modifier.height(12.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
