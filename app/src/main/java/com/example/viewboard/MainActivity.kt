@@ -9,8 +9,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.viewboard.backend.notification.impl.Notification
 import com.example.viewboard.backend.auth.impl.AuthAPI
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
-import com.example.viewboard.ui.navigation.Navigation
-import com.example.viewboard.ui.theme.ComposeLoginScreenInitTheme
+import com.example.viewboard.frontend.navigation.Navigation
+import com.example.viewboard.frontend.components.theme.ComposeLoginScreenInitTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {

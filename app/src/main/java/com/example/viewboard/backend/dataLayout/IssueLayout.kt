@@ -2,7 +2,7 @@ package com.example.viewboard.backend.dataLayout
 
 import com.google.firebase.firestore.DocumentId
 import com.example.viewboard.backend.util.Timestamp
-import com.example.viewboard.stateholder.IssueViewModel
+import com.example.viewboard.frontend.stateholder.IssueViewModel
 
 /**
  * Current progress state of an issue
