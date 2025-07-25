@@ -11,13 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
-import androidx.navigation.NavController
 import com.example.viewboard.frontend.stateholder.IssueViewModel
 import com.example.viewboard.frontend.components.utils.extractIssueDateTimes
 
 
 @Composable
 fun TimelineSchedule(
+    modifier: Modifier = Modifier,
     year: Int,
     month: Int,
     height: Dp = 510.dp,
@@ -26,8 +26,7 @@ fun TimelineSchedule(
     onYearChange: (Int) -> Unit,
     onMonthChange: (Int) -> Unit,
     onselectDate: (LocalDate) -> Unit,
-    modifier: Modifier = Modifier,
-    navController: NavController
+
 ) {
     Box(modifier = modifier.height(height)) {
         val issuesList by issueViewModel.displayedAllIssues.collectAsState()

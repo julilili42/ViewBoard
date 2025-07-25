@@ -1,9 +1,8 @@
 package com.example.viewboard.frontend.components.timetable
 
+import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
@@ -23,21 +22,18 @@ import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
 import com.example.viewboard.backend.dataLayout.IssueProgress
 import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.frontend.components.home.issueProgress.IssueProgressCalculator
-import com.example.viewboard.frontend.components.utils.gradientColorList
 
 @Composable
-fun VerticalMilestoneBar(
+fun VerticalProgressBar(
+    modifier: Modifier = Modifier,
     project: ProjectLayout,
     width: Dp = 8.dp,
-    spacing: Dp = 2.dp,
     corner: Dp = 4.dp,
     timeSpan: IssueDeadlineFilter,
-    total: Int = 4,
     colors: List<Color>,
     calculator: IssueProgressCalculator = remember { IssueProgressCalculator() },
-    modifier: Modifier = Modifier,
+
 ) {
-    val brush = gradientColorList(colors.first(), colors.last(), total)
     val progress by produceState<IssueProgress>(
         initialValue = IssueProgress(0, 0, 0f),
         key1 = project.id,
@@ -48,43 +44,26 @@ fun VerticalMilestoneBar(
             .collect { value = it }
     }
 
-    Column(
-        modifier = modifier.width(width),
-        verticalArrangement = Arrangement.spacedBy(spacing)
+    val progressFraction = (progress.percentComplete / 100f).coerceIn(0f, 1f)
+    Log.d("progress", "progress: $progressFraction")
+    Box(
+        modifier = modifier
+            .width(width)
+            .fillMaxHeight()
+            .clip(RoundedCornerShape(corner))
+            .background(Color.LightGray.copy(alpha = 0.3f))
     ) {
-        repeat(total) { idx ->
-            val fillFrac = (progress.completedIssues.toFloat() - idx).coerceIn(0f, 1f)
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(corner))
-                    .background(Color.LightGray.copy(alpha = 0.3f))
-            ) {
-                if (fillFrac > 0f) {
-                    // Color for index
-                    val baseColor = brush[idx]
-                    val nextColor = brush[idx + 1]
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(fillFrac)
-                            .clip(RoundedCornerShape(corner))
-                            .background(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(
-                                        baseColor.copy(alpha = 1f),
-                                        nextColor.copy(alpha = 1f)
-                                    ),
-                                    startY = 0.0f,
-                                    endY = Float.POSITIVE_INFINITY,
-                                    tileMode = TileMode.Clamp
-                                )
-                            )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(progressFraction)
+                .clip(RoundedCornerShape(corner))
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(colors.first(), colors.last()),
+                        tileMode = TileMode.Clamp
                     )
-                }
-            }
-        }
+                )
+        )
     }
 }

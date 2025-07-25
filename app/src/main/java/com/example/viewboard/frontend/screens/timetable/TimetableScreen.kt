@@ -42,11 +42,10 @@ import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimetableScreen(
-    navController: NavHostController,
-    issueViewModel: IssueViewModel,
-    projectViewModel: ProjectViewModel,
-) {
+fun TimetableScreen(issueViewModel: IssueViewModel,
+                    projectViewModel: ProjectViewModel,
+                    navController: NavHostController,
+                    ) {
     val configuration = LocalConfiguration.current
     var contactHeight by remember { mutableStateOf(configuration.screenHeightDp.dp) }
     val density = LocalDensity.current
@@ -65,81 +64,76 @@ fun TimetableScreen(
             ProfileHeader(
                 name = "Raoul",
                 subtitle = "Just a short overview for you.",
-                navController = navController,
+                navController =navController,
                 showBackButton = false,
                 onProfileClick = {
                     navController.navigate(BottomBarScreen.Profile.route)
                 },
-                onBackClick = { navController.navigateUp() }
+                onBackClick = {navController.navigateUp()}
             )
         },
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding() + 16.dp)
+                .padding(top = paddingValues.calculateTopPadding()+16.dp)
                 .background(MaterialTheme.colorScheme.background)
                 .onGloballyPositioned { coords ->
                     screenHeightPx = coords.size.height
                 },
+        ){
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
-            Column(
+            EdgeToEdgeRoundedRightItemWithBadge(viewName = "Timetable",
+                                                modifier = Modifier.padding(start = 16.dp) )
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                EdgeToEdgeRoundedRightItemWithBadge(
-                    viewName = "Timetable",
-                    modifier = Modifier.padding(start = 16.dp)
+                SegmentedSwitch(
+                    options = "Projects" to "Issues",
+                    selectedLeft = showProjects,
+                    onSelectionChange = { showProjects = it }
                 )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    SegmentedSwitch(
-                        options = "Projects" to "Issues",
-                        selectedLeft = showProjects,
-                        onSelectionChange = { showProjects = it }
+            }
+            Box(
+                modifier = Modifier
+                    //.weight(1f)
+                    .weight(0.75f)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(Color.White)
+            ) {
+                if (showProjects) {
+                    contactHeight = configuration.screenHeightDp.dp
+                    VerticalTimelineSchedule(
+                        projects = projects,
+                        modifier = Modifier.fillMaxSize(),
                     )
-                }
-                Box(
-                    modifier = Modifier
-                        //.weight(1f)
-                        .weight(0.75f)
-                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                        .background(Color.White)
-                ) {
-                    if (showProjects) {
-                        contactHeight = configuration.screenHeightDp.dp
-                        VerticalTimelineSchedule(
-                            projects = projects,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        contactHeight = 530.dp
-                        selectedDate?.let {
-                            TimelineSchedule(
-                                year = year,
-                                month = month,
-                                onYearChange = { year = it },
-                                onMonthChange = { month = it },
-                                issueViewModel = issueViewModel,
-                                height = contactHeight,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(contactHeight),
-                                onselectDate = { selectedDate = it },
-                                selectedDate = selectedDate,
-                                navController = navController
+                } else {
+                    contactHeight = 530.dp
+                    selectedDate?.let {
+                        TimelineSchedule(
+                            year         = year,
+                            month        = month,
+                            onYearChange = { year = it },
+                            onMonthChange= { month = it },
+                            issueViewModel =  issueViewModel,
+                            height       = contactHeight,
+                            modifier     = Modifier.fillMaxWidth().height(contactHeight),
+                            onselectDate = { selectedDate = it },
+                            selectedDate = selectedDate,
 
-                            )
-                        }
+                        )
                     }
                 }
             }
         }
+    }
         if (!showProjects) {
             DraggableMyIssuesSection(
                 navController = navController,

@@ -32,6 +32,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalDensity
+import androidx.navigation.NavController
 import colorFromCode
 import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
 import com.example.viewboard.backend.dataLayout.ProjectLayout
@@ -43,7 +44,7 @@ import java.time.LocalDate
 @Composable
 fun VerticalTimelineSchedule(
     projects: List<ProjectLayout>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val primaryColor = MaterialTheme.colorScheme.primary
@@ -51,11 +52,7 @@ fun VerticalTimelineSchedule(
         val monthPx = totalPx / 365f
         val scrollState = rememberScrollState()
         val density = LocalDensity.current
-
-        val today = LocalDate.now()
         val todayInDays = dayOfYearFromIso(LocalDate.now().toString())
-        val monthFrac = (today.dayOfMonth - 1) / today.lengthOfMonth().toFloat()
-        val todayPx = ((today.monthValue - 1) * 30 + monthFrac) * monthPx
         val todayInDaysPx = (todayInDays * monthPx) + 60
         val todayInDaysDP = with(density) { todayInDaysPx.toDp() }
         Box(modifier = Modifier.fillMaxSize()) {
@@ -168,16 +165,14 @@ fun VerticalTimelineSchedule(
                                         MaterialTheme.colorScheme.secondary,
                                         MaterialTheme.colorScheme.primary
                                     )
-                                    VerticalMilestoneBar(
+                                    VerticalProgressBar(
                                         project = project,
-                                        total = total,
                                         colors = primaryGradient,
                                         timeSpan = IssueDeadlineFilter.ALL_TIME,
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .padding(vertical = 1.dp),
                                         width = 8.dp,
-                                        spacing = 1.dp,
                                         corner = 4.dp
                                     )
                                 }
