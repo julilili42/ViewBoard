@@ -7,6 +7,8 @@ import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.dataLayout.UserLayout
 import com.example.viewboard.backend.dataLayout.ViewLayout
 import com.example.viewboard.backend.storage.abstraction.StorageServerAPI
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
@@ -71,13 +73,63 @@ object FirebaseAPI : StorageServerAPI() {
     }
 
     override fun rmProject(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
-        projectTable.document(id)
-            .delete()
-            .addOnSuccessListener {
-                println("successfully removed project: $id")
-                onSuccess(id)
+        projectTable.document(id).get()
+            .addOnSuccessListener { document ->
+                if (!document.exists()) {
+                    println("failed to remove project: $id")
+                    onFailure(id)
+                    return@addOnSuccessListener
+                }
+
+                val projIssues = document.get("issues") as? List<String> ?: emptyList()
+
+                val deleteIssueTasks = projIssues.map { id ->
+                    issueTable.document(id).delete()
+                }
+
+                viewTable.get()
+                    .addOnSuccessListener { viewQuerySnapshot ->
+                        val updateViewTasks = mutableListOf<Task<Void>>()
+
+                        for (viewDoc in viewQuerySnapshot.documents) {
+                            val viewIssues = viewDoc.get("issues") as? MutableList<String> ?: mutableListOf()
+
+                            val updatedIssues = viewIssues.filterNot { it in projIssues }
+
+                            if (updatedIssues.size != viewIssues.size) {
+                                val task = viewTable.document(viewDoc.id)
+                                    .update("issues", updatedIssues)
+                                updateViewTasks.add(task)
+                            }
+                        }
+
+                        val allTasks = deleteIssueTasks + updateViewTasks
+
+                        Tasks.whenAllComplete(allTasks)
+                            .addOnSuccessListener {
+                                projectTable.document(id)
+                                    .delete()
+                                    .addOnSuccessListener {
+                                        println("successfully removed project: $id")
+                                        onSuccess(id)
+                                    }
+                                    .addOnFailureListener {
+                                        println("failed to remove project: $id")
+                                        onFailure(id)
+                                    }
+                            }
+                            .addOnFailureListener { e ->
+                                println("failed to remove project: $id")
+                                onFailure(id)
+                            }
+                    }
+                    .addOnFailureListener { e ->
+                        println("failed to remove project: $id")
+                        onFailure(id)
+                    }
+
             }
-            .addOnFailureListener {
+            .addOnFailureListener { e ->
                 println("failed to remove project: $id")
                 onFailure(id)
             }
