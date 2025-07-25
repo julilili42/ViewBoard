@@ -129,23 +129,6 @@ fun Navigation(modifier: Modifier = Modifier) {
                 }
             }
 
-            composable(BottomBarScreen.Profile.route) {
-                MainLayout(navController, currentRoute) { padding ->
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(padding)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(padding)
-                        ) {
-                            ProfileScreen(navController = navController)
-                        }
-                    }
-                }
-            }
-
             composable(BottomBarScreen.View.route) {backStack->
                 val viewsViewModel: ViewsViewModel = viewModel(backStack)
                 MainLayout(navController, currentRoute) { padding ->
