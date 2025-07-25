@@ -11,6 +11,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import kotlinx.coroutines.launch
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import java.util.Locale
@@ -70,7 +72,7 @@ fun ProjectItem(
     val projectNameCode = generateProjectCodeFromDbId(project.id)
     val projectNamecolor = colorFromCode(projectNameCode)
     val avatarSize = 18.dp
-
+    val context = LocalContext.current
 
     Card(
         modifier = Modifier
@@ -122,8 +124,24 @@ fun ProjectItem(
                                     scope.launch {
                                         FirebaseAPI.rmProject(
                                             id = project.id,
-                                            onSuccess = { /* TODO */ },
-                                            onFailure = { /* TODO */ }
+                                            onSuccess = {
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        "Project successfully deleted",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
+                                            },
+                                            onFailure = {
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        "Project deletion failed",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
+                                            }
                                         )
                                     }
                                     showConfirmDialog = false
