@@ -31,6 +31,11 @@ import com.example.viewboard.backend.dataLayout.ProjectLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.frontend.navigation.utils.ChipInputField
 import com.example.viewboard.frontend.components.utils.capitalizeWords
+import androidx.compose.material3.Text
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -237,6 +242,18 @@ fun IssueCreationScreen(
                 onEntryRemove = { removed -> labels = labels - removed },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (newLabelName.isNotBlank()) {
+                Text(
+                    text = "Press enter to add label",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .align(Alignment.Start)
+                )
+            }
+
             Spacer(Modifier.height(12.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -303,6 +320,8 @@ fun IssueCreationScreen(
                     if (isDateValid && isTimeValid) {
                         updateDeadlineFromDateText()
                         updateDeadlineFromTimeText()
+
+
                         val newIssue = IssueLayout(
                             title       = title.capitalizeWords(),
                             desc        = desc,
