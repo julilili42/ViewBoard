@@ -47,17 +47,17 @@ fun VerticalTimelineSchedule(
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val primaryColor = MaterialTheme.colorScheme.primary
-        val totalPx          = constraints.maxHeight.toFloat()
-        val monthPx          = totalPx / 365f
-        val scrollState      = rememberScrollState()
-        val density          = LocalDensity.current
+        val totalPx = constraints.maxHeight.toFloat()
+        val monthPx = totalPx / 365f
+        val scrollState = rememberScrollState()
+        val density = LocalDensity.current
 
-        val today     = LocalDate.now()
+        val today = LocalDate.now()
         val todayInDays = dayOfYearFromIso(LocalDate.now().toString())
         val monthFrac = (today.dayOfMonth - 1) / today.lengthOfMonth().toFloat()
-        val todayPx   = ((today.monthValue - 1)*30 + monthFrac) * monthPx
-        val todayInDaysPx   = (todayInDays * monthPx) + 60
-        val todayInDaysDP= with(density) { todayInDaysPx .toDp() }
+        val todayPx = ((today.monthValue - 1) * 30 + monthFrac) * monthPx
+        val todayInDaysPx = (todayInDays * monthPx) + 60
+        val todayInDaysDP = with(density) { todayInDaysPx.toDp() }
         Box(modifier = Modifier.fillMaxSize()) {
             Row(modifier = Modifier.fillMaxSize()) {
                 Column(
@@ -67,16 +67,16 @@ fun VerticalTimelineSchedule(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     listOf(
-                        "Jan","Feb","Mar","Apr","May","Jun",
-                        "Jul","Aug","Sep","Oct","Nov","Dec"
+                        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
                     ).forEach { m ->
                         Box(
                             modifier = Modifier
-                                .height(monthPx.toDp()*30)
+                                .height(monthPx.toDp() * 30)
                                 .fillMaxWidth()
                                 .drawBehind {
                                     val stroke = 2.dp.toPx()
-                                    val x = size.width - stroke/2
+                                    val x = size.width - stroke / 2
                                     drawLine(
                                         color = primaryColor.copy(alpha = 0.5f),
                                         start = Offset(x, 0f),
@@ -87,7 +87,11 @@ fun VerticalTimelineSchedule(
 
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(m, style = MaterialTheme.typography.bodySmall,color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                m,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 }
@@ -99,18 +103,17 @@ fun VerticalTimelineSchedule(
                         .fillMaxHeight()
                         .horizontalScroll(scrollState)
                 ) {
-                    // gestrichelte Linie nur im scrollbaren Bereich
                     Canvas(modifier = Modifier.matchParentSize()) {
                         val dash = 6.dp.toPx()
 
-                        val yPos        = todayInDaysDP.toPx()
+                        val yPos = todayInDaysDP.toPx()
 
                         drawLine(
-                            color       = primaryColor,//Color.Red,
-                            start       = Offset(0f, yPos ),
-                            end         = Offset(size.width, yPos),
+                            color = primaryColor,
+                            start = Offset(0f, yPos),
+                            end = Offset(size.width, yPos),
                             strokeWidth = 1.dp.toPx(),
-                            pathEffect  = PathEffect.dashPathEffect(floatArrayOf(dash, dash), 0f)
+                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(dash, dash), 0f)
                         )
                     }
 
@@ -119,14 +122,14 @@ fun VerticalTimelineSchedule(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         projects.forEach { project ->
-                            val startDateToDays = dayOfYearFromIso(project.startTS,)
-                            val endDateToDays = dayOfYearFromIso(project.deadlineTS,)
+                            val startDateToDays = dayOfYearFromIso(project.startTS)
+                            val endDateToDays = dayOfYearFromIso(project.deadlineTS)
                             val dayDiff = endDateToDays - startDateToDays
-                            val startDp  = (startDateToDays  * monthPx + 60).toDp()
-                            val heightDp = (dayDiff * monthPx -30).toDp()
+                            val startDp = (startDateToDays * monthPx + 60).toDp()
+                            val heightDp = (dayDiff * monthPx - 30).toDp()
                             val projectNameCode = generateProjectCodeFromDbId(project.name)
                             val projectNamecolor = colorFromCode(projectNameCode)
-                            val total = (dayDiff/15).toInt().coerceAtLeast(1)
+                            val total = (dayDiff / 15).toInt().coerceAtLeast(1)
                             Log.d("total", "total: $total")
                             Column(
                                 modifier = Modifier
@@ -141,7 +144,12 @@ fun VerticalTimelineSchedule(
                                         .offset(y = startDp)
                                         .widthIn(min = 45.dp)
                                         .background(
-                                            brush = Brush.linearGradient(listOf(projectNamecolor, projectNamecolor.copy(alpha = 0.8f))),
+                                            brush = Brush.linearGradient(
+                                                listOf(
+                                                    projectNamecolor,
+                                                    projectNamecolor.copy(alpha = 0.8f)
+                                                )
+                                            ),
                                             shape = RoundedCornerShape(4.dp)
                                         )
                                 )
@@ -162,15 +170,15 @@ fun VerticalTimelineSchedule(
                                     )
                                     VerticalMilestoneBar(
                                         project = project,
-                                        total     = total,
-                                        colors    = primaryGradient,
+                                        total = total,
+                                        colors = primaryGradient,
                                         timeSpan = IssueDeadlineFilter.ALL_TIME,
-                                        modifier  = Modifier
+                                        modifier = Modifier
                                             .fillMaxSize()
                                             .padding(vertical = 1.dp),
-                                        width     = 8.dp,
-                                        spacing   = 1.dp,
-                                        corner    = 4.dp
+                                        width = 8.dp,
+                                        spacing = 1.dp,
+                                        corner = 4.dp
                                     )
                                 }
                             }

@@ -27,8 +27,10 @@ sealed class BottomBarScreen(val route: String, @StringRes val title: Int, val i
         R.string.home,
         R.drawable.house_black_silhouette_without_door_svgrepo_com
     )
+
     object Timetable :
         BottomBarScreen("timetable", R.string.timetable, R.drawable.calendar_mark_svgrepo_com)
+
     object View : BottomBarScreen("view", R.string.views, R.drawable.contacts_svgrepo_com)
     object Profile : BottomBarScreen("profile", R.string.profile, R.drawable.user_svgrepo_com)
 }
@@ -74,11 +76,11 @@ private fun BottomBar(navController: NavHostController, currentRoute: String?) {
                 NavigationBarItem(
                     selected = selected,
                     colors = NavigationBarItemDefaults.colors(
-                        indicatorColor        = Color(0xFF495D92), // z.B. Braun
-                        selectedIconColor     = Color.White,
-                        selectedTextColor     = Color.White,
-                        unselectedIconColor   = Color(0xFF757575),
-                        unselectedTextColor   = Color(0xFF757575)
+                        indicatorColor = Color(0xFF495D92), // z.B. Braun
+                        selectedIconColor = Color.White,
+                        selectedTextColor = Color.White,
+                        unselectedIconColor = Color(0xFF757575),
+                        unselectedTextColor = Color(0xFF757575)
                     ),
                     icon = {
                         Icon(

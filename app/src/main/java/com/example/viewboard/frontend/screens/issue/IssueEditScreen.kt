@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.viewboard.backend.util.Timestamp
+import com.example.viewboard.backend.time.Timestamp
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.storage.impl.FirebaseAPI
 import com.example.viewboard.backend.auth.impl.AuthAPI
@@ -80,7 +80,7 @@ fun IssueEditScreen(
         }
     val mailsOfIssueUsers: List<String> = pairedObjects
         .filter { it.userId in issue.users }
-        .map    { it.mail.toString() }
+        .map { it.mail.toString() }
 
     var users by remember(mailsOfIssueUsers) { mutableStateOf(mailsOfIssueUsers) }
     val assignmentIds: ArrayList<String> = remember(users, pairedObjects) {
@@ -103,7 +103,7 @@ fun IssueEditScreen(
         .filterNotNull()
     Log.d("emails", "emails=${emails}")
 
-    val suggestionList = remember(newParticipant, users, emails ) {
+    val suggestionList = remember(newParticipant, users, emails) {
         if (newParticipant.isBlank()) {
             emptyList()
         } else {
@@ -192,7 +192,12 @@ fun IssueEditScreen(
                         FirebaseAPI.updIssue(
                             updatedIssue,
                             onSuccess = { _ -> onUpdated() },
-                            onFailure = { _ -> Log.e("IssueEdit", "Error while saving ${issue.id}") }
+                            onFailure = { _ ->
+                                Log.e(
+                                    "IssueEdit",
+                                    "Error while saving ${issue.id}"
+                                )
+                            }
                         )
                         navController.popBackStack()
                     },
@@ -287,7 +292,8 @@ fun IssueEditScreen(
                         onDone = { updateDeadline() }
                     ),
                     trailingIcon = {
-                        Icon(Icons.Default.DateRange, null,
+                        Icon(
+                            Icons.Default.DateRange, null,
                             Modifier.clickable { pickTime() })
                     },
                     modifier = Modifier.weight(1f)

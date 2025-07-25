@@ -40,7 +40,7 @@ fun HomeScreen(
     onSortTasks: () -> Unit = {}
 ) {
 
-    var columnHeightPx    by remember { mutableStateOf(0) }
+    var columnHeightPx by remember { mutableStateOf(0) }
     var screenHeightPx by remember { mutableStateOf(0) }
     val density = LocalDensity.current
     val span by viewModel.timeSpan.collectAsState(
@@ -52,15 +52,15 @@ fun HomeScreen(
     val percentCompleted = progress.percentComplete
     Scaffold(
         topBar = {
-                    ProfileHeader(
-                        name = AuthAPI.getCurrentDisplayName() ?: "failed to load username",
-                        subtitle = "Welcome back!!",
-                        navController =navController,
-                        showBackButton = false ,
-                        onProfileClick = {
-                            navController.navigate(BottomBarScreen.Profile.route)
-                        },
-                        onBackClick = {navController.navigateUp()},
+            ProfileHeader(
+                name = AuthAPI.getCurrentDisplayName() ?: "failed to load username",
+                subtitle = "Welcome back!!",
+                navController = navController,
+                showBackButton = false,
+                onProfileClick = {
+                    navController.navigate(BottomBarScreen.Profile.route)
+                },
+                onBackClick = { navController.navigateUp() },
             )
         }
     ) { paddingValues ->
@@ -77,7 +77,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
-                    .height(contactHeight )
+                    .height(contactHeight)
                     .onSizeChanged { size ->
                         columnHeightPx = size.height
                     }
@@ -95,11 +95,14 @@ fun HomeScreen(
                 Spacer(Modifier.height(24.dp))
 
 
-                Log.d("IssueProgress", "Progress: total=${progress.totalIssues}, done=${progress.completedIssues}, percent=${progress.percentComplete},span=${span}")
+                Log.d(
+                    "IssueProgress",
+                    "Progress: total=${progress.totalIssues}, done=${progress.completedIssues}, percent=${progress.percentComplete},span=${span}"
+                )
                 ProgressCard(
                     title = span,
                     progress = percentCompleted,
-                    onClick={viewModel.advanceTimeSpan()}
+                    onClick = { viewModel.advanceTimeSpan() }
                 )
             }
             DraggableMyTasksSection(
@@ -108,7 +111,7 @@ fun HomeScreen(
                 issueViewModel = issueViewModel,
                 viewsViewModel = viewsViewModel,
                 modifier = Modifier.fillMaxSize(),
-                minSheetHeightPx =  (screenHeightPx - topBlockHeightPx).coerceAtLeast(0f),
+                minSheetHeightPx = (screenHeightPx - topBlockHeightPx).coerceAtLeast(0f),
             )
         }
     }

@@ -43,7 +43,6 @@ import com.example.viewboard.backend.dataLayout.IssueDeadlineFilter
 import com.example.viewboard.backend.dataLayout.IssueProgress
 
 
-
 @Composable
 fun ProjectItem(
     project: ProjectLayout,

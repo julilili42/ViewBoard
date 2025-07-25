@@ -52,8 +52,14 @@ fun ProjectCardTasks(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .border(BorderStroke(1.dp, Color.Black.copy(alpha = 0.2f)), shape = MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.medium)
+                .border(
+                    BorderStroke(1.dp, Color.Black.copy(alpha = 0.2f)),
+                    shape = MaterialTheme.shapes.medium
+                )
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant,
+                    shape = MaterialTheme.shapes.medium
+                )
         ) {
             Column(
                 modifier = Modifier
@@ -72,7 +78,12 @@ fun ProjectCardTasks(
                         Box(
                             modifier = Modifier
                                 .background(
-                                    brush = Brush.linearGradient(listOf(projectColor, projectColor.copy(alpha = 1f))),
+                                    brush = Brush.linearGradient(
+                                        listOf(
+                                            projectColor,
+                                            projectColor.copy(alpha = 1f)
+                                        )
+                                    ),
                                     shape = RoundedCornerShape(4.dp)
                                 )
                                 .padding(0.dp)
@@ -94,9 +105,11 @@ fun ProjectCardTasks(
                                 .weight(1f)
                                 .padding(start = 8.dp)
                         ) {
-                            Text(text = issueName,
+                            Text(
+                                text = issueName,
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                             Spacer(modifier = Modifier.height(6.dp))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -127,9 +140,11 @@ fun ProjectCardTasks(
                         }
                     }
                     IconButton(onClick = onMenuClick) {
-                        Icon(imageVector = Icons.Default.MoreVert,
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
                             contentDescription = "More options",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }

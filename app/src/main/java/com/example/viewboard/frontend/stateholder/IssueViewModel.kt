@@ -1,4 +1,5 @@
 package com.example.viewboard.frontend.stateholder
+
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -35,7 +36,6 @@ class IssueViewModel : ViewModel() {
     enum class SortOrder { ASC, DESC }
 
 
-
     private val _allIssues = MutableStateFlow<List<IssueLayout>>(emptyList())
     val allIssues: StateFlow<List<IssueLayout>> = _allIssues.asStateFlow()
     private val _filter = MutableStateFlow<IssueState?>(null)
@@ -45,7 +45,7 @@ class IssueViewModel : ViewModel() {
     val sortField: StateFlow<SortField> = _sortField.asStateFlow()
     private val _sortOrder = MutableStateFlow(SortOrder.ASC)
     val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
-    private val _showOnlyMyIssues  = MutableStateFlow(false)
+    private val _showOnlyMyIssues = MutableStateFlow(false)
     val showOnlyMyIssues: StateFlow<Boolean> = _showOnlyMyIssues.asStateFlow()
 
     private val userId = AuthAPI.getUid() ?: ""
@@ -56,7 +56,7 @@ class IssueViewModel : ViewModel() {
     private val _items = mutableStateListOf<IssueLayout>()
     val items: List<IssueLayout> get() = _items
 
-    private val _timeSpan   = MutableStateFlow(IssueDeadlineFilter.CURRENT_MONTH)
+    private val _timeSpan = MutableStateFlow(IssueDeadlineFilter.CURRENT_MONTH)
     private val _progress = MutableStateFlow(IssueProgress(0, 0, 0.0f))
     private val calculator = IssueProgressCalculator()
 
@@ -70,7 +70,6 @@ class IssueViewModel : ViewModel() {
     val state: StateFlow<IssueState> = _state
     var isDragging by mutableStateOf(false)
 
-    
 
     /** Lade Issues aus Firebase entsprechend dem Projekt */
     fun reload() {
@@ -79,6 +78,7 @@ class IssueViewModel : ViewModel() {
                 .collectLatest { _allIssues.value = it }
         }
     }
+
     private fun reloadForProject(id: String) {
         viewModelScope.launch {
             FirebaseAPI
@@ -96,9 +96,11 @@ class IssueViewModel : ViewModel() {
         _filter.value = state
         reload()
     }
+
     fun setShowOnlyMine() {
         _showOnlyMyIssues.value = !_showOnlyMyIssues.value
     }
+
     /** Setze die aktuelle Project‑ID */
     fun setProject(projectId: String) {
         _projectId.value = projectId
@@ -128,11 +130,13 @@ class IssueViewModel : ViewModel() {
         }
     }
 
-    fun startDragging(){
-        isDragging = true }
+    fun startDragging() {
+        isDragging = true
+    }
 
-    fun stopDragging(){
-        isDragging = false }
+    fun stopDragging() {
+        isDragging = false
+    }
 
     fun moveItemToState(item: IssueLayout, newState: IssueState) {
         if (item.state == newState) return
@@ -166,7 +170,7 @@ class IssueViewModel : ViewModel() {
                 flowOf(emptyList())
             } else {
                 FirebaseAPI.getIssuesFromView(
-                    viewID    = viewId,
+                    viewID = viewId,
                     onSuccess = { },
                     onFailure = { }
                 )
@@ -275,7 +279,6 @@ class IssueViewModel : ViewModel() {
         )
 
 
-
     val displayedAllIssues: StateFlow<List<IssueLayout>> =
         combine(
             rawAllIssuesFlow,
@@ -342,7 +345,8 @@ class IssueViewModel : ViewModel() {
                             }
                         }.awaitAll()
                     }
-                    _emailsForIssue.value = pairs.toMap() }
+                    _emailsForIssue.value = pairs.toMap()
+                }
         }
     }
 }

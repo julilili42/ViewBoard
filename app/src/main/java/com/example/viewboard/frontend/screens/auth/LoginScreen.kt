@@ -195,7 +195,7 @@ fun LoginSection(modifier: Modifier = Modifier, navController: NavController) {
 
         // Login-Button
         Button(
-            onClick = { AuthAPI.loginWithEmail(context, email, password, navController)},
+            onClick = { AuthAPI.loginWithEmail(context, email, password, navController) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp),

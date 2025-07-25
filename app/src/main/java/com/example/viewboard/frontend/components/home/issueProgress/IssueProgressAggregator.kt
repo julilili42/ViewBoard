@@ -1,10 +1,12 @@
 package com.example.viewboard.frontend.components.home.issueProgress
+
 import com.example.viewboard.backend.dataLayout.IssueLayout
 import com.example.viewboard.backend.dataLayout.IssueState
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
+
 class IssueProgressAggregator(
     private val projId: String,
     private val userId: String
@@ -13,7 +15,7 @@ class IssueProgressAggregator(
         .whereEqualTo("projectId", projId)
 
     // Öffentlich beobachtbare StateFlows
-    val totalCount     = MutableStateFlow(0)
+    val totalCount = MutableStateFlow(0)
     val completedCount = MutableStateFlow(0)
 
     private val listener = db.addSnapshotListener { snaps, err ->
@@ -28,6 +30,7 @@ class IssueProgressAggregator(
                     if (issue.users.contains(userId) && issue.state == IssueState.DONE)
                         completedCount.value += 1
                 }
+
                 DocumentChange.Type.MODIFIED -> {
                     // altes Objekt ließe sich optional aus change.oldIndex holen,
                     // hier nehmen wir einfach immer neu:
@@ -43,6 +46,7 @@ class IssueProgressAggregator(
                             completedCount.value -= 1
                     }
                 }
+
                 DocumentChange.Type.REMOVED -> {
                     totalCount.value -= 1
                     if (issue.users.contains(userId) && issue.state == IssueState.DONE)

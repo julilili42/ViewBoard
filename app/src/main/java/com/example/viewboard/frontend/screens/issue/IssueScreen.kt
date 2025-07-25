@@ -68,27 +68,34 @@ fun IssueScreen(
     Scaffold(
         topBar = {
             ProfileHeader(
-                name           = AuthAPI.getCurrentDisplayName() ?: "…",
-                subtitle       = "Welcome back!!",
-                navController  = navController,
+                name = AuthAPI.getCurrentDisplayName() ?: "…",
+                subtitle = "Welcome back!!",
+                navController = navController,
                 showBackButton = true,
                 onProfileClick = { navController.navigate(BottomBarScreen.Profile.route) },
-                onBackClick    = { navController.navigateUp() }
+                onBackClick = { navController.navigateUp() }
             )
         },
         floatingActionButton = {
             CustomIcon(
-                iconRes       = R.drawable.plus_large_svgrepo_com,
-                contentDesc   = stringResource(R.string.plus_large_svgrepo_com),
+                iconRes = R.drawable.plus_large_svgrepo_com,
+                contentDesc = stringResource(R.string.plus_large_svgrepo_com),
                 backgroundColor = MaterialTheme.colorScheme.primary,
-                iconTint        = Color.White,
-                width           = 50.dp,
-                height          = 50.dp,
-                modifier        = Modifier
+                iconTint = Color.White,
+                width = 50.dp,
+                height = 50.dp,
+                modifier = Modifier
                     .offset(y = 40.dp)
                     .padding(16.dp)
                     .clip(CircleShape),
-                onClick       = { navController.navigate(NavScreens.IssueCreationNavScreens.createRoute(projectName,projectId)) }
+                onClick = {
+                    navController.navigate(
+                        NavScreens.IssueCreationNavScreens.createRoute(
+                            projectName,
+                            projectId
+                        )
+                    )
+                }
             )
         }
     ) { paddingValues ->
@@ -98,10 +105,10 @@ fun IssueScreen(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding     = PaddingValues(16.dp),
+            contentPadding = PaddingValues(16.dp),
 
 
-        ) {
+            ) {
             item {
                 EdgeToEdgeRoundedRightItemWithBadge(
                     viewName = projectName,
@@ -112,17 +119,17 @@ fun IssueScreen(
             val sortOptions = listOf(
                 SortOptionsIssues("Sort by Date", IssueViewModel.SortField.DATE),
                 SortOptionsIssues("Sort by Name", IssueViewModel.SortField.NAME),
-                )
+            )
             item {
                 Row(
                     Modifier.fillMaxWidth(),
-                    verticalAlignment   = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     CustomSearchField(
-                        query           = query,
-                        onQueryChange   = { issueViewModel.setQuery(it)},
-                        modifier        = Modifier
+                        query = query,
+                        onQueryChange = { issueViewModel.setQuery(it) },
+                        modifier = Modifier
                             .height(40.dp)
                             .width(200.dp)
                     )
@@ -132,21 +139,23 @@ fun IssueScreen(
                         R.drawable.profile_group_svgrepo_com
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         CustomIcon(
-                            iconRes         = iconRes,
-                            contentDesc     = "",
+                            iconRes = iconRes,
+                            contentDesc = "",
                             backgroundColor = MaterialTheme.colorScheme.primary,
-                            iconTint   = Color.White,
-                            width           = 40.dp,
-                            height          = 40.dp,
-                            onClick         = { issueViewModel.setShowOnlyMine() },
-                            modifier        = Modifier.padding(end = 8.dp)
+                            iconTint = Color.White,
+                            width = 40.dp,
+                            height = 40.dp,
+                            onClick = { issueViewModel.setShowOnlyMine() },
+                            modifier = Modifier.padding(end = 8.dp)
                         )
-                        IssueSortMenuSimple(issueViewModel,
+                        IssueSortMenuSimple(
+                            issueViewModel,
                             options = sortOptions,
                             iconTint = Color.White,
                             backgroundColor = MaterialTheme.colorScheme.primary,
                             iconRes = R.drawable.sort_desc_svgrepo_com,
-                            contentDesc = "Sort")
+                            contentDesc = "Sort"
+                        )
                     }
                 }
             }
@@ -232,9 +241,9 @@ fun IssueScreen(
 }
 
 fun stateFromIndex(idx: Int): IssueState = when (idx) {
-    0    -> IssueState.NEW
-    1    -> IssueState.ONGOING
-    2    -> IssueState.DONE
+    0 -> IssueState.NEW
+    1 -> IssueState.ONGOING
+    2 -> IssueState.DONE
     else -> throw IllegalArgumentException("Invalid Index for IssueState: $idx")
 }
 

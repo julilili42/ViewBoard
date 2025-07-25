@@ -33,10 +33,10 @@ fun ChipInputField(
     newEntry: String,
     contentText: String,
     suggestions: List<String> = emptyList(),
-    onSuggestionClick: (String) -> Unit={},             // Callback with String
-    onNewEntryChange: (String) -> Unit={},
-    onEntryConfirmed: () -> Unit={},
-    onEntryRemove: (String) -> Unit={},
+    onSuggestionClick: (String) -> Unit = {},             // Callback with String
+    onNewEntryChange: (String) -> Unit = {},
+    onEntryConfirmed: () -> Unit = {},
+    onEntryRemove: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
@@ -61,7 +61,8 @@ fun ChipInputField(
                 FlowRow(modifier = Modifier.fillMaxWidth()) {
                     entries.forEach { entry ->
                         AssistChip(
-                            onClick = { if (enabled) onEntryRemove(entry) },                            label = { Text(entry) },
+                            onClick = { if (enabled) onEntryRemove(entry) },
+                            label = { Text(entry) },
                             modifier = Modifier
                                 .height(32.dp)
                                 .padding(start = 4.dp, bottom = 2.dp)
@@ -103,7 +104,11 @@ fun ChipInputField(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.outline,
+                                RoundedCornerShape(4.dp)
+                            )
                     ) {
                         suggestions.forEach { suggestion ->
                             Box(

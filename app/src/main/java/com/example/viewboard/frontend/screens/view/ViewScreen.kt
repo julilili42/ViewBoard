@@ -110,8 +110,7 @@ fun ViewScreen(
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        ,
+                        .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -127,11 +126,11 @@ fun ViewScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         ViewSortMenuSimple(
                             viewViewModel = viewsViewModel,
-                            iconRes          = R.drawable.sort_desc_svgrepo_com,
-                            backgroundColor  = MaterialTheme.colorScheme.primary,
-                            iconTint  = Color.White,
-                            contentDesc      = stringResource(R.string.filter_svgrepo_com__1),
-                            modifier         = Modifier.size(40.dp)
+                            iconRes = R.drawable.sort_desc_svgrepo_com,
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            iconTint = Color.White,
+                            contentDesc = stringResource(R.string.filter_svgrepo_com__1),
+                            modifier = Modifier.size(40.dp)
                         )
                     }
                 }
@@ -181,7 +180,7 @@ fun ViewScreen(
                                             creator = uid,
                                             issues = ArrayList()
                                         ),
-                                        onSuccess = { _ ->  },
+                                        onSuccess = { _ -> },
                                         onFailure = { err -> /* TODO handle error*/ }
                                     )
                                 }

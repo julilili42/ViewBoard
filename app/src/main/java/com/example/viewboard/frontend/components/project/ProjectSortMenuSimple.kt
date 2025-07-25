@@ -115,6 +115,7 @@ fun ProjectSortMenuSimple(
                                     projectViewModel.setSortOrder(ProjectViewModel.SortOrder.ASC)
                                 }
                             }
+
                             "Sort by Name" -> {
                                 if (currentField == ProjectViewModel.SortField.NAME) {
                                     projectViewModel.setSortOrder(

@@ -47,14 +47,18 @@ fun ChangeEmailScreen(
                             scope.launch {
                                 AuthAPI.updateEmail(
                                     oldPassword = currentPassword,
-                                    newEmail     = newEmail,
-                                    onSuccess  = {
+                                    newEmail = newEmail,
+                                    onSuccess = {
                                         Toast
-                                            .makeText(context, "E‑Mail updated successfully", Toast.LENGTH_SHORT)
+                                            .makeText(
+                                                context,
+                                                "E‑Mail updated successfully",
+                                                Toast.LENGTH_SHORT
+                                            )
                                             .show()
                                         navController.popBackStack()
                                     },
-                                    onError    = { msg ->
+                                    onError = { msg ->
                                         Toast
                                             .makeText(context, msg, Toast.LENGTH_LONG)
                                             .show()

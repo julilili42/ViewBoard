@@ -61,6 +61,8 @@ fun Navigation(modifier: Modifier = Modifier) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val isLoggedIn = FirebaseProvider.auth.currentUser != null
+
+    // avoids always having to log-in at app start
     val start = if (isLoggedIn) "main" else NavScreens.LoginNavScreens.route
 
     Scaffold(

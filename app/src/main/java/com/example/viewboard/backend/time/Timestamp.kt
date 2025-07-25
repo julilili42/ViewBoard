@@ -1,4 +1,4 @@
-package com.example.viewboard.backend.util
+package com.example.viewboard.backend.time
 
 import java.time.Instant
 import java.time.ZoneId
@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter
  * @property zone the default zone
  * @property data data is used to import a timestamp exported string
  */
-class Timestamp (
+class Timestamp(
     dateFmt: String = "dd.MM.yy",
     timeFmt: String = "HH:mm",
     fullFmt: String = "dd.MM.yy HH:mm",
@@ -35,7 +35,7 @@ class Timestamp (
      *
      * @return the date in default format
      */
-    public fun getDate() : String {
+    public fun getDate(): String {
         return m_dateFmt.format(m_instant)
     }
 
@@ -44,7 +44,7 @@ class Timestamp (
      *
      * @return the time in default format
      */
-    public fun getTime() : String {
+    public fun getTime(): String {
         return m_timeFmt.format(m_instant)
     }
 
@@ -53,7 +53,7 @@ class Timestamp (
      *
      * @return the date-time in default format
      */
-    public fun getFull() : String {
+    public fun getFull(): String {
         return m_fullFmt.format(m_instant)
     }
 
@@ -65,7 +65,7 @@ class Timestamp (
      *
      * @return the date/time in custom format and zone
      */
-    public fun getCustom(customFmt: String, zone: ZoneId) : String {
+    public fun getCustom(customFmt: String, zone: ZoneId): String {
         val fmt: DateTimeFormatter = DateTimeFormatter.ofPattern(customFmt).withZone(zone)
         return fmt.format(m_instant)
     }
@@ -77,7 +77,7 @@ class Timestamp (
      *
      * @return true is the timestamps are equal
      */
-    public fun cmp(timestamp: Timestamp) : Boolean {
+    public fun cmp(timestamp: Timestamp): Boolean {
         return (m_instant == timestamp.m_instant)
     }
 
@@ -86,7 +86,7 @@ class Timestamp (
      *
      * @return the timestamp as string
      */
-    public fun export() : String {
+    public fun export(): String {
         return m_instant.toString()
     }
 

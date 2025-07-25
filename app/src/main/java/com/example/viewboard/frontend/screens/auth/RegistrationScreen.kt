@@ -64,7 +64,7 @@ fun RegisterTopSection(modifier: Modifier = Modifier) {
     ) {
         val uiColor = uiColor()
 
-        Box(contentAlignment = Alignment.TopCenter, modifier=Modifier.fillMaxWidth()) {
+        Box(contentAlignment = Alignment.TopCenter, modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.padding(top = 80.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -222,8 +222,7 @@ fun RegisterLoginSection(navController: NavController, modifier: Modifier = Modi
             .fillMaxWidth()
             .wrapContentWidth(Alignment.CenterHorizontally)
             .padding(bottom = 24.dp)
-            .clickable(onClick = { navController.navigate(NavScreens.LoginNavScreens.route) })
-        ,
+            .clickable(onClick = { navController.navigate(NavScreens.LoginNavScreens.route) }),
         text = annotatedText
     )
 }

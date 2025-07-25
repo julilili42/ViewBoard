@@ -56,9 +56,6 @@ fun ProjectCard(
 }
 
 
-
-
-
 fun randomGradientColors(): List<Color> {
     val colors = listOf(
         Color(0xFFE57373), // Rot

@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.tasks.await
 
 object FirebaseAPI : StorageServerAPI() {
-    public override fun init() {
+    override fun init() {
         val db = Firebase.firestore
 
         projectTable = db.collection("Projects")
@@ -42,7 +42,11 @@ object FirebaseAPI : StorageServerAPI() {
         users = userTable.snapshots().map { it.toObjects<UserLayout>() }
     }
 
-    public override fun addProject(projectLayout: ProjectLayout, onSuccess: (String) -> Unit, onFailure: (ProjectLayout) -> Unit) {
+    override fun addProject(
+        projectLayout: ProjectLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (ProjectLayout) -> Unit
+    ) {
         val uid = AuthAPI.getUid() ?: return
 
         val updatedUsers = ArrayList(projectLayout.users).apply {
@@ -66,7 +70,7 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun rmProject(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override fun rmProject(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
         projectTable.document(id)
             .delete()
             .addOnSuccessListener {
@@ -79,7 +83,11 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun updProject(projectLayout: ProjectLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override fun updProject(
+        projectLayout: ProjectLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         projectTable.document(projectLayout.id)
             .set(projectLayout)
             .addOnSuccessListener {
@@ -92,7 +100,12 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun updProject(id: String, projectLayout: ProjectLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override fun updProject(
+        id: String,
+        projectLayout: ProjectLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         projectTable.document(id)
             .set(projectLayout)
             .addOnSuccessListener {
@@ -105,7 +118,11 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun getProject(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : ProjectLayout? {
+    override suspend fun getProject(
+        id: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ): ProjectLayout? {
         val snap = projectTable.document(id)
             .get()
             .addOnSuccessListener {
@@ -121,11 +138,11 @@ object FirebaseAPI : StorageServerAPI() {
         return snap.toObject(ProjectLayout::class.java)
     }
 
-    public override fun getAllProjects() : Flow<List<ProjectLayout>> {
+    override fun getAllProjects(): Flow<List<ProjectLayout>> {
         return projects
     }
 
-    public override fun getProjectsFromUser(userID: String?) : Flow<List<ProjectLayout>> {
+    override fun getProjectsFromUser(userID: String?): Flow<List<ProjectLayout>> {
         return if (userID != null) {
             projects.map { projects ->
                 projects.filter { it.users.contains(userID) }
@@ -135,7 +152,12 @@ object FirebaseAPI : StorageServerAPI() {
         }
     }
 
-    public override suspend fun addIssue(projID: String, issueLayout: IssueLayout, onSuccess: (String) -> Unit, onFailure: (IssueLayout) -> Unit) {
+    override suspend fun addIssue(
+        projID: String,
+        issueLayout: IssueLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (IssueLayout) -> Unit
+    ) {
         val batch = Firebase.firestore.batch()
         val projREF = projectTable.document(projID)
         val issueREF = issueTable.document()
@@ -155,7 +177,13 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun addIssue(projID: String, viewID: String, issueLayout: IssueLayout, onSuccess: (String) -> Unit, onFailure: (IssueLayout) -> Unit) {
+    override suspend fun addIssue(
+        projID: String,
+        viewID: String,
+        issueLayout: IssueLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (IssueLayout) -> Unit
+    ) {
         val projREF = projectTable.document(projID)
         val viewREF = viewTable.document(viewID)
         val issueREF = issueTable.document()
@@ -165,7 +193,10 @@ object FirebaseAPI : StorageServerAPI() {
             val views = projSnap.get("views") as? List<String> ?: emptyList()
 
             if (!views.contains(viewID)) {
-                throw FirebaseFirestoreException("project does not include the view", FirebaseFirestoreException.Code.ABORTED)
+                throw FirebaseFirestoreException(
+                    "project does not include the view",
+                    FirebaseFirestoreException.Code.ABORTED
+                )
             }
 
             transaction.set(issueREF, issueLayout)
@@ -183,7 +214,12 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun rmIssue(projID: String, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override suspend fun rmIssue(
+        projID: String,
+        id: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         val projREF = projectTable.document(projID)
         val issueREF = issueTable.document(id)
 
@@ -211,7 +247,12 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun addIssueToView(viewID: String, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override suspend fun addIssueToView(
+        viewID: String,
+        id: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         val batch = Firebase.firestore.batch()
 
         viewTable.document(viewID)
@@ -226,7 +267,12 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun rmIssueFromView(viewID: String, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override suspend fun rmIssueFromView(
+        viewID: String,
+        id: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         val batch = Firebase.firestore.batch()
 
         viewTable.document(viewID)
@@ -241,7 +287,11 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun updIssue(issueLayout: IssueLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override fun updIssue(
+        issueLayout: IssueLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         issueTable.document(issueLayout.id)
             .set(issueLayout)
             .addOnSuccessListener {
@@ -254,7 +304,12 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun updIssue(id: String, issueLayout: IssueLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override fun updIssue(
+        id: String,
+        issueLayout: IssueLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         issueTable.document(id)
             .set(issueLayout)
             .addOnSuccessListener {
@@ -267,7 +322,11 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun getIssue(id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : IssueLayout? {
+    override suspend fun getIssue(
+        id: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ): IssueLayout? {
         val snap = issueTable.document(id)
             .get()
             .addOnSuccessListener {
@@ -283,11 +342,15 @@ object FirebaseAPI : StorageServerAPI() {
         return snap.toObject(IssueLayout::class.java)
     }
 
-    public override fun getAllIssues() : Flow<List<IssueLayout>> {
+    override fun getAllIssues(): Flow<List<IssueLayout>> {
         return issues
     }
 
-    public override fun getIssuesFromView(viewID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<IssueLayout>> {
+    override fun getIssuesFromView(
+        viewID: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ): Flow<List<IssueLayout>> {
         return viewTable.document(viewID)
             .snapshots()
             .map { snap ->
@@ -305,7 +368,7 @@ object FirebaseAPI : StorageServerAPI() {
                         }
                 }
 
-                combine (docFlows) { docs ->
+                combine(docFlows) { docs ->
                     val map = docs.filterNotNull().associateBy { it.id }
                     issues.mapNotNull { map[it] }
                 }
@@ -320,7 +383,11 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun getIssuesFromProject(projID: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : Flow<List<IssueLayout>> {
+    override fun getIssuesFromProject(
+        projID: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ): Flow<List<IssueLayout>> {
         return projectTable.document(projID)
             .snapshots()
             .map { snap ->
@@ -338,7 +405,7 @@ object FirebaseAPI : StorageServerAPI() {
                         }
                 }
 
-                combine (docFlows) { docs ->
+                combine(docFlows) { docs ->
                     val map = docs.filterNotNull().associateBy { it.id }
                     issues.mapNotNull { map[it] }
                 }
@@ -353,73 +420,72 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun getIssuesFromAssignment(userID: String?) : Flow<List<IssueLayout>> {
+    override fun getIssuesFromAssignment(userID: String?): Flow<List<IssueLayout>> {
         return issues.map { issues ->
             if (userID != null) {
                 issues.filter { it.users.contains(userID) }
-            }
-            else {
+            } else {
                 emptyList()
             }
         }
     }
 
-    public override fun getIssuesFromAssignment(userID: String?, projID: String) : Flow<List<IssueLayout>> {
+    override fun getIssuesFromAssignment(userID: String?, projID: String): Flow<List<IssueLayout>> {
         return getIssuesFromProject(projID).map { issues ->
             if (userID != null) {
                 issues.filter { it.users.contains(userID) }
-            }
-            else {
+            } else {
                 emptyList()
             }
         }
     }
 
-    public override fun getIssuesFromCreator(userID: String?) : Flow<List<IssueLayout>> {
+    override fun getIssuesFromCreator(userID: String?): Flow<List<IssueLayout>> {
         return issues.map { issues ->
             if (userID != null) {
                 issues.filter { it.creator == userID }
-            }
-            else {
+            } else {
                 emptyList()
             }
         }
     }
 
-    public override fun getIssuesFromCreator(userID: String?, projID: String) : Flow<List<IssueLayout>> {
+    override fun getIssuesFromCreator(userID: String?, projID: String): Flow<List<IssueLayout>> {
         return getIssuesFromProject(projID).map { issues ->
             if (userID != null) {
                 issues.filter { it.creator == userID }
-            }
-            else {
+            } else {
                 emptyList()
             }
         }
     }
 
-    public override fun getIssuesFromUser(userID: String?) : Flow<List<IssueLayout>> {
+    override fun getIssuesFromUser(userID: String?): Flow<List<IssueLayout>> {
         return issues.map { issues ->
             if (userID != null) {
                 issues.filter { it.users.contains(userID) || it.creator == userID }
-            }
-            else {
+            } else {
                 emptyList()
             }
         }
     }
 
-    public override fun getIssuesFromUser(userID: String?, projID: String) : Flow<List<IssueLayout>> {
+    override fun getIssuesFromUser(userID: String?, projID: String): Flow<List<IssueLayout>> {
         return getIssuesFromProject(projID).map { issues ->
             if (userID != null) {
                 issues.filter { it.users.contains(userID) || it.creator == userID }
-            }
-            else {
+            } else {
                 emptyList()
             }
         }
     }
 
-    public override suspend fun addView(userID: String?, viewLayout: ViewLayout, onSuccess: (String) -> Unit, onFailure: (ViewLayout) -> Unit) {
+    override suspend fun addView(
+        userID: String?,
+        viewLayout: ViewLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (ViewLayout) -> Unit
+    ) {
         if (userID == null) {
             println("failed to remove view, invalid user id: $userID")
             onFailure(viewLayout)
@@ -446,7 +512,12 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun rmView(userID: String?, id: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override suspend fun rmView(
+        userID: String?,
+        id: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         if (userID == null) {
             println("failed to remove view, invalid user id: $userID")
             onFailure(id)
@@ -473,7 +544,11 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun updView(viewLayout: ViewLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override fun updView(
+        viewLayout: ViewLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         viewTable.document(viewLayout.id)
             .set(viewLayout)
             .addOnSuccessListener {
@@ -486,7 +561,12 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override fun updView(id: String, viewLayout: ViewLayout, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+    override fun updView(
+        id: String,
+        viewLayout: ViewLayout,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         viewTable.document(id)
             .set(viewLayout)
             .addOnSuccessListener {
@@ -499,7 +579,11 @@ object FirebaseAPI : StorageServerAPI() {
             }
     }
 
-    public override suspend fun getViews(userID: String?, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) : List<ViewLayout> {
+    override suspend fun getViews(
+        userID: String?,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
+    ): List<ViewLayout> {
         if (userID.isNullOrBlank()) return emptyList()
         val userSnap = FirebaseProvider.firestore
             .collection("users")
@@ -515,7 +599,7 @@ object FirebaseAPI : StorageServerAPI() {
         }
     }
 
-    public override fun getAllViews() : Flow<List<ViewLayout>> {
+    override fun getAllViews(): Flow<List<ViewLayout>> {
         return views
     }
 

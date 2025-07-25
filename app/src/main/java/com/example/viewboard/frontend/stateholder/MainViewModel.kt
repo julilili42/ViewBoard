@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainViewModel : ViewModel() {
     val items = mutableStateListOf<IssueLayout>()
-    private val _timeSpan   = MutableStateFlow(IssueDeadlineFilter.CURRENT_MONTH)
+    private val _timeSpan = MutableStateFlow(IssueDeadlineFilter.CURRENT_MONTH)
     val timeSpan: StateFlow<IssueDeadlineFilter> = _timeSpan.asStateFlow()
     private val _progress = MutableStateFlow(IssueProgress(0, 0, 0.0f))
     val progress: StateFlow<IssueProgress> = _progress.asStateFlow()

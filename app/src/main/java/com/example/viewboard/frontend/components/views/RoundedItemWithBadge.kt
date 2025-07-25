@@ -27,7 +27,7 @@ fun EdgeToEdgeRoundedRightItemWithBadge(
     parentHorizontalPadding: Dp = 16.dp,
     boxHeight: Dp = 56.dp,
 
-) {
+    ) {
     Card(
         shape = RoundedCornerShape(
             topStart = 0.dp,
@@ -59,7 +59,7 @@ fun EdgeToEdgeRoundedRightItemWithBadge(
             )
 
             if (!projectId.isNullOrBlank()) {
-                val tagCode= generateProjectCodeFromDbId(projectId)
+                val tagCode = generateProjectCodeFromDbId(projectId)
                 val tagColor = colorFromCode(tagCode)
                 ProjectNameBadge(
                     text = tagCode,

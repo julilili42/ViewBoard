@@ -38,15 +38,16 @@ fun DraggableScreen(
             if (state.isDragging) {
                 var targetSize by remember { mutableStateOf(IntSize.Zero) }
                 Box(
-                    modifier = Modifier.graphicsLayer {
-                        val raw = state.dragPosition + state.dragOffset
-                        val corrected = raw - rootOffset
-                        scaleX = 0.8f
-                        scaleY = 0.8f
-                        alpha = if (targetSize == IntSize.Zero) 0f else .9f
-                        translationX = corrected.x - targetSize.width / 2
-                        translationY = corrected.y - targetSize.height / 2
-                    }
+                    modifier = Modifier
+                        .graphicsLayer {
+                            val raw = state.dragPosition + state.dragOffset
+                            val corrected = raw - rootOffset
+                            scaleX = 0.8f
+                            scaleY = 0.8f
+                            alpha = if (targetSize == IntSize.Zero) 0f else .9f
+                            translationX = corrected.x - targetSize.width / 2
+                            translationY = corrected.y - targetSize.height / 2
+                        }
                         .onGloballyPositioned { targetSize = it.size }
                 ) {
                     state.draggableComposable?.invoke()
@@ -55,7 +56,6 @@ fun DraggableScreen(
         }
     }
 }
-
 
 
 @Composable
@@ -133,7 +133,7 @@ fun <T> DropItem(
     }
 }
 
- class DragTargetInfo {
+class DragTargetInfo {
     var isDragging: Boolean by mutableStateOf(false)
     var dragPosition by mutableStateOf(Offset.Zero)
     var dragOffset by mutableStateOf(Offset.Zero)

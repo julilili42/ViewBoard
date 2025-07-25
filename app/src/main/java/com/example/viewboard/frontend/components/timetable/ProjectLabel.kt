@@ -24,15 +24,15 @@ fun ProjectLabel(
     Box(
         modifier = modifier
             .drawBehind {
-                val pointerWidth  = with(density) { 12.dp.toPx() }
+                val pointerWidth = with(density) { 12.dp.toPx() }
                 val pointerHeight = with(density) { 6.dp.toPx() }
                 val cx = size.width / 2f
                 val y0 = size.height
 
                 val path = Path().apply {
-                    moveTo(cx - pointerWidth/2, y0)
-                    lineTo(cx + pointerWidth/2, y0)
-                    lineTo(cx,                 y0 + pointerHeight)
+                    moveTo(cx - pointerWidth / 2, y0)
+                    lineTo(cx + pointerWidth / 2, y0)
+                    lineTo(cx, y0 + pointerHeight)
                     close()
                 }
                 drawPath(path, color = arrowColor)

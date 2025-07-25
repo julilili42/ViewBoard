@@ -39,7 +39,7 @@ fun CustomDropdownMenu(
     options: List<ViewLayout>,
     selectedOption: String?,
     onOptionSelected: (String) -> Unit,
-    modifier: Modifier = Modifier   
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val displayText = if (selectedOption.isNullOrBlank()) {
@@ -57,7 +57,7 @@ fun CustomDropdownMenu(
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .border(1.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small)
                 .clickable { expanded = true }
-                .padding(horizontal = 12.dp,),
+                .padding(horizontal = 12.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             CompositionLocalProvider(
@@ -76,34 +76,35 @@ fun CustomDropdownMenu(
             }
         }
         // Dropdown
-        if(!selectedOption.isNullOrBlank()){
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .fillMaxWidth(0.37f)
-                .clip(MaterialTheme.shapes.small)
-                .heightIn(max = 200.dp)
-                .padding(horizontal = 12.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        if (!selectedOption.isNullOrBlank()) {
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .fillMaxWidth(0.37f)
+                    .clip(MaterialTheme.shapes.small)
+                    .heightIn(max = 200.dp)
+                    .padding(horizontal = 12.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
 
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = option.name,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    },
-                    modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant),
-                    onClick = {
-                        onOptionSelected(option.id)
-                        expanded = false
-                    }
-                )
-            } }
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = option.name,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        },
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant),
+                        onClick = {
+                            onOptionSelected(option.id)
+                            expanded = false
+                        }
+                    )
+                }
+            }
         }
     }
 }

@@ -66,8 +66,10 @@ fun ViewItem(
         ) {
             OptionsMenuButton(
                 options = listOf(
-                    "Delete" to { Log.d("ViewItem", "Delete clicked for ${view.id}")
-                        onDelete(view.id) }
+                    "Delete" to {
+                        Log.d("ViewItem", "Delete clicked for ${view.id}")
+                        onDelete(view.id)
+                    }
                 ),
                 modifier = Modifier.align(Alignment.TopEnd),
                 icon = Icons.Default.MoreVert

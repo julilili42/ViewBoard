@@ -51,8 +51,8 @@ fun ProjectsScreen(
     // Bestimme den Filter-Modus anhand des Namens
     val filterMode = when (projectName.lowercase()) {
         "created" -> ProjectFilter.CREATED
-        "shared"  -> ProjectFilter.SHARED
-        else      -> ProjectFilter.CREATED
+        "shared" -> ProjectFilter.SHARED
+        else -> ProjectFilter.CREATED
     }
 
     LaunchedEffect(filterMode) {
@@ -78,7 +78,7 @@ fun ProjectsScreen(
             )
         },
         floatingActionButton = {
-            if(editable) {
+            if (editable) {
                 CustomIcon(
                     iconRes = R.drawable.plus_large_svgrepo_com,
                     contentDesc = stringResource(R.string.plus_large_svgrepo_com),
@@ -128,11 +128,11 @@ fun ProjectsScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         ProjectSortMenuSimple(
                             projectViewModel = projectViewModel,
-                            iconRes          = R.drawable.sort_desc_svgrepo_com,
-                            backgroundColor  = MaterialTheme.colorScheme.primary,
-                            iconTint  = Color.White,
-                            contentDesc      = stringResource(R.string.filter_svgrepo_com__1),
-                            modifier         = Modifier.size(40.dp)
+                            iconRes = R.drawable.sort_desc_svgrepo_com,
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            iconTint = Color.White,
+                            contentDesc = stringResource(R.string.filter_svgrepo_com__1),
+                            modifier = Modifier.size(40.dp)
                         )
                     }
                 }

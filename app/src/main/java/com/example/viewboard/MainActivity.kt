@@ -37,7 +37,8 @@ class MainActivity : ComponentActivity() {
                 lifecycleScope.launch {
                     Notification.checkUpcomingDeadlines(this@MainActivity)
                     Notification.checkNewIssueAssignments(this@MainActivity)
-                    Notification.checkNewProjectAssignments(this@MainActivity)                }
+                    Notification.checkNewProjectAssignments(this@MainActivity)
+                }
             },
             onError = { error ->
                 Log.e("MainActivity", "profile could not be established")

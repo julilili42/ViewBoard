@@ -20,31 +20,34 @@ import kotlinx.coroutines.launch
 class ViewsViewModel : ViewModel() {
     enum class SortField { NAME, CREATED }
     enum class SortOrder { ASC, DESC }
-    
+
     private val userId: String = AuthAPI.getUid() ?: ""
 
     private val _filter = MutableStateFlow<String?>(null)
     private val _query = MutableStateFlow("")
-    val query : StateFlow<String?> = _query.asStateFlow()
+    val query: StateFlow<String?> = _query.asStateFlow()
 
     private val _sortField = MutableStateFlow(SortField.CREATED)
     private val _sortOrder = MutableStateFlow(SortOrder.DESC)
 
     val sortField: StateFlow<SortField> = _sortField.asStateFlow()
     val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
-    
+
     private val _selectedViewId = MutableStateFlow<String?>(null)
     val selectedViewId: StateFlow<String?> = _selectedViewId
-    
-    fun setQuery(q: String) { _query.value = q }
-    
+
+    fun setQuery(q: String) {
+        _query.value = q
+    }
+
     fun setSortField(field: SortField) {
-        _sortField.value = field }
-    
+        _sortField.value = field
+    }
+
     fun selectView(viewId: String) {
         _selectedViewId.value = viewId
     }
-    
+
     fun setSortOrder(order: SortOrder) {
         _sortOrder.value = order
     }
@@ -132,12 +135,12 @@ class ViewsViewModel : ViewModel() {
             SharingStarted.Lazily,
             initialValue = ""
         )
-    
+
     init {
         viewModelScope.launch {
             displayedViewsHome
-                .filter { it.isNotEmpty() }        
-                .first()                              
+                .filter { it.isNotEmpty() }
+                .first()
                 .let { firstList ->
                     if (_selectedViewId.value == null) {
                         _selectedViewId.value = firstList.first().id

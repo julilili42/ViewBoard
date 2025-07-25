@@ -42,10 +42,10 @@ fun CustomIcon(
     ) {
         val iconSize = min(width, height) * 0.6f
         Icon(
-            painter           = painterResource(id = iconRes),
-            contentDescription= contentDesc,
-            tint              = iconTint,
-            modifier          = Modifier.size(iconSize)
+            painter = painterResource(id = iconRes),
+            contentDescription = contentDesc,
+            tint = iconTint,
+            modifier = Modifier.size(iconSize)
         )
     }
 }

@@ -68,9 +68,10 @@ fun ProgressCard(
                         .size(24.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary)
-                        .clickable {onClick()
+                        .clickable {
+                            onClick()
                             period = period.next()
-                             },
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

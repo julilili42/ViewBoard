@@ -40,15 +40,15 @@ fun formatRemaining(isoTimestamp: String): String {
     return if (duration.toHours() < 24) {
         val hours = duration.toHours().toInt().coerceAtLeast(0)
         when (hours) {
-            0    -> "expired"
-            1    -> "1 hour"
+            0 -> "expired"
+            1 -> "1 hour"
             else -> "$hours hours"
         }
     } else {
         val days = duration.toDays().toInt()
         when (days) {
-            0    -> "expired"
-            1    -> "1 day"
+            0 -> "expired"
+            1 -> "1 day"
             else -> "$days days"
         }
     }
@@ -97,7 +97,7 @@ fun extractIssueDateTimes(issues: List<IssueLayout>): List<OffsetDateTime> {
 fun gradientColorList(
     startColor: Color,
     endColor: Color,
-    steps:      Int
+    steps: Int
 ): List<Color> {
     require(steps > 0) { "steps must be > 0" }
     return List(steps + 1) { i ->
@@ -124,8 +124,8 @@ fun dayOfYearFromIso(
 }
 
 fun IssueDeadlineFilter.next(): IssueDeadlineFilter = when (this) {
-    IssueDeadlineFilter.CURRENT_YEAR  -> IssueDeadlineFilter.CURRENT_MONTH
+    IssueDeadlineFilter.CURRENT_YEAR -> IssueDeadlineFilter.CURRENT_MONTH
     IssueDeadlineFilter.CURRENT_MONTH -> IssueDeadlineFilter.CURRENT_WEEK
-    IssueDeadlineFilter.CURRENT_WEEK  -> IssueDeadlineFilter.CURRENT_YEAR
+    IssueDeadlineFilter.CURRENT_WEEK -> IssueDeadlineFilter.CURRENT_YEAR
     IssueDeadlineFilter.ALL_TIME -> IssueDeadlineFilter.ALL_TIME
 }

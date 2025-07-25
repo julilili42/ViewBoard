@@ -51,7 +51,7 @@ fun ViewIssueScreen(
     projectViewModel: ProjectViewModel,
     navController: NavController,
 
-) {
+    ) {
     val projects by projectViewModel.displayedViewProjects.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     val query by issueViewModel.query.collectAsState(initial = "")
@@ -109,7 +109,7 @@ fun ViewIssueScreen(
             item {
                 EdgeToEdgeRoundedRightItemWithBadge(
                     viewName = viewName,
-                    projectId=projectId,
+                    projectId = projectId,
                 )
             }
             item {
@@ -134,22 +134,22 @@ fun ViewIssueScreen(
             items(issues) { issue ->
                 val emailsState by produceState<List<String?>>(
                     initialValue = emptyList(),
-                    key1 = issue .users
+                    key1 = issue.users
                 ) {
-                    val result = runCatching { AuthAPI.getEmailsByIds(issue .users) }
+                    val result = runCatching { AuthAPI.getEmailsByIds(issue.users) }
                         .getOrNull()
                         ?.getOrNull()
                     value = result ?: emptyList()
                 }
                 IssueItemCard(
-                    title        = issue .title,
-                    date         = issue .deadlineTS,
-                    emailsState =emailsState,
-                    projectId    = projectId,
-                    issueId      = issue .id,
-                    navController= navController,
+                    title = issue.title,
+                    date = issue.deadlineTS,
+                    emailsState = emailsState,
+                    projectId = projectId,
+                    issueId = issue.id,
+                    navController = navController,
                     issueLabels = emptyList(),
-                    modifier     = Modifier.clip(RoundedCornerShape(12.dp))
+                    modifier = Modifier.clip(RoundedCornerShape(12.dp))
                 )
             }
         }

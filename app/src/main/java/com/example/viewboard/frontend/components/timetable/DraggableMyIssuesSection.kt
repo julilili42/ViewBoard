@@ -80,7 +80,8 @@ fun DraggableMyIssuesSection(
                         orientation = Orientation.Vertical,
                         state = rememberDraggableState { delta ->
                             val newHeight = currentSheetHeightPx - delta
-                            currentSheetHeightPx = newHeight.coerceIn(minSheetHeightPx, maxHeightPx * 0.8f) // Max 80%
+                            currentSheetHeightPx =
+                                newHeight.coerceIn(minSheetHeightPx, maxHeightPx * 0.8f) // Max 80%
                         }
                     ),
                 contentAlignment = Alignment.Center
@@ -89,7 +90,10 @@ fun DraggableMyIssuesSection(
                     modifier = Modifier
                         .width(40.dp)
                         .height(4.dp)
-                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), shape = MaterialTheme.shapes.small)
+                        .background(
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                            shape = MaterialTheme.shapes.small
+                        )
                 )
                 Row(
                     modifier = Modifier

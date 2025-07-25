@@ -1,7 +1,7 @@
 package com.example.viewboard.backend.dataLayout
 
 import com.google.firebase.firestore.DocumentId
-import com.example.viewboard.backend.util.Timestamp
+import com.example.viewboard.backend.time.Timestamp
 
 /**
  * @property id the id of the project
@@ -13,7 +13,7 @@ import com.example.viewboard.backend.util.Timestamp
  * @property startTS the start timestamp of the project
  * @property deadlineTS the deadline timestamp of the project
  */
-data class ProjectLayout (
+data class ProjectLayout(
     @DocumentId
     var id: String = "",
     var name: String = "",

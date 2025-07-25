@@ -28,12 +28,11 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 
-
 @Composable
 fun MonthCalendar(
     year: Int,
     month: Int,
-    issues: List<OffsetDateTime> ,
+    issues: List<OffsetDateTime>,
     modifier: Modifier = Modifier,
     selectedDate: LocalDate? = null,
     onDateSelected: (LocalDate) -> Unit = {}
@@ -88,7 +87,7 @@ fun MonthCalendar(
 
         items(allDates) { date ->
             val isCurrent = date.monthValue == safeMonth
-            val issueCount = issues.count { it.toLocalDate()  == date }
+            val issueCount = issues.count { it.toLocalDate() == date }
             val isTodayDate = date == today
             val isSelected = date == selectedDate
 
