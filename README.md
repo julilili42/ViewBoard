@@ -1,74 +1,65 @@
-# ViewBoard – Zentrale Issue-Verwaltung für Teams
+# ViewBoard — Centralized Issue Management for Teams
 
-## 🚀 Projektüberblick
+## 🚀 Project Overview
 
-**ViewBoard** ist eine Android-App zur effizienten Verwaltung von Aufgaben (Issues) in privaten oder geschäftlichen Projektteams. Die App bietet eine klare Struktur, Benachrichtigungen und anpassbare Ansichten für unterschiedliche Nutzerbedürfnisse.
+ViewBoard is an Android app for streamlined issue management in private and business project teams. It provides a clear structure, notifications, and configurable views for different user needs.
+
+---
+
+## 📱 Screenshots
+
+| Home & My Issues | Projects View | Timetable |
+| --- | --- | --- |
+| <img src="https://github.com/user-attachments/assets/fbd42f5f-0806-4d26-b474-7bd4b32a95cf" width="300"> | <img src="https://github.com/user-attachments/assets/77262025-6ca8-48be-8624-5148964f0117" width="300"> | <img src="https://github.com/user-attachments/assets/28188556-a777-4eac-963b-61a67e248653" width="300"> |
+
+
+
 
 ---
 ## 📥 APK
 
-Die Debug‑APK für dieses Projekt liegt im Ordner `/apk`:
+The debug APK is located at:
 
 ```bash
 /apk/app-debug.apk
 ```
 
-Zur Installation auf einem verbundenen Gerät oder Emulator:
+Install on a connected device or emulator:
 
 ```bash
 adb install -r apk/app-debug.apk
 ```
 ---
 
-📌 Zusammenarbeit
-
-- Entwicklung: `develop`
-- Releases & Abgaben: `main`
-- Neue Features: `feature/<name>`
-- Commit-Messages: Nutzt Prefixes wie `[feature]`, `[refactor]`, `[fix]`
----
-
-## 🎯 Zielgruppe und Konzept
-
-- **Private und geschäftliche Projektteams**
-- Zentrale Verwaltung aller Aufgaben
-- **Skalierbarkeit** durch konfigurierbare Views
-- Trennung zwischen **globalen** (teamweiten) und **persönlichen** Issues
-
+🎯 Target Users & Concept
+- Private and business project teams
+- Centralized management of all issues
+- Scalable via configurable views
+- Separation of global (team-wide) and personal issues
+  
 ---
 
 ## 🛠️ Minimum Viable Product (MVP)
 
 | Feature | Beschreibung |
 |--------|--------------|
-| ✅ Issue-Management | Erstellen, Bearbeiten und Löschen von Issues |
-| ✅ Labeling | Kategorisierung von Issues über Labels |
-| ✅ Filterfunktion | Filter z. B. nach Deadlines |
-| ✅ Nutzer­authentifizierung | Login-System für Benutzer |
-| ✅ Benachrichtigungen | Hinweise bei neuen Issues & bevorstehenden Deadlines |
-| ✅ Globale & persönliche Issues | Trennung von Team- und Einzelaufgaben |
-
----
-
-## 🌟 Zusätzliche Features (geplant)
-
-| Feature | Beschreibung |
-|--------|--------------|
-| 💬 Kommentarfunktion | Kommentare zu jedem Issue |
-| 📅 Meilenstein-Tracking | Planung und Fortschritt wichtiger Projektziele |
-| 📧 E-Mail-Benachrichtigungen | Optional bei Aktivitäten oder Deadlines |
-| 📈 Fortschrittsanzeige | Visualisiertes Progress-Widget pro Projekt oder Meilenstein |
+| ✅ Issue management | Create, edit, and delete issues |
+| ✅ Labeling | Categorize issues with labels |
+| ✅ Filtering | e.g., by deadlines |
+| ✅ User authentication | Sign-in for users |
+| ✅ Notifications | Alerts for new issues & upcoming deadlines |
+| ✅ Global & personal issues | Separate team vs. individual tasks |
 
 ---
 
 ## 📦 Technologie
 
 - **Android (Kotlin)**
-- **Firebase** für Authentifizierung, Datenbank und Push
+- **Firebase** for authentication, database, and push notifications
 - **Jetpack Compose** 
 
 ---
 
-## 📄 Lizenz
+## 📄 License
 
-Dieses Projekt steht unter der **MIT-Lizenz**. Siehe [LICENSE](./LICENSE) für Details.
+This project is released under the MIT License. See [LICENSE](./LICENSE) for details.
